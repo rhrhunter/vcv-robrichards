@@ -1,0 +1,23 @@
+{
+  "slug": "robrich",
+  "name": "robrich",
+  "version": "1.0.0",
+  "license": "proprietary",
+  "brand": "robrich",
+  "author": "Rob Richards",
+  "authorEmail": "",
+  "authorUrl": "",
+  "pluginUrl": "",
+  "manualUrl": "",
+  "sourceUrl": "",
+  "donateUrl": "",
+  "changelogUrl": "",
+  "modules": [
+    {
+      "slug": "darkworld",
+      "name": "darkworld",
+      "description": "",
+      "tags": []
+    }
+  ]
+}
