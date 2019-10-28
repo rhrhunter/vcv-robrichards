@@ -1,2 +1,4 @@
 # vcv-robrichards
-VCV Plugins by RobRichards
+Simple VCV Plugins by RobRichards
+
+
