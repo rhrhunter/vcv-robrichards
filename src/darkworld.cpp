@@ -16,6 +16,8 @@ struct Darkworld : Module {
                  ROUTING_PARAM,
                  WORLD_PROGRAM_PARAM,
                  MIDI_CHANNEL_PARAM,
+                 BYPASS_DARK_PARAM,
+                 BYPASS_WORLD_PARAM,
                  NUM_PARAMS
   };
   enum InputIds  {
@@ -36,12 +38,12 @@ struct Darkworld : Module {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // main knob parameters
-    configParam(DECAY_PARAM, 0.f, 127.f, 0.f, "");
-    configParam(MIX_PARAM, 0.f, 127.f, 0.f, "");
-    configParam(DWELL_PARAM, 0.f, 127.f, 0.f, "");
-    configParam(MODIFY_PARAM, 0.f, 127.f, 0.f, "");
-    configParam(TONE_PARAM, 0.f, 127.f, 0.f, "");
-    configParam(PRE_DELAY_PARAM, 0.f, 127.f, 0.f, "");
+    configParam(DECAY_PARAM, 0.f, 127.f, 0.f, "Decay");
+    configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
+    configParam(DWELL_PARAM, 0.f, 127.f, 0.f, "Dwell");
+    configParam(MODIFY_PARAM, 0.f, 127.f, 0.f, "Modify");
+    configParam(TONE_PARAM, 0.f, 127.f, 0.f, "Tone");
+    configParam(PRE_DELAY_PARAM, 0.f, 127.f, 0.f, "Pre-Delay");
 
     // three way switches
     // 0.0f is top position
@@ -51,6 +53,9 @@ struct Darkworld : Module {
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 2.f, "MIDI Channel");
+
+    // bypass buttons
+    configParam(BYPASS_DARK_PARAM, 0.f, 1.f, 0.f, "Bypass Dark");
 
     // DeviceIds start counting from 0, not 1
     midi_out.setDeviceId(3);
@@ -121,6 +126,20 @@ struct Darkworld : Module {
       pre_delay = pre_delay_cv;
     }
 
+    int enable_dark = (int) floor(params[BYPASS_DARK_PARAM].getValue());
+    int enable_world = (int) floor(params[BYPASS_WORLD_PARAM].getValue());
+
+    int bypass;
+    if (enable_world && enable_dark) {
+      bypass = 127;
+    } else if (!enable_world && enable_dark) {
+      bypass = 85;
+    } else if (enable_world && !enable_dark) {
+      bypass = 45;
+    } else {
+      bypass = 0;
+    }
+    
     // assign values from knobs (or cv)
     midi_out.setValue(decay, 14);
     midi_out.setValue(mix, 15);
@@ -134,6 +153,8 @@ struct Darkworld : Module {
     midi_out.setValue(route_prog, 22);
     midi_out.setValue(world_prog, 23);
 
+    // bypass the dark and/or world channels
+    midi_out.setValue(bypass, 103);
   }
 };
 
@@ -165,11 +186,15 @@ struct DarkworldWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 65)), module, Darkworld::TONE_INPUT));
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, Darkworld::PRE_DELAY_INPUT));
 
-    // switches
+    // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, Darkworld::DARK_PROGRAM_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, Darkworld::ROUTING_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Darkworld::WORLD_PROGRAM_PARAM));
 
+    // bypass switches
+    addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 115)), module, Darkworld::BYPASS_DARK_PARAM));
+    addParam(createParamCentered<CBAButton>(mm2px(Vec(50, 115)), module, Darkworld::BYPASS_WORLD_PARAM));
+    
     // midi configuration displays
     addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();

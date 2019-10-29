@@ -21,6 +21,14 @@ namespace rack {
     }
   };
 
+  struct CBAButton : app::SvgSwitch {
+    CBAButton() {
+      momentary = false;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));
+    }
+  };
+  
   struct MidiChannelDisplay : TransparentWidget {
     int *value;
     void *module;
