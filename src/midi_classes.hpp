@@ -6,7 +6,7 @@ using namespace std;
 
 namespace rack {
 
-struct RRMidiOutput : midi::Output {
+  struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
   int lastMidiCCValues[128];
   int midi_device_id;
   int midi_channel;
