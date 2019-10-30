@@ -29,16 +29,25 @@ namespace rack {
     }
   };
 
-  struct CBAButton : app::SvgSwitch {
-    CBAButton() {
+  struct CBAButtonGreen : app::SvgSwitch {
+    CBAButtonGreen() {
+      momentary = false;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_3.svg")));
+    }
+  };
+
+  
+  struct CBAButtonRed : app::SvgSwitch {
+    CBAButtonRed() {
       momentary = false;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));
     }
   };
 
-  struct CBAMomentaryButton : app::SvgSwitch {
-    CBAMomentaryButton() {
+  struct CBAMomentaryButtonRed : app::SvgSwitch {
+    CBAMomentaryButtonRed() {
       momentary = true;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));

@@ -193,7 +193,7 @@ struct MoodWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Mood::LOOP_PROGRAM_PARAM));
 
     // bypass switches
-    addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
+    addParam(createParamCentered<CBAButtonGreen>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
     addParam(createParamCentered<CBAButtonRedGreen>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays

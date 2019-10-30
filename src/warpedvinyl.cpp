@@ -222,8 +222,8 @@ struct WarpedVinylWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, WarpedVinyl::TAP_DIVISION_PARAM));
 
     // bypass switches & tap tempo
-    addParam(createParamCentered<CBAMomentaryButton>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
-    addParam(createParamCentered<CBAButton>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
+    addParam(createParamCentered<CBAMomentaryButtonRed>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
+    addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, WarpedVinyl::MIDI_CHANNEL_PARAM));
