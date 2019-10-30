@@ -24,6 +24,12 @@
       "name": "warpedvinyl",
       "description": "MIDI Implementation for Chase Bliss Warped Vinyl Hifi",
       "tags": ["midi", "fx", "warped"]
-    }    
+    },
+    {
+      "slug": "mood",
+      "name": "mood",
+      "description": "MIDI Implementation for Chase Bliss MOOD",
+      "tags": ["midi", "fx", "mood"]
+    }        
   ]
 }

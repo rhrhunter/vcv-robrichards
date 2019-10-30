@@ -162,7 +162,7 @@ struct Darkworld : Module {
 struct DarkworldWidget : ModuleWidget {
   DarkworldWidget(Darkworld* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/core.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_blank.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
