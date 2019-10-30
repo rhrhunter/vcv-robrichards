@@ -55,7 +55,8 @@ struct Darkworld : Module {
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 2.f, "MIDI Channel");
 
     // bypass buttons
-    configParam(BYPASS_DARK_PARAM, 0.f, 1.f, 0.f, "Bypass Dark");
+    configParam(BYPASS_DARK_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Dark");
+    configParam(BYPASS_WORLD_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass World");    
 
     // DeviceIds start counting from 0, not 1
     midi_out.setDeviceId(3);

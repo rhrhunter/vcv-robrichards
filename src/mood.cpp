@@ -55,8 +55,8 @@ struct Mood : Module {
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 5.f, "MIDI Channel");
 
     // bypass buttons
-    configParam(BYPASS_BLOOD_PARAM, 0.f, 1.f, 0.f, "Bypass Blood");
-    configParam(BYPASS_LOOP_PARAM, 0.f, 1.f, 0.f, "Bypass Loop");
+    configParam(BYPASS_BLOOD_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Blood");
+    configParam(BYPASS_LOOP_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Loop");
 
     // DeviceIds start counting from 0, not 1
     midi_out.setDeviceId(3);
