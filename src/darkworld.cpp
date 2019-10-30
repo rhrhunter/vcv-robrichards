@@ -139,7 +139,7 @@ struct Darkworld : Module {
     } else {
       bypass = 0;
     }
-    
+
     // assign values from knobs (or cv)
     midi_out.setValue(decay, 14);
     midi_out.setValue(mix, 15);
@@ -162,7 +162,7 @@ struct Darkworld : Module {
 struct DarkworldWidget : ModuleWidget {
   DarkworldWidget(Darkworld* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/core.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -194,7 +194,7 @@ struct DarkworldWidget : ModuleWidget {
     // bypass switches
     addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 118)), module, Darkworld::BYPASS_DARK_PARAM));
     addParam(createParamCentered<CBAButton>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
-    
+
     // midi configuration displays
     addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();

@@ -1,10 +1,10 @@
 {
-  "slug": "robrich",
-  "name": "robrich",
+  "slug": "RobRichards",
+  "name": "RobRichards",
   "version": "1.0.0",
-  "license": "proprietary",
-  "brand": "robrich",
-  "author": "Rob Richards",
+  "license": "GPLv3",
+  "brand": "RobRichards",
+  "author": "RobRichards",
   "authorEmail": "",
   "authorUrl": "",
   "pluginUrl": "",
@@ -16,8 +16,14 @@
     {
       "slug": "darkworld",
       "name": "darkworld",
-      "description": "",
-      "tags": []
-    }
+      "description": "MIDI Implementation for Chase Bliss Darkworld",
+      "tags": ["midi", "fx", "dark"]
+    },
+    {
+      "slug": "warpedvinyl",
+      "name": "warpedvinyl",
+      "description": "MIDI Implementation for Chase Bliss Warped Vinyl Hifi",
+      "tags": ["midi", "fx", "warped"]
+    }    
   ]
 }
