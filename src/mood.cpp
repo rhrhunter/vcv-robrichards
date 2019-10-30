@@ -56,7 +56,7 @@ struct Mood : Module {
 
     // bypass buttons
     configParam(BYPASS_BLOOD_PARAM, 0.f, 1.f, 0.f, "Bypass Blood");
-    configParam(BYPASS_LOOP_PARAM, 0.f, 1.f, 0.f, "Bypass Loop");    
+    configParam(BYPASS_LOOP_PARAM, 0.f, 1.f, 0.f, "Bypass Loop");
 
     // DeviceIds start counting from 0, not 1
     midi_out.setDeviceId(3);
@@ -194,7 +194,7 @@ struct MoodWidget : ModuleWidget {
 
     // bypass switches
     addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
-    addParam(createParamCentered<CBAButton>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
+    addParam(createParamCentered<CBAButtonRedGreen>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, Mood::MIDI_CHANNEL_PARAM));

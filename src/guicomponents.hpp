@@ -21,6 +21,14 @@ namespace rack {
     }
   };
 
+  struct CBAButtonRedGreen : app::SvgSwitch {
+    CBAButtonRedGreen() {
+      momentary = false;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_3.svg")));
+    }
+  };
+
   struct CBAButton : app::SvgSwitch {
     CBAButton() {
       momentary = false;
