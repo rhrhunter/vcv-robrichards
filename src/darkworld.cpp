@@ -47,9 +47,9 @@ struct Darkworld : Module {
 
     // three way switches
     // 0.0f is top position
-    configParam(DARK_PROGRAM_PARAM, 0.0f, 2.0f, 1.0f, "Dark Program");
-    configParam(ROUTING_PARAM, 0.0f, 2.0f, 1.0f, "Routing Mode");
-    configParam(WORLD_PROGRAM_PARAM, 0.0f, 2.0f, 1.0f, "World Program");
+    configParam(DARK_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Dark Program");
+    configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Routing Mode");
+    configParam(WORLD_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "World Program");
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 2.f, "MIDI Channel");
@@ -79,9 +79,9 @@ struct Darkworld : Module {
     int pre_delay = (int) floor(params[PRE_DELAY_PARAM].getValue() + 0.5);
 
     // switch values
-    int dark_prog = (int) floor(params[DARK_PROGRAM_PARAM].getValue() + 1);
-    int route_prog = (int) floor(params[ROUTING_PARAM].getValue() + 1);
-    int world_prog = (int) floor(params[WORLD_PROGRAM_PARAM].getValue() + 1);
+    int dark_prog = (int) floor(params[DARK_PROGRAM_PARAM].getValue());
+    int route_prog = (int) floor(params[ROUTING_PARAM].getValue());
+    int world_prog = (int) floor(params[WORLD_PROGRAM_PARAM].getValue());
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[DECAY_INPUT].isConnected()) {

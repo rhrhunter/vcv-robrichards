@@ -80,9 +80,9 @@ struct Mood : Module {
     int modify_loop = (int) floor(params[MODIFY_LOOP_PARAM].getValue() + 0.5);
 
     // switch values
-    int blood_prog = (int) floor(params[BLOOD_PROGRAM_PARAM].getValue() + 1);
-    int route_prog = (int) floor(params[ROUTING_PARAM].getValue() + 1);
-    int loop_prog = (int) floor(params[LOOP_PROGRAM_PARAM].getValue() + 1);
+    int blood_prog = (int) floor(params[BLOOD_PROGRAM_PARAM].getValue());
+    int route_prog = (int) floor(params[ROUTING_PARAM].getValue());
+    int loop_prog = (int) floor(params[LOOP_PROGRAM_PARAM].getValue());
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[TIME_INPUT].isConnected()) {
