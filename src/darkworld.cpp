@@ -47,9 +47,9 @@ struct Darkworld : Module {
 
     // three way switches
     // 0.0f is top position
-    configParam(DARK_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Dark Program");
-    configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Routing Mode");
-    configParam(WORLD_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "World Program");
+    configParam(DARK_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Dark Program (Mod, Shim, Black)");
+    configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Routing Mode (Parallel, D>>W, W>>D)");
+    configParam(WORLD_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "World Program (Hall, Plate, Spring)");
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 2.f, "MIDI Channel");

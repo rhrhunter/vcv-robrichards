@@ -47,9 +47,9 @@ struct Mood : Module {
 
     // three way switches
     // 1.0f is top position
-    configParam(BLOOD_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Blood Program");
-    configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Routing Mode");
-    configParam(LOOP_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Loop Program");
+    configParam(BLOOD_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Blood Program (Reverb, Delay, Slip)");
+    configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Blood Routing (In, Loop+In, Loop)");
+    configParam(LOOP_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Loop Program (Env, Tape, Stretch)");
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 5.f, "MIDI Channel");

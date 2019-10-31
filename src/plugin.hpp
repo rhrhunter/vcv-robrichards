@@ -10,3 +10,5 @@ extern Plugin* pluginInstance;
 extern Model* modelDarkworld;
 extern Model* modelWarpedVinyl;
 extern Model* modelMood;
+extern Model* modelGenerationLoss;
+extern Model* modelThermae;

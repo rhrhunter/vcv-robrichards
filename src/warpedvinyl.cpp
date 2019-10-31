@@ -50,7 +50,7 @@ struct WarpedVinyl : Module {
 
     // 6 way switches
     // 0.0f is top position
-    configParam(TAP_DIVISION_PARAM, 0.0f, 5.0f, 0.0f, "Tap Divisions");
+    configParam(TAP_DIVISION_PARAM, 0.0f, 5.0f, 0.0f, "Tap Divisions (1,2,4,3,6,8)");
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 3.f, "MIDI Channel");
@@ -217,7 +217,8 @@ struct WarpedVinylWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, WarpedVinyl::WARP_INPUT));
 
     // clock port
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 80)), module, WarpedVinyl::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 100)), module, WarpedVinyl::CLOCK_INPUT));
+    
     // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, WarpedVinyl::TAP_DIVISION_PARAM));
 

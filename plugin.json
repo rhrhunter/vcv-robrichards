@@ -16,20 +16,32 @@
     {
       "slug": "darkworld",
       "name": "darkworld",
-      "description": "MIDI Implementation for Chase Bliss Darkworld",
-      "tags": ["midi", "fx", "dark"]
+      "description": "VCV MIDI Implementation for Chase Bliss Darkworld",
+      "tags": ["midi", "fx", "darkworld", "reverb"]
     },
     {
       "slug": "warpedvinyl",
       "name": "warpedvinyl",
-      "description": "MIDI Implementation for Chase Bliss Warped Vinyl Hifi",
-      "tags": ["midi", "fx", "warped"]
+      "description": "VCV MIDI Implementation for Chase Bliss Warped Vinyl Hifi",
+      "tags": ["midi", "fx", "warpedvinyl", "chorus", "vibrato"]
     },
     {
       "slug": "mood",
       "name": "mood",
-      "description": "MIDI Implementation for Chase Bliss MOOD",
-      "tags": ["midi", "fx", "mood"]
-    }        
+      "description": "VCV MIDI Implementation for Chase Bliss MOOD",
+      "tags": ["midi", "fx", "mood", "looper"]
+    },
+    {
+      "slug": "genloss",
+      "name": "genloss",
+      "description": "VCV MIDI Implementation for Chase Bliss Generation Loss",
+      "tags": ["midi", "fx", "genloss", "lofi"]
+    },
+    {
+      "slug": "thermae",
+      "name": "thermae",
+      "description": "VCV MIDI Implementation for Chase Bliss Thermae",
+      "tags": ["midi", "fx", "thermae", "delay", "pitch shift"]
+    }                
   ]
 }
