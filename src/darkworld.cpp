@@ -30,7 +30,11 @@ struct Darkworld : Module {
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
-  enum LightIds  { NUM_LIGHTS };
+  enum LightIds  {
+                  DARK_LIGHT,
+                  WORLD_LIGHT,
+                  NUM_LIGHTS
+  };
 
   RRMidiOutput midi_out;
 
@@ -132,12 +136,28 @@ struct Darkworld : Module {
 
     int bypass;
     if (enable_world && enable_dark) {
+      // world LED red (on)
+      // dark LED red (on)
+      lights[WORLD_LIGHT].setBrightness(1.f);
+      lights[DARK_LIGHT].setBrightness(1.f);
       bypass = 127;
     } else if (!enable_world && enable_dark) {
+      // world LED off
+      // dark LED red (on)
+      lights[WORLD_LIGHT].setBrightness(0.f);
+      lights[DARK_LIGHT].setBrightness(1.f);
       bypass = 85;
     } else if (enable_world && !enable_dark) {
+      // world LED red (on)
+      // dark LED off
+      lights[WORLD_LIGHT].setBrightness(1.f);
+      lights[DARK_LIGHT].setBrightness(0.f);
       bypass = 45;
     } else {
+      // world LED off
+      // dark LED off
+      lights[WORLD_LIGHT].setBrightness(0.f);
+      lights[DARK_LIGHT].setBrightness(0.f);
       bypass = 0;
     }
 
@@ -193,8 +213,11 @@ struct DarkworldWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Darkworld::WORLD_PROGRAM_PARAM));
 
     // bypass switches
-    addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(15, 118)), module, Darkworld::BYPASS_DARK_PARAM));
-    addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, Darkworld::DARK_LIGHT));
+    addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 118)), module, Darkworld::BYPASS_DARK_PARAM));
+
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Darkworld::WORLD_LIGHT));
+    addParam(createParamCentered<CBAButton>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));

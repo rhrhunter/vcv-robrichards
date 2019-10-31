@@ -45,10 +45,10 @@ struct Thermae : Module {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // main knob parameters
-    configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
-    configParam(LPF_PARAM, 0.f, 127.f, 64.f, "Lpf");
+    configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix (Wet/Dry)");
+    configParam(LPF_PARAM, 0.f, 127.f, 64.f, "LPF (Low Pass Filter)");
     configParam(REGEN_PARAM, 0.f, 127.f, 0.f, "Regen");
-    configParam(GLIDE_PARAM, 0.f, 127.f, 0.f, "GLIDE");
+    configParam(GLIDE_PARAM, 0.f, 127.f, 0.f, "Glide");
     configParam(INT1_PARAM, 0.f, 127.f, 64.f, "Int1");
     configParam(INT2_PARAM, 0.f, 127.f, 64.f, "Int2");
 

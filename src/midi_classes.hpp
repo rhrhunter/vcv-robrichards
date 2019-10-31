@@ -61,7 +61,7 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
       return false;
     }
     lastMidiCCValues[cc] = value;
-    INFO("Setting cc:%d to value:%d", cc, value);
+    //INFO("Setting cc:%d to value:%d", cc, value);
 
     // CC
     midi::Message m;
