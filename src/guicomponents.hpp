@@ -39,7 +39,7 @@ namespace rack {
   struct CBAButtonGreen : app::SvgSwitch {
     CBAButtonGreen() {
       momentary = false;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_3.svg")));
     }
   };
@@ -47,7 +47,7 @@ namespace rack {
   struct CBAButtonRed : app::SvgSwitch {
     CBAButtonRed() {
       momentary = false;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
     }
   };
@@ -55,18 +55,34 @@ namespace rack {
   struct CBAButton : app::SvgSwitch {
     CBAButton() {
       momentary = false;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
     }
   };
 
   struct CBAMomentaryButtonRed : app::SvgSwitch {
     CBAMomentaryButtonRed() {
       momentary = true;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
     }
   };
+  
+  struct CBAMomentaryButtonGrey : app::SvgSwitch {
+    CBAMomentaryButtonGrey() {
+      momentary = true;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));      
+    }    
+  };
 
+  struct CBAButtonGrey : app::SvgSwitch {
+    CBAButtonGrey() {
+      momentary = false;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+    }    
+  };
+  
   struct MidiChannelDisplay : TransparentWidget {
     int *value;
     void *module;

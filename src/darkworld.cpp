@@ -214,10 +214,10 @@ struct DarkworldWidget : ModuleWidget {
 
     // bypass switches
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, Darkworld::DARK_LIGHT));
-    addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 118)), module, Darkworld::BYPASS_DARK_PARAM));
+    addParam(createParamCentered<CBAButtonGrey>(mm2px(Vec(15, 118)), module, Darkworld::BYPASS_DARK_PARAM));
 
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Darkworld::WORLD_LIGHT));
-    addParam(createParamCentered<CBAButton>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
+    addParam(createParamCentered<CBAButtonGrey>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));
