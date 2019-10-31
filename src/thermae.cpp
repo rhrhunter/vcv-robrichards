@@ -262,7 +262,7 @@ struct ThermaeWidget : ModuleWidget {
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Thermae::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();
     mcd->box.pos = Vec(50, 285);
-    mcd->box.size = Vec(50, 20);
+    mcd->box.size = Vec(32, 20);
     mcd->value = &((module->midi_out).midi_channel);
     mcd->module = (void *) module;
     addChild(mcd);

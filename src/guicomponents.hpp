@@ -101,18 +101,18 @@ namespace rack {
 
       std::string to_display = std::to_string(st);
 
-      while(to_display.length()<3) to_display = ' ' + to_display;
+      while(to_display.length()<2) to_display = ' ' + to_display;
 
       Vec textPos = Vec(6.0f, 17.0f);
 
       NVGcolor textColor = nvgRGB(0xdf, 0xd2, 0x2c);
       nvgFillColor(args.vg, nvgTransRGBA(textColor, 16));
-      nvgText(args.vg, textPos.x, textPos.y, "~~~", NULL);
+      nvgText(args.vg, textPos.x, textPos.y, "~~", NULL);
 
       textColor = nvgRGB(0xda, 0xe9, 0x29);
 
       nvgFillColor(args.vg, nvgTransRGBA(textColor, 16));
-      nvgText(args.vg, textPos.x, textPos.y, "\\\\\\", NULL);
+      nvgText(args.vg, textPos.x, textPos.y, "\\\\", NULL);
 
 
       textColor = nvgRGB(0xfb, 0x00, 0x00);
