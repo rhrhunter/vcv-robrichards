@@ -157,7 +157,6 @@ struct Thermae : Module {
       if (start_blinking) {
         curr_rate_sec = next_blink_sec - this_time_sec;
         curr_rate_usec = next_blink_usec - this_time_usec;
-        double rate_s = curr_rate_sec + (curr_rate_usec / 1000000);
       }
 
     } else if (tap_tempo) {
