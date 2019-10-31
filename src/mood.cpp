@@ -172,12 +172,12 @@ struct MoodWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 15)), module, Mood::TIME_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 15)), module, Mood::MIX_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 15)), module, Mood::LENGTH_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 50)), module, Mood::MODIFY_BLOOD_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 50)), module, Mood::CLOCK_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 50)), module, Mood::MODIFY_LOOP_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, Mood::TIME_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, Mood::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, Mood::LENGTH_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, Mood::MODIFY_BLOOD_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, Mood::CLOCK_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, Mood::MODIFY_LOOP_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, Mood::TIME_INPUT));
@@ -197,7 +197,7 @@ struct MoodWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonRedGreen>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, Mood::MIDI_CHANNEL_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Mood::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();
     mcd->box.pos = Vec(50, 285);
     mcd->box.size = Vec(50, 20);

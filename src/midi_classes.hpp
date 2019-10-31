@@ -22,13 +22,13 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     for (int n = 0; n < 128; n++) {
       lastMidiCCValues[n] = -1;
     }
-    MidiGenerator::reset();    
+    MidiGenerator::reset();
   }
 
   void onMessage(midi::Message message) override {
     midi::Output::sendMessage(message);
   }
-  
+
   void setDeviceId(int id) override {
     // only update the channel if it changed
     if (midi_device_id != id) {

@@ -17,8 +17,8 @@ struct Thermae : Module {
                  L_TOGGLE_PARAM,
                  M_TOGGLE_PARAM,
                  R_TOGGLE_PARAM,
-                 HOLD_PARAM,
-                 SLOWDOWN_PARAM,
+                 HOLD_MODE_PARAM,
+                 SLOWDOWN_MODE_PARAM,
                  MIDI_CHANNEL_PARAM,
                  BYPASS_PARAM,
                  TAP_TEMPO_PARAM,
@@ -46,21 +46,21 @@ struct Thermae : Module {
 
     // main knob parameters
     configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
-    configParam(LPF_PARAM, 0.f, 127.f, 0.f, "Lpf");
+    configParam(LPF_PARAM, 0.f, 127.f, 64.f, "Lpf");
     configParam(REGEN_PARAM, 0.f, 127.f, 0.f, "Regen");
     configParam(GLIDE_PARAM, 0.f, 127.f, 0.f, "GLIDE");
-    configParam(INT1_PARAM, 0.f, 127.f, 0.f, "Int1");
-    configParam(INT2_PARAM, 0.f, 127.f, 0.f, "Int2");
+    configParam(INT1_PARAM, 0.f, 127.f, 64.f, "Int1");
+    configParam(INT2_PARAM, 0.f, 127.f, 64.f, "Int2");
 
     // 3 way switches
     // 1.0f is top position
     configParam(L_TOGGLE_PARAM, 1.0f, 3.0f, 2.0f, "Pre-delay (Quarter Note, Dotted Eighth Note, Eighth Note)");
     configParam(M_TOGGLE_PARAM, 1.0f, 3.0f, 2.0f, "Int1 delay (Quarter Note, Dotted Eighth Note, Eighth Note)");
-    configParam(R_TOGGLE_PARAM, 1.0f, 3.0f, 2.0f, "Int2 delay (Quarter Note, Dotted Eighth Note, Eighth Note");    
+    configParam(R_TOGGLE_PARAM, 1.0f, 3.0f, 2.0f, "Int2 delay (Quarter Note, Dotted Eighth Note, Eighth Note");
 
     // 2 way switches
-    configParam(HOLD_PARAM, 0.f, 127.0f, 0.0f, "Hold Mode (Self Oscillation)");
-    configParam(SLOWDOWN_PARAM, 0.f, 127.0f, 0.0f, "Slowdown Mode");
+    configParam(HOLD_MODE_PARAM, 0.f, 1.f, 0.f, "Hold Mode (Self Oscillation)");
+    configParam(SLOWDOWN_MODE_PARAM, 0.f, 1.f, 0.f, "Slowdown Mode");
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 4.f, "MIDI Channel");
@@ -90,6 +90,37 @@ struct Thermae : Module {
     else
       midi_out.setChannel(channel);
 
+    // handle a clock message
+    if (inputs[CLOCK_INPUT].isConnected()) {
+      bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
+      midi_out.setClock(clock);
+    }
+
+    // determine if tap tempo has been pressed
+    int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
+
+    // if the tap tempo button was pressed, force a midi message to be sent
+    if (can_tap_tempo && tap_tempo) {
+      // we are allowing tap tempo actions and they tapped the tempo button
+      midi_out.lastMidiCCValues[93] = -1;
+      midi_out.setValue(1, 93);
+      can_tap_tempo = false;
+
+      // take a time stamp of the last tap tempo that was performed
+      gettimeofday(&last_tap_tempo_time, NULL);
+    } else if (tap_tempo) {
+      // they wanted to do a tap tempo, but they did it too fast.
+      // calculate if we are allowed to tap next time
+      struct timeval ctime;
+      gettimeofday(&ctime, NULL);
+
+      // calculate if enough time has elapsed
+      double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
+        (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
+      if (elapsed > 0.05)
+        can_tap_tempo = true;
+    }
+
     // knob values
     int mix = (int) floor(params[MIX_PARAM].getValue() + 0.5);
     int lpf = (int) floor(params[LPF_PARAM].getValue() + 0.5);
@@ -101,12 +132,16 @@ struct Thermae : Module {
     // 3way switch values (1,2,3)
     int l_toggle = (int) floor(params[L_TOGGLE_PARAM].getValue());
     int m_toggle = (int) floor(params[M_TOGGLE_PARAM].getValue());
-    int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());    
+    int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());
 
     // 2way switch values (0,127)
-    int slowdown_mode = (int) floor(params[SLOWDOWN_PARAM].getValue());
-    int hold_mode = (int) floor(params[HOLD_PARAM].getValue());    
-    
+    int slowdown_mode = (int) floor(params[SLOWDOWN_MODE_PARAM].getValue());
+    int hold_mode = (int) floor(params[HOLD_MODE_PARAM].getValue());
+    if (slowdown_mode > 0)
+      slowdown_mode = 127;
+    if (hold_mode > 0)
+      hold_mode = 127;
+
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[MIX_INPUT].isConnected()) {
       int mix_cv = (int) floor((inputs[MIX_INPUT].getVoltage() * 16.9f));
@@ -158,12 +193,6 @@ struct Thermae : Module {
     else
       bypass = 0;
 
-    // handle a clock message
-    if (inputs[CLOCK_INPUT].isConnected()) {
-      bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
-      midi_out.setClock(clock);
-    }
-
     // assign values from knobs (or cv)
     midi_out.setValue(mix, 14);
     midi_out.setValue(lpf, 15);
@@ -174,40 +203,15 @@ struct Thermae : Module {
 
     // assign values from switches
     midi_out.setValue(l_toggle, 21);
-    midi_out.setValue(m_toggle, 21);
-    midi_out.setValue(r_toggle, 23);    
+    midi_out.setValue(m_toggle, 22);
+    midi_out.setValue(r_toggle, 23);
 
-    // enable/disable hold and slowdown mode
-    midi_out.setValue(hold_mode, 24);    
+    // enable/disable hold mode and/or slowdown mode
+    midi_out.setValue(hold_mode, 24);
     midi_out.setValue(slowdown_mode, 25);
-    
+
     // enable or bypass the pedal
     midi_out.setValue(bypass, 102);
-
-    // determine if tap tempo has been pressed
-    int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
-
-    // if the tap tempo button was pressed, force a midi message to be sent
-    if (can_tap_tempo && tap_tempo) {
-      // we are allowing tap tempo actions and they tapped the tempo button
-      midi_out.lastMidiCCValues[93] = -1;
-      midi_out.setValue(1, 93);
-      can_tap_tempo = false;
-
-      // take a time stamp of the last tap tempo that was performed
-      gettimeofday(&last_tap_tempo_time, NULL);
-    } else if (tap_tempo) {
-      // they wanted to do a tap tempo, but they did it too fast.
-      // calculate if we are allowed to tap next time
-      struct timeval ctime;
-      gettimeofday(&ctime, NULL);
-
-      // calculate if enough time has elapsed
-      double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
-        (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
-      if (elapsed > 0.05)
-        can_tap_tempo = true;
-    }
   }
 };
 
@@ -223,12 +227,12 @@ struct ThermaeWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 15)), module, Thermae::MIX_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 15)), module, Thermae::LPF_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 15)), module, Thermae::REGEN_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 50)), module, Thermae::GLIDE_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 50)), module, Thermae::INT1_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 50)), module, Thermae::INT2_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, Thermae::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, Thermae::LPF_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, Thermae::REGEN_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, Thermae::GLIDE_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, Thermae::INT1_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, Thermae::INT2_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, Thermae::MIX_INPUT));
@@ -246,12 +250,16 @@ struct ThermaeWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, Thermae::M_TOGGLE_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Thermae::R_TOGGLE_PARAM));
 
+    // slowdown mode toggle and hold mode toggle
+    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(46, 90)), module, Thermae::SLOWDOWN_MODE_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(54, 90)), module, Thermae::HOLD_MODE_PARAM));
+
     // bypass switches & tap tempo
     addParam(createParamCentered<CBAMomentaryButtonRed>(mm2px(Vec(15, 118)), module, Thermae::TAP_TEMPO_PARAM));
     addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, Thermae::MIDI_CHANNEL_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Thermae::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();
     mcd->box.pos = Vec(50, 285);
     mcd->box.size = Vec(50, 20);

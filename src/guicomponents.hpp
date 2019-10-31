@@ -7,9 +7,9 @@ using namespace std;
 
 namespace rack {
 
-  struct DWKnob : RoundKnob {
-    DWKnob() {
-      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/dwknob.svg")));
+  struct CBAKnob : RoundKnob {
+    CBAKnob() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_1.svg")));
     }
   };
 
@@ -21,36 +21,43 @@ namespace rack {
     }
   };
 
+  struct CBASwitchTwoWay : app::SvgSwitch {
+    CBASwitchTwoWay() {
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_toggle_0.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_toggle_2.svg")));
+    }
+  };
+
   struct CBAButtonRedGreen : app::SvgSwitch {
     CBAButtonRedGreen() {
       momentary = false;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_3.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_3.svg")));
     }
   };
 
   struct CBAButtonGreen : app::SvgSwitch {
     CBAButtonGreen() {
       momentary = false;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_3.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_3.svg")));
     }
   };
 
-  
+
   struct CBAButtonRed : app::SvgSwitch {
     CBAButtonRed() {
       momentary = false;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
     }
   };
 
   struct CBAMomentaryButtonRed : app::SvgSwitch {
     CBAMomentaryButtonRed() {
       momentary = true;
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_1.svg")));
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/dwbutton_2.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
     }
   };
 
@@ -60,7 +67,7 @@ namespace rack {
     std::shared_ptr<Font> font;
 
     MidiChannelDisplay() {
-      font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
+      font = APP->window->loadFont(asset::plugin(pluginInstance, "res/midi_font.ttf"));
     };
 
     void draw(const DrawArgs &args) override {
@@ -102,7 +109,7 @@ namespace rack {
       nvgText(args.vg, textPos.x, textPos.y, "\\\\\\", NULL);
 
 
-      textColor = nvgRGB(0x28, 0xb0, 0xf3);
+      textColor = nvgRGB(0xfb, 0x00, 0x00);
       nvgFillColor(args.vg, textColor);
       nvgText(args.vg, textPos.x, textPos.y, to_display.c_str(), NULL);
     }

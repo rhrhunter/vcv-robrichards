@@ -56,7 +56,7 @@ struct Darkworld : Module {
 
     // bypass buttons
     configParam(BYPASS_DARK_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Dark");
-    configParam(BYPASS_WORLD_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass World");    
+    configParam(BYPASS_WORLD_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass World");
 
     // DeviceIds start counting from 0, not 1
     midi_out.setDeviceId(3);
@@ -172,12 +172,12 @@ struct DarkworldWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 15)), module, Darkworld::DECAY_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 15)), module, Darkworld::MIX_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 15)), module, Darkworld::DWELL_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 50)), module, Darkworld::MODIFY_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 50)), module, Darkworld::TONE_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 50)), module, Darkworld::PRE_DELAY_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, Darkworld::DECAY_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, Darkworld::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, Darkworld::DWELL_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, Darkworld::MODIFY_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, Darkworld::TONE_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, Darkworld::PRE_DELAY_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, Darkworld::DECAY_INPUT));
@@ -197,7 +197,7 @@ struct DarkworldWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();
     mcd->box.pos = Vec(50, 285);
     mcd->box.size = Vec(50, 20);

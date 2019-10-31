@@ -80,6 +80,37 @@ struct WarpedVinyl : Module {
     else
       midi_out.setChannel(channel);
 
+    // handle a clock message
+    if (inputs[CLOCK_INPUT].isConnected()) {
+      bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
+      midi_out.setClock(clock);
+    }
+
+    // determine if tap tempo has been pressed
+    int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
+
+    // if the tap tempo button was pressed, force a midi message to be sent
+    if (can_tap_tempo && tap_tempo) {
+      // we are allowing tap tempo actions and they tapped the tempo button
+      midi_out.lastMidiCCValues[93] = -1;
+      midi_out.setValue(1, 93);
+      can_tap_tempo = false;
+
+      // take a time stamp of the last tap tempo that was performed
+      gettimeofday(&last_tap_tempo_time, NULL);
+    } else if (tap_tempo) {
+      // they wanted to do a tap tempo, but they did it too fast.
+      // calculate if we are allowed to tap next time
+      struct timeval ctime;
+      gettimeofday(&ctime, NULL);
+
+      // calculate if enough time has elapsed, if so allow a tap tempo next time
+      double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
+        (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
+      if (elapsed > 0.05)
+        can_tap_tempo = true;
+    }
+
     // knob values
     int tone = (int) floor(params[TONE_PARAM].getValue() + 0.5);
     int lag = (int) floor(params[LAG_PARAM].getValue() + 0.5);
@@ -142,12 +173,6 @@ struct WarpedVinyl : Module {
     else
       bypass = 0;
 
-    // handle a clock message
-    if (inputs[CLOCK_INPUT].isConnected()) {
-      bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
-      midi_out.setClock(clock);
-    }
-
     // assign values from knobs (or cv)
     midi_out.setValue(tone, 14);
     midi_out.setValue(lag, 15);
@@ -161,31 +186,6 @@ struct WarpedVinyl : Module {
 
     // enable or bypass the pedal
     midi_out.setValue(bypass, 102);
-
-    // determine if tap tempo has been pressed
-    int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
-    
-    // if the tap tempo button was pressed, force a midi message to be sent
-    if (can_tap_tempo && tap_tempo) {
-      // we are allowing tap tempo actions and they tapped the tempo button
-      midi_out.lastMidiCCValues[93] = -1;
-      midi_out.setValue(1, 93);
-      can_tap_tempo = false;
-
-      // take a time stamp of the last tap tempo that was performed
-      gettimeofday(&last_tap_tempo_time, NULL);
-    } else if (tap_tempo) {
-      // they wanted to do a tap tempo, but they did it too fast.
-      // calculate if we are allowed to tap next time
-      struct timeval ctime;
-      gettimeofday(&ctime, NULL);
-
-      // calculate if enough time has elapsed
-      double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
-        (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
-      if (elapsed > 0.05)
-        can_tap_tempo = true;
-    }
   }
 };
 
@@ -201,12 +201,12 @@ struct WarpedVinylWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 15)), module, WarpedVinyl::TONE_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 15)), module, WarpedVinyl::LAG_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 15)), module, WarpedVinyl::MIX_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 50)), module, WarpedVinyl::RPM_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(30, 50)), module, WarpedVinyl::DEPTH_PARAM));
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(50, 50)), module, WarpedVinyl::WARP_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, WarpedVinyl::TONE_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, WarpedVinyl::LAG_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, WarpedVinyl::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, WarpedVinyl::RPM_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, WarpedVinyl::DEPTH_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, WarpedVinyl::WARP_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, WarpedVinyl::TONE_INPUT));
@@ -218,7 +218,7 @@ struct WarpedVinylWidget : ModuleWidget {
 
     // clock port
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 100)), module, WarpedVinyl::CLOCK_INPUT));
-    
+
     // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, WarpedVinyl::TAP_DIVISION_PARAM));
 
@@ -227,7 +227,7 @@ struct WarpedVinylWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<DWKnob>(mm2px(Vec(10, 100)), module, WarpedVinyl::MIDI_CHANNEL_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, WarpedVinyl::MIDI_CHANNEL_PARAM));
     MidiChannelDisplay *mcd = new MidiChannelDisplay();
     mcd->box.pos = Vec(50, 285);
     mcd->box.size = Vec(50, 20);
