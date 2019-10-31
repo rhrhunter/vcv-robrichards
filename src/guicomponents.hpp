@@ -44,12 +44,18 @@ namespace rack {
     }
   };
 
-
   struct CBAButtonRed : app::SvgSwitch {
     CBAButtonRed() {
       momentary = false;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
+    }
+  };
+
+  struct CBAButton : app::SvgSwitch {
+    CBAButton() {
+      momentary = false;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
     }
   };
 

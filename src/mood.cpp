@@ -30,7 +30,11 @@ struct Mood : Module {
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
-  enum LightIds  { NUM_LIGHTS };
+  enum LightIds  {
+                  BLOOD_LIGHT,
+                  ENUMS(LOOP_LIGHT, 2),
+                  NUM_LIGHTS
+  };
 
   RRMidiOutput midi_out;
 
@@ -130,17 +134,6 @@ struct Mood : Module {
     int enable_blood = (int) floor(params[BYPASS_BLOOD_PARAM].getValue());
     int enable_loop = (int) floor(params[BYPASS_LOOP_PARAM].getValue());
 
-    int bypass;
-    if (enable_loop && enable_blood) {
-      bypass = 127;
-    } else if (!enable_loop && enable_blood) {
-      bypass = 85;
-    } else if (enable_loop && !enable_blood) {
-      bypass = 45;
-    } else {
-      bypass = 0;
-    }
-
     // assign values from knobs (or cv)
     midi_out.setValue(time, 14);
     midi_out.setValue(mix, 15);
@@ -152,7 +145,44 @@ struct Mood : Module {
     // assign values from switches
     midi_out.setValue(blood_prog, 21);
     midi_out.setValue(route_prog, 22);
-    midi_out.setValue(loop_prog, 23);
+
+    // if the loop program is changed, the loop
+    // section gets bypassed, so force a bypass
+    if (midi_out.setValue(loop_prog, 23)) {
+      enable_loop = 0;
+      params[BYPASS_LOOP_PARAM].setValue(0.f);
+    }
+
+    int bypass;
+    if (enable_loop && enable_blood) {
+      bypass = 127;
+      // turn loop LED green (on)
+      // turn blood LED green
+      lights[LOOP_LIGHT + 0].setBrightness(1.f);
+      lights[LOOP_LIGHT + 1].setBrightness(0.f);
+      lights[BLOOD_LIGHT].setBrightness(1.f);
+    } else if (!enable_loop && enable_blood) {
+      bypass = 85;
+      // turn loop LED red (off)
+      // turn blood LED on (green)
+      lights[LOOP_LIGHT + 0].setBrightness(0.f);
+      lights[LOOP_LIGHT + 1].setBrightness(1.f);
+      lights[BLOOD_LIGHT].setBrightness(1.f);
+    } else if (enable_loop && !enable_blood) {
+      bypass = 45;
+      // turn loop LED green (on)
+      // turn blood LED off
+      lights[LOOP_LIGHT + 0].setBrightness(1.f);
+      lights[LOOP_LIGHT + 1].setBrightness(0.f);
+      lights[BLOOD_LIGHT].setBrightness(0.f);
+    } else {
+      bypass = 0;
+      // turn loop LED red (off)
+      // turn blood LED off
+      lights[LOOP_LIGHT + 0].setBrightness(0.f);
+      lights[LOOP_LIGHT + 1].setBrightness(1.f);
+      lights[BLOOD_LIGHT].setBrightness(0.f);
+    }
 
     // bypass the blood and/or loop channels
     midi_out.setValue(bypass, 103);
@@ -192,9 +222,11 @@ struct MoodWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, Mood::ROUTING_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Mood::LOOP_PROGRAM_PARAM));
 
-    // bypass switches
-    addParam(createParamCentered<CBAButtonGreen>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
-    addParam(createParamCentered<CBAButtonRedGreen>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
+    // bypass switches and Leds
+    addChild(createLightCentered<LargeLight<GreenLight>>(mm2px(Vec(15.0, 109)), module, Mood::BLOOD_LIGHT));
+    addParam(createParamCentered<CBAButton>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
+    addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(46, 109)), module, Mood::LOOP_LIGHT));
+    addParam(createParamCentered<CBAButton>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Mood::MIDI_CHANNEL_PARAM));

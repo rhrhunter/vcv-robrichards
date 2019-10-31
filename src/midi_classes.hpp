@@ -56,9 +56,9 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     }
   }
 
-  void setValue(int value, int cc) {
+  bool setValue(int value, int cc) {
     if (value == lastMidiCCValues[cc]) {
-      return;
+      return false;
     }
     lastMidiCCValues[cc] = value;
     INFO("Setting cc:%d to value:%d", cc, value);
@@ -69,6 +69,7 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     m.setNote(cc);
     m.setValue(value);
     sendMessage(m);
+    return true;
   }
 };
 
