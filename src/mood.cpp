@@ -1,4 +1,4 @@
-4#include "plugin.hpp"
+#include "plugin.hpp"
 
 #include <math.h>
 #include "guicomponents.hpp"
