@@ -38,6 +38,8 @@ struct WarpedVinyl : Module {
   };
 
   RRMidiOutput midi_out;
+
+  // tap tempo variables≈o
   bool can_tap_tempo;
   struct timeval last_tap_tempo_time;
   double next_blink_usec;
@@ -46,7 +48,8 @@ struct WarpedVinyl : Module {
   bool first_tap;
   double curr_rate_sec;
   double curr_rate_usec;
-  float rateLimiterPhase = 0.f;
+  float next_brightness;
+  int curr_tap_tempo_light_color;
 
   WarpedVinyl() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -89,6 +92,10 @@ struct WarpedVinyl : Module {
     first_tap = false;
     curr_rate_sec = 0;
     curr_rate_usec = 0;
+    next_brightness = 0.f;
+
+    // tap tempo light colors: 1=red, 0=green
+    curr_tap_tempo_light_color = 1;
   }
 
   void process(const ProcessArgs& args) override {
@@ -127,8 +134,8 @@ struct WarpedVinyl : Module {
       double this_time_sec = (double) ctime.tv_sec;
 
       // calculate the next time we need to blink
-      next_blink_usec = (this_time_usec - last_time_usec) + this_time_usec;
-      next_blink_sec = (this_time_sec - last_time_sec) + this_time_sec;
+      next_blink_usec = ((this_time_usec - last_time_usec) / 2) + this_time_usec;
+      next_blink_sec = ((this_time_sec - last_time_sec) / 2) + this_time_sec;
 
       // update the current time
       last_tap_tempo_time = ctime;
@@ -140,6 +147,9 @@ struct WarpedVinyl : Module {
       } else if (!start_blinking && first_tap) {
         // second tap occurred, start blinking the light
         start_blinking = true;
+
+        // the next time we blink, turn on the light
+        next_brightness = 1.f;
       }
 
       // calculate the blink rate based on the last two taps
@@ -155,10 +165,10 @@ struct WarpedVinyl : Module {
       struct timeval ctime;
       gettimeofday(&ctime, NULL);
 
-      // calculate if enough time has elapsed
+      // calculate if enough time has elapsed (>100ms)
       double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
         (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
-      if (elapsed > 0.2)
+      if (elapsed > 0.1)
         can_tap_tempo = true;
     } else if (start_blinking) {
       // no tap tempo button was clicked and we have a stored "next blink time",
@@ -175,26 +185,16 @@ struct WarpedVinyl : Module {
       double elapsed = (double) ((elapsed_sec) + (elapsed_usec / 1000000));
       if (elapsed > 0) {
         // flash the tap tempo light
-        lights[TAP_TEMPO_LIGHT].setBrightness(1.f);
+        lights[TAP_TEMPO_LIGHT].setBrightness(next_brightness);
+
+        // flip the brightness value for the next blink
+        next_brightness = !next_brightness;
 
         // store the current time for the next blink, add rate and subtract the amount we went over
         // because this accounts for the drift we may have experienced.
         next_blink_usec = (this_time_usec + curr_rate_usec) - elapsed_usec;
         next_blink_sec = (this_time_sec + curr_rate_sec) - elapsed_sec;
 
-        // slightly scale back the rate limit phase so that we dont shut off the light
-        // too quickly
-        rateLimiterPhase -= 0.15f;
-      }
-      else {
-        // we dont need to flash the light yet,
-        // allow the light to stay on for at least 300ms if it is already on
-        const float rateLimiterPeriod = 0.3f;
-        rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
-        if (rateLimiterPhase >= 1.f) {
-          rateLimiterPhase -= 1.f;
-          lights[TAP_TEMPO_LIGHT].setBrightness(0.f);
-        }
       }
     }
 

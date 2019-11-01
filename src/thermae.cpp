@@ -42,6 +42,8 @@ struct Thermae : Module {
   };
 
   RRMidiOutput midi_out;
+
+  // tap tempo variables
   bool can_tap_tempo;
   struct timeval last_tap_tempo_time;
   double next_blink_usec;
@@ -50,8 +52,8 @@ struct Thermae : Module {
   bool first_tap;
   double curr_rate_sec;
   double curr_rate_usec;
-  float rateLimiterPhase = 0.f;
-  int curr_tap_tempo_light_color = 1;
+  float next_brightness;
+  int curr_tap_tempo_light_color;
 
   Thermae() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -100,6 +102,10 @@ struct Thermae : Module {
     first_tap = false;
     curr_rate_sec = 0;
     curr_rate_usec = 0;
+    next_brightness = 0.f;
+
+    // tap tempo light colors: 1=red, 0=green
+    curr_tap_tempo_light_color = 1;
   }
 
   void process(const ProcessArgs& args) override {
@@ -152,8 +158,8 @@ struct Thermae : Module {
       double this_time_sec = (double) ctime.tv_sec;
 
       // calculate the next time we need to blink
-      next_blink_usec = (this_time_usec - last_time_usec) + this_time_usec;
-      next_blink_sec = (this_time_sec - last_time_sec) + this_time_sec;
+      next_blink_usec = ((this_time_usec - last_time_usec) / 2) + this_time_usec;
+      next_blink_sec = ((this_time_sec - last_time_sec) / 2) + this_time_sec;
 
       // update the current time
       last_tap_tempo_time = ctime;
@@ -165,6 +171,9 @@ struct Thermae : Module {
       } else if (!start_blinking && first_tap) {
         // second tap occurred, start blinking the light
         start_blinking = true;
+
+        // the next time we blink, turn on the light
+        next_brightness = 1.f;
       }
 
       // calculate the blink rate based on the last two taps
@@ -180,10 +189,10 @@ struct Thermae : Module {
       struct timeval ctime;
       gettimeofday(&ctime, NULL);
 
-      // calculate if enough time has elapsed
+      // calculate if enough time has elapsed (>100ms)
       double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
         (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
-      if (elapsed > 0.2)
+      if (elapsed > 0.1)
         can_tap_tempo = true;
     } else if (start_blinking) {
       // no tap tempo button was clicked and we have a stored "next blink time",
@@ -199,29 +208,20 @@ struct Thermae : Module {
       double elapsed_sec = (double) (this_time_sec - next_blink_sec);
       double elapsed = (double) ((elapsed_sec) + (elapsed_usec / 1000000));
       if (elapsed > 0) {
-        // flash the tap tempo light (turn off the other color in case its still on)
-        lights[TAP_TEMPO_LIGHT + curr_tap_tempo_light_color].setBrightness(1.f);
+        // flash the tap tempo light for the active color
+        lights[TAP_TEMPO_LIGHT + curr_tap_tempo_light_color].setBrightness(next_brightness);
+
+        // flip the brightness value for the next blink
+        next_brightness = !next_brightness;
+
+        // turn off the other color in case it is still on
         lights[TAP_TEMPO_LIGHT + (!curr_tap_tempo_light_color)].setBrightness(0.f);
 
-        // store the current time for the next blink, add rate and subtract the amount we went over
-        // because this accounts for the drift we may have experienced.
+        // store the current time for the next blink, add rate and
+        // subtract the amount we went over because this accounts for
+        // the drift we may have experienced.
         next_blink_usec = (this_time_usec + curr_rate_usec) - elapsed_usec;
         next_blink_sec = (this_time_sec + curr_rate_sec) - elapsed_sec;
-
-        // slightly scale back the rate limit phase so that we dont shut off the light
-        // too quickly
-        rateLimiterPhase -= 0.15f;
-      }
-      else {
-        // we dont need to flash the light yet,
-        // allow the light to stay on for at least 300ms if it is already on
-        const float rateLimiterPeriod = 0.3f;
-        rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
-        if (rateLimiterPhase >= 1.f) {
-          rateLimiterPhase -= 1.f;
-          lights[TAP_TEMPO_LIGHT + 0].setBrightness(0.f);
-          lights[TAP_TEMPO_LIGHT + 1].setBrightness(0.f);
-        }
       }
     }
 
