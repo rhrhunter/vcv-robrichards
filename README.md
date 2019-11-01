@@ -1,5 +1,6 @@
 # vcv-robrichards
-Simple VCV Plugins by RobRichards
+VCV Plugins by RobRichards
 
 ![RobRichards Plugins](plugins.png)
 
+Here you'll find unofficial Midi controller plugins for various ChaseBliss Pedals. Enjoy.
