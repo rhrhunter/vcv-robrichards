@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+4#include "plugin.hpp"
 
 #include <math.h>
 #include "guicomponents.hpp"
@@ -224,9 +224,9 @@ struct MoodWidget : ModuleWidget {
 
     // bypass switches and Leds
     addChild(createLightCentered<LargeLight<GreenLight>>(mm2px(Vec(15, 109)), module, Mood::BLOOD_LIGHT));
-    addParam(createParamCentered<CBAButtonGrey>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(46, 109)), module, Mood::LOOP_LIGHT));
-    addParam(createParamCentered<CBAButtonGrey>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Mood::MIDI_CHANNEL_PARAM));

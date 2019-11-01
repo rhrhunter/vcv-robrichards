@@ -36,7 +36,7 @@ struct Thermae : Module {
   };
   enum OutputIds { NUM_OUTPUTS };
   enum LightIds  {
-                  TAP_TEMPO_LIGHT,
+                  ENUMS(TAP_TEMPO_LIGHT, 2),
                   BYPASS_LIGHT,
                   NUM_LIGHTS
   };
@@ -51,6 +51,7 @@ struct Thermae : Module {
   double curr_rate_sec;
   double curr_rate_usec;
   float rateLimiterPhase = 0.f;
+  int curr_tap_tempo_light_color = 1;
 
   Thermae() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -114,6 +115,20 @@ struct Thermae : Module {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
       midi_out.setClock(clock);
     }
+
+    // 2way switch values (0,127)
+    int slowdown_mode = (int) floor(params[SLOWDOWN_MODE_PARAM].getValue());
+    int hold_mode = (int) floor(params[HOLD_MODE_PARAM].getValue());
+    if (slowdown_mode > 0) {
+      slowdown_mode = 127;
+      // entering slowdown mode makes the tap tempo light turn green
+      curr_tap_tempo_light_color = 0;
+    } else {
+      // disabling slowdown mode makes the tap tempo light turn red
+      curr_tap_tempo_light_color = 1;
+    }
+    if (hold_mode > 0)
+      hold_mode = 127;
 
     // determine if tap tempo has been pressed
     int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
@@ -184,8 +199,9 @@ struct Thermae : Module {
       double elapsed_sec = (double) (this_time_sec - next_blink_sec);
       double elapsed = (double) ((elapsed_sec) + (elapsed_usec / 1000000));
       if (elapsed > 0) {
-        // flash the tap tempo light
-        lights[TAP_TEMPO_LIGHT].setBrightness(1.f);
+        // flash the tap tempo light (turn off the other color in case its still on)
+        lights[TAP_TEMPO_LIGHT + curr_tap_tempo_light_color].setBrightness(1.f);
+        lights[TAP_TEMPO_LIGHT + (!curr_tap_tempo_light_color)].setBrightness(0.f);
 
         // store the current time for the next blink, add rate and subtract the amount we went over
         // because this accounts for the drift we may have experienced.
@@ -203,7 +219,8 @@ struct Thermae : Module {
         rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
         if (rateLimiterPhase >= 1.f) {
           rateLimiterPhase -= 1.f;
-          lights[TAP_TEMPO_LIGHT].setBrightness(0.f);
+          lights[TAP_TEMPO_LIGHT + 0].setBrightness(0.f);
+          lights[TAP_TEMPO_LIGHT + 1].setBrightness(0.f);
         }
       }
     }
@@ -220,14 +237,6 @@ struct Thermae : Module {
     int l_toggle = (int) floor(params[L_TOGGLE_PARAM].getValue());
     int m_toggle = (int) floor(params[M_TOGGLE_PARAM].getValue());
     int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());
-
-    // 2way switch values (0,127)
-    int slowdown_mode = (int) floor(params[SLOWDOWN_MODE_PARAM].getValue());
-    int hold_mode = (int) floor(params[HOLD_MODE_PARAM].getValue());
-    if (slowdown_mode > 0)
-      slowdown_mode = 127;
-    if (hold_mode > 0)
-      hold_mode = 127;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[MIX_INPUT].isConnected()) {
@@ -346,10 +355,10 @@ struct ThermaeWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(54, 90)), module, Thermae::HOLD_MODE_PARAM));
 
     // bypass switches & tap tempo
-    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, Thermae::TAP_TEMPO_LIGHT));
-    addParam(createParamCentered<CBAMomentaryButtonGrey>(mm2px(Vec(15, 118)), module, Thermae::TAP_TEMPO_PARAM));
+    addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Thermae::TAP_TEMPO_LIGHT));
+    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, Thermae::TAP_TEMPO_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Thermae::BYPASS_LIGHT));
-    addParam(createParamCentered<CBAButtonGrey>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
 
 
     // midi configuration displays

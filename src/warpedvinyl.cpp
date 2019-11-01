@@ -31,11 +31,22 @@ struct WarpedVinyl : Module {
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
-  enum LightIds  { NUM_LIGHTS };
+  enum LightIds  {
+                  TAP_TEMPO_LIGHT,
+                  BYPASS_LIGHT,
+                  NUM_LIGHTS
+  };
 
   RRMidiOutput midi_out;
   bool can_tap_tempo;
   struct timeval last_tap_tempo_time;
+  double next_blink_usec;
+  double next_blink_sec;
+  bool start_blinking;
+  bool first_tap;
+  double curr_rate_sec;
+  double curr_rate_usec;
+  float rateLimiterPhase = 0.f;
 
   WarpedVinyl() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -70,6 +81,14 @@ struct WarpedVinyl : Module {
 
     // get the current time, this is so we can keep throttle tap tempo messages
     gettimeofday(&last_tap_tempo_time, NULL);
+
+    // initialize the tap tempo LED blink measurements
+    next_blink_usec = 0;
+    next_blink_sec = 0;
+    start_blinking = false;
+    first_tap = false;
+    curr_rate_sec = 0;
+    curr_rate_usec = 0;
   }
 
   void process(const ProcessArgs& args) override {
@@ -96,19 +115,87 @@ struct WarpedVinyl : Module {
       midi_out.setValue(1, 93);
       can_tap_tempo = false;
 
-      // take a time stamp of the last tap tempo that was performed
-      gettimeofday(&last_tap_tempo_time, NULL);
+      // measure the amount of time from the previous tap tempo to this tap tempo.
+      // this will be the tap tempo rate (for the tap tempo LED).
+      double last_time_usec = (double) last_tap_tempo_time.tv_usec;
+      double last_time_sec = (double) last_tap_tempo_time.tv_sec;
+
+      // get a new measurement
+      struct timeval ctime;
+      gettimeofday(&ctime, NULL);
+      double this_time_usec = (double) ctime.tv_usec;
+      double this_time_sec = (double) ctime.tv_sec;
+
+      // calculate the next time we need to blink
+      next_blink_usec = (this_time_usec - last_time_usec) + this_time_usec;
+      next_blink_sec = (this_time_sec - last_time_sec) + this_time_sec;
+
+      // update the current time
+      last_tap_tempo_time = ctime;
+
+      // keep track of whether two taps have occurred so far
+      if (!start_blinking && !first_tap) {
+        // first tap occurred
+        first_tap = true;
+      } else if (!start_blinking && first_tap) {
+        // second tap occurred, start blinking the light
+        start_blinking = true;
+      }
+
+      // calculate the blink rate based on the last two taps
+      // if we were told to start blinking
+      if (start_blinking) {
+        curr_rate_sec = next_blink_sec - this_time_sec;
+        curr_rate_usec = next_blink_usec - this_time_usec;
+      }
+
     } else if (tap_tempo) {
       // they wanted to do a tap tempo, but they did it too fast.
       // calculate if we are allowed to tap next time
       struct timeval ctime;
       gettimeofday(&ctime, NULL);
 
-      // calculate if enough time has elapsed, if so allow a tap tempo next time
+      // calculate if enough time has elapsed
       double elapsed = (double)(ctime.tv_usec - last_tap_tempo_time.tv_usec) / 1000000 +
         (double)(ctime.tv_sec - last_tap_tempo_time.tv_sec);
-      if (elapsed > 0.05)
+      if (elapsed > 0.2)
         can_tap_tempo = true;
+    } else if (start_blinking) {
+      // no tap tempo button was clicked and we have a stored "next blink time",
+      // determine if we should blink the tempo light right now
+      struct timeval ctime;
+      gettimeofday(&ctime, NULL);
+
+      // if the current time is greater than the next blink time, flash the light.
+      // the next process iteration will turn it off
+      double this_time_usec = (double) ctime.tv_usec;
+      double this_time_sec = (double) ctime.tv_sec;
+      double elapsed_usec = (double) (this_time_usec - next_blink_usec);
+      double elapsed_sec = (double) (this_time_sec - next_blink_sec);
+      double elapsed = (double) ((elapsed_sec) + (elapsed_usec / 1000000));
+      if (elapsed > 0) {
+        // flash the tap tempo light
+        lights[TAP_TEMPO_LIGHT].setBrightness(1.f);
+
+        // store the current time for the next blink, add rate and subtract the amount we went over
+        // because this accounts for the drift we may have experienced.
+        next_blink_usec = (this_time_usec + curr_rate_usec) - elapsed_usec;
+        next_blink_sec = (this_time_sec + curr_rate_sec) - elapsed_sec;
+
+        // slightly scale back the rate limit phase so that we dont shut off the light
+        // too quickly
+        rateLimiterPhase -= 0.15f;
+      }
+      else {
+        // we dont need to flash the light yet,
+        // allow the light to stay on for at least 300ms if it is already on
+        const float rateLimiterPeriod = 0.3f;
+        rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
+        if (rateLimiterPhase >= 1.f) {
+          rateLimiterPhase -= 1.f;
+          lights[TAP_TEMPO_LIGHT].setBrightness(0.f);
+        }
+      }
     }
 
     // knob values
@@ -168,10 +255,14 @@ struct WarpedVinyl : Module {
     // bypass or enable the pedal
     int enable_pedal = (int) floor(params[BYPASS_PARAM].getValue());
     int bypass;
-    if (enable_pedal)
+    if (enable_pedal) {
+      // turn bypass light on (red)
+      lights[BYPASS_LIGHT].setBrightness(1.f);
       bypass = 127;
-    else
+    } else {
+      lights[BYPASS_LIGHT].setBrightness(0.f);
       bypass = 0;
+    }
 
     // assign values from knobs (or cv)
     midi_out.setValue(tone, 14);
@@ -223,8 +314,10 @@ struct WarpedVinylWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, WarpedVinyl::TAP_DIVISION_PARAM));
 
     // bypass switches & tap tempo
-    addParam(createParamCentered<CBAMomentaryButtonRed>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
-    addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, WarpedVinyl::TAP_TEMPO_LIGHT));
+    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, WarpedVinyl::BYPASS_LIGHT));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, WarpedVinyl::MIDI_CHANNEL_PARAM));

@@ -30,7 +30,11 @@ struct GenerationLoss : Module {
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
-  enum LightIds  { NUM_LIGHTS };
+  enum LightIds  {
+                  AUX_LIGHT,
+                  BYPASS_LIGHT,
+                  NUM_LIGHTS
+  };
 
   RRMidiOutput midi_out;
 
@@ -132,12 +136,28 @@ struct GenerationLoss : Module {
 
     int bypass;
     if (enable_pedal && enable_aux) {
+      // bypass LED red (on)
+      // aux LED red (on)
+      lights[BYPASS_LIGHT].setBrightness(1.f);
+      lights[AUX_LIGHT].setBrightness(1.f);
       bypass = 127;
     } else if (!enable_pedal && enable_aux) {
+      // bypass LED off
+      // aux LED red (on)
+      lights[BYPASS_LIGHT].setBrightness(0.f);
+      lights[AUX_LIGHT].setBrightness(1.f);
       bypass = 85;
     } else if (enable_pedal && !enable_aux) {
+      // bypass LED red (on)
+      // aux LED off
+      lights[BYPASS_LIGHT].setBrightness(1.f);
+      lights[AUX_LIGHT].setBrightness(0.f);
       bypass = 45;
     } else {
+      // bypass LED off
+      // aux LED off
+      lights[BYPASS_LIGHT].setBrightness(0.f);
+      lights[AUX_LIGHT].setBrightness(0.f);
       bypass = 0;
     }
 
@@ -193,8 +213,10 @@ struct GenerationLossWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, GenerationLoss::HISS_PARAM));
 
     // bypass switches
-    addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(15, 118)), module, GenerationLoss::BYPASS_AUX_PARAM));
-    addParam(createParamCentered<CBAButtonRed>(mm2px(Vec(46, 118)), module, GenerationLoss::BYPASS_PEDAL_PARAM));
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, GenerationLoss::AUX_LIGHT));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(15, 118)), module, GenerationLoss::BYPASS_AUX_PARAM));
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, GenerationLoss::BYPASS_LIGHT));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, GenerationLoss::BYPASS_PEDAL_PARAM));
 
     // midi configuration displays
     addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, GenerationLoss::MIDI_CHANNEL_PARAM));

@@ -66,23 +66,23 @@ namespace rack {
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
     }
   };
-  
-  struct CBAMomentaryButtonGrey : app::SvgSwitch {
-    CBAMomentaryButtonGrey() {
+
+  struct CBAMomentaryButtonGray : app::SvgSwitch {
+    CBAMomentaryButtonGray() {
       momentary = true;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
-      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));      
-    }    
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+    }
   };
 
-  struct CBAButtonGrey : app::SvgSwitch {
-    CBAButtonGrey() {
+  struct CBAButtonGray : app::SvgSwitch {
+    CBAButtonGray() {
       momentary = false;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
-    }    
+    }
   };
-  
+
   struct MidiChannelDisplay : TransparentWidget {
     int *value;
     void *module;
