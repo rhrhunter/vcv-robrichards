@@ -64,7 +64,7 @@ struct WarpedVinyl : Module {
 
     // 6 way switches
     // 0.0f is top position
-    configParam(TAP_DIVISION_PARAM, 0.0f, 5.0f, 0.0f, "Tap Divisions (1,2,4,3,6,8)");
+    configParam(TAP_DIVISION_PARAM, 0, 5, 0, "Tap Divisions (whole,half,quarter triplet,quarter,eight,sixteenth)");
 
     // midi configuration knobs
     configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 3.f, "MIDI Channel");
@@ -109,6 +109,10 @@ struct WarpedVinyl : Module {
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
+      // turn on the clock (if not on already)
+      midi_out.setValue(127, 51);
+
+      // send a clock message
       midi_out.setClock(clock);
     }
 
