@@ -3,7 +3,6 @@
 #include <math.h>
 #include "guicomponents.hpp"
 #include "midi_classes.hpp"
-
 #include <sys/time.h>
 
 struct Thermae : Module {
@@ -158,9 +157,18 @@ struct Thermae : Module {
       double this_time_usec = (double) ctime.tv_usec;
       double this_time_sec = (double) ctime.tv_sec;
 
-      // calculate the next time we need to blink
-      next_blink_usec = ((this_time_usec - last_time_usec) / 2) + this_time_usec;
-      next_blink_sec = ((this_time_sec - last_time_sec) / 2) + this_time_sec;
+      // calculate the next time we need to blink (dont allow slower than a 2s rate)
+      next_blink_usec = this_time_usec - last_time_usec;
+      if (next_blink_usec > 1000000)
+        next_blink_usec = 1000000;
+      next_blink_usec /= 2;
+      next_blink_usec += this_time_usec;
+
+      next_blink_sec = this_time_sec  - last_time_sec;
+      if (next_blink_sec > 2)
+        next_blink_sec = 2;
+      next_blink_sec /= 2;
+      next_blink_sec += this_time_sec;
 
       // update the current time
       last_tap_tempo_time = ctime;
