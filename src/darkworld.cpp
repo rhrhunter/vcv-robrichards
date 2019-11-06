@@ -37,6 +37,7 @@ struct Darkworld : Module {
   };
 
   RRMidiOutput midi_out;
+  float rate_limiter_phase = 0.f;
 
   Darkworld() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -75,62 +76,7 @@ struct Darkworld : Module {
     else
       midi_out.setChannel(channel);
 
-    // knob values
-    int decay = (int) floor(params[DECAY_PARAM].getValue() + 0.5);
-    int mix = (int) floor(params[MIX_PARAM].getValue() + 0.5);
-    int dwell = (int) floor(params[DWELL_PARAM].getValue() + 0.5);
-    int modify = (int) floor(params[MODIFY_PARAM].getValue() + 0.5);
-    int tone = (int) floor(params[TONE_PARAM].getValue() + 0.5);
-    int pre_delay = (int) floor(params[PRE_DELAY_PARAM].getValue() + 0.5);
-
-    // switch values
-    int dark_prog = (int) floor(params[DARK_PROGRAM_PARAM].getValue());
-    int route_prog = (int) floor(params[ROUTING_PARAM].getValue());
-    int world_prog = (int) floor(params[WORLD_PROGRAM_PARAM].getValue());
-
-    // read cv voltages and override values of knobs, use the knob value as a ceiling
-    if (inputs[DECAY_INPUT].isConnected()) {
-      int decay_cv = (int) floor((inputs[DECAY_INPUT].getVoltage() * 16.9f));
-      if (decay_cv > decay)
-        decay_cv = decay;
-      decay = decay_cv;
-    }
-
-    if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) floor((inputs[MIX_INPUT].getVoltage() * 16.9f));
-      if (mix_cv > mix)
-        mix_cv = mix;
-      mix = mix_cv;
-    }
-
-    if (inputs[DWELL_INPUT].isConnected()) {
-      int dwell_cv = (int) floor((inputs[DWELL_INPUT].getVoltage() * 16.9f));
-      if (dwell_cv > dwell)
-        dwell_cv = dwell;
-      dwell = dwell_cv;
-    }
-
-    if (inputs[TONE_INPUT].isConnected()) {
-      int tone_cv = (int) floor((inputs[TONE_INPUT].getVoltage() * 16.9f));
-      if (tone_cv > tone)
-        tone_cv = tone;
-      tone = tone_cv;
-    }
-
-    if (inputs[MODIFY_INPUT].isConnected()) {
-      int modify_cv = (int) floor((inputs[MODIFY_INPUT].getVoltage() * 16.9f));
-      if (modify_cv > modify)
-        modify_cv = modify;
-      modify = modify_cv;
-    }
-
-    if (inputs[PRE_DELAY_INPUT].isConnected()) {
-      int pre_delay_cv = (int) floor((inputs[PRE_DELAY_INPUT].getVoltage() * 16.9f));
-      if (pre_delay_cv > pre_delay)
-        pre_delay_cv = pre_delay;
-      pre_delay = pre_delay_cv;
-    }
-
+    // read the bypass button values
     int enable_dark = (int) floor(params[BYPASS_DARK_PARAM].getValue());
     int enable_world = (int) floor(params[BYPASS_WORLD_PARAM].getValue());
 
@@ -161,6 +107,66 @@ struct Darkworld : Module {
       bypass = 0;
     }
 
+    // bypass the dark and/or world channels
+    midi_out.setValue(bypass, 103);
+
+    // read the three-way switch values
+    int dark_prog = (int) floor(params[DARK_PROGRAM_PARAM].getValue());
+    int route_prog = (int) floor(params[ROUTING_PARAM].getValue());
+    int world_prog = (int) floor(params[WORLD_PROGRAM_PARAM].getValue());
+
+    // assign values from switches
+    midi_out.setValue(dark_prog, 21);
+    midi_out.setValue(route_prog, 22);
+    midi_out.setValue(world_prog, 23);
+
+    // apply rate limiting here so that we do not flood the
+    // system with midi messages caused by the CV inputs.
+    const float rate_limiter_period = 0.005f;
+    rate_limiter_phase += args.sampleTime / rate_limiter_period;
+    if (rate_limiter_phase >= 1.f) {
+      // reduce the phase and proceed
+      rate_limiter_phase -= 1.f;
+    } else {
+      // skip this process iteration
+      return;
+    }
+
+    // knob values
+    int decay = (int) std::round(params[DECAY_PARAM].getValue());
+    int mix = (int) std::round(params[MIX_PARAM].getValue());
+    int dwell = (int) std::round(params[DWELL_PARAM].getValue());
+    int modify = (int) std::round(params[MODIFY_PARAM].getValue());
+    int tone = (int) std::round(params[TONE_PARAM].getValue());
+    int pre_delay = (int) std::round(params[PRE_DELAY_PARAM].getValue());
+
+    // read cv voltages and override values of knobs,
+    // clamp down the cv value to be between 0 and the value of the knob
+    if (inputs[DECAY_INPUT].isConnected()) {
+      int decay_cv = (int) std::round(inputs[DECAY_INPUT].getVoltage()*2) / 10.f * 127;
+      decay = clamp(decay_cv, 0, decay);
+    }
+    if (inputs[MIX_INPUT].isConnected()) {
+      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      mix = clamp(mix_cv, 0, mix);
+    }
+    if (inputs[DWELL_INPUT].isConnected()) {
+      int dwell_cv = (int) std::round(inputs[DWELL_INPUT].getVoltage()*2) / 10.f * 127;
+      dwell = clamp(dwell_cv, 0, dwell);
+    }
+    if (inputs[TONE_INPUT].isConnected()) {
+      int tone_cv = (int) std::round(inputs[TONE_INPUT].getVoltage()*2) / 10.f * 127;
+      tone = clamp(tone_cv, 0, tone);
+    }
+    if (inputs[MODIFY_INPUT].isConnected()) {
+      int modify_cv = (int) std::round(inputs[MODIFY_INPUT].getVoltage()*2) / 10.f * 127;
+      modify = clamp(modify_cv, 0, modify);
+    }
+    if (inputs[PRE_DELAY_INPUT].isConnected()) {
+      int pre_delay_cv = (int) std::round(inputs[PRE_DELAY_INPUT].getVoltage()*2) / 10.f * 127;
+      pre_delay = clamp(pre_delay_cv, 0, pre_delay);
+    }
+
     // assign values from knobs (or cv)
     midi_out.setValue(decay, 14);
     midi_out.setValue(mix, 15);
@@ -168,14 +174,6 @@ struct Darkworld : Module {
     midi_out.setValue(modify, 17);
     midi_out.setValue(tone, 18);
     midi_out.setValue(pre_delay, 19);
-
-    // assign values from switches
-    midi_out.setValue(dark_prog, 21);
-    midi_out.setValue(route_prog, 22);
-    midi_out.setValue(world_prog, 23);
-
-    // bypass the dark and/or world channels
-    midi_out.setValue(bypass, 103);
   }
 };
 

@@ -37,6 +37,7 @@ struct GenerationLoss : Module {
   };
 
   RRMidiOutput midi_out;
+  float rate_limiter_phase = 0.f;
 
   GenerationLoss() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -75,62 +76,7 @@ struct GenerationLoss : Module {
     else
       midi_out.setChannel(channel);
 
-    // knob values
-    int wow = (int) floor(params[WOW_PARAM].getValue() + 0.5);
-    int wet = (int) floor(params[WET_PARAM].getValue() + 0.5);
-    int hp= (int) floor(params[HP_PARAM].getValue() + 0.5);
-    int flutter = (int) floor(params[FLUTTER_PARAM].getValue() + 0.5);
-    int gen = (int) floor(params[GEN_PARAM].getValue() + 0.5);
-    int lp = (int) floor(params[LP_PARAM].getValue() + 0.5);
-
-    // switch values
-    int aux_func = (int) floor(params[AUX_FUNC_PARAM].getValue());
-    int dry_func = (int) floor(params[DRY_PARAM].getValue());
-    int hiss_func = (int) floor(params[HISS_PARAM].getValue());
-
-    // read cv voltages and override values of knobs, use the knob value as a ceiling
-    if (inputs[WOW_INPUT].isConnected()) {
-      int wow_cv = (int) floor((inputs[WOW_INPUT].getVoltage() * 16.9f));
-      if (wow_cv > wow)
-        wow_cv = wow;
-      wow = wow_cv;
-    }
-
-    if (inputs[WET_INPUT].isConnected()) {
-      int wet_cv = (int) floor((inputs[WET_INPUT].getVoltage() * 16.9f));
-      if (wet_cv > wet)
-        wet_cv = wet;
-      wet = wet_cv;
-    }
-
-    if (inputs[HP_INPUT].isConnected()) {
-      int hp_cv = (int) floor((inputs[HP_INPUT].getVoltage() * 16.9f));
-      if (hp_cv > hp)
-        hp_cv = hp;
-      hp = hp_cv;
-    }
-
-    if (inputs[GEN_INPUT].isConnected()) {
-      int gen_cv = (int) floor((inputs[GEN_INPUT].getVoltage() * 16.9f));
-      if (gen_cv > gen)
-        gen_cv = gen;
-      gen = gen_cv;
-    }
-
-    if (inputs[FLUTTER_INPUT].isConnected()) {
-      int flutter_cv = (int) floor((inputs[FLUTTER_INPUT].getVoltage() * 16.9f));
-      if (flutter_cv > flutter)
-        flutter_cv = flutter;
-      flutter = flutter_cv;
-    }
-
-    if (inputs[LP_INPUT].isConnected()) {
-      int lp_cv = (int) floor((inputs[LP_INPUT].getVoltage() * 16.9f));
-      if (lp_cv > lp)
-        lp_cv = lp;
-      lp = lp_cv;
-    }
-
+    // read the bypass button values
     int enable_aux = (int) floor(params[BYPASS_AUX_PARAM].getValue());
     int enable_pedal = (int) floor(params[BYPASS_PEDAL_PARAM].getValue());
 
@@ -161,6 +107,65 @@ struct GenerationLoss : Module {
       bypass = 0;
     }
 
+    // bypass the aux function and/or pedal
+    midi_out.setValue(bypass, 103);
+
+    // read the three-way switch values
+    int aux_func = (int) floor(params[AUX_FUNC_PARAM].getValue());
+    int dry_func = (int) floor(params[DRY_PARAM].getValue());
+    int hiss_func = (int) floor(params[HISS_PARAM].getValue());
+
+    // assign values from switches
+    midi_out.setValue(aux_func, 21);
+    midi_out.setValue(dry_func, 22);
+    midi_out.setValue(hiss_func, 23);
+
+    // apply rate limiting here so that we do not flood the
+    // system with midi messages caused by the CV inputs.
+    const float rate_limiter_period = 0.005f;
+    rate_limiter_phase += args.sampleTime / rate_limiter_period;
+    if (rate_limiter_phase >= 1.f) {
+      // reduce the phase and proceed
+      rate_limiter_phase -= 1.f;
+    } else {
+      // skip this process iteration
+      return;
+    }
+
+    // knob values
+    int wow = (int) std::round(params[WOW_PARAM].getValue());
+    int wet = (int) std::round(params[WET_PARAM].getValue());
+    int hp= (int) std::round(params[HP_PARAM].getValue());
+    int flutter = (int) std::round(params[FLUTTER_PARAM].getValue());
+    int gen = (int) std::round(params[GEN_PARAM].getValue());
+    int lp = (int) std::round(params[LP_PARAM].getValue());
+
+    // read cv voltages and override values of knobs, use the knob value as a ceiling
+    if (inputs[WOW_INPUT].isConnected()) {
+      int wow_cv = (int) std::round(inputs[WOW_INPUT].getVoltage()*2) / 10.f * 127;
+      wow = clamp(wow_cv, 0, wow);
+    }
+    if (inputs[WET_INPUT].isConnected()) {
+      int wet_cv = (int) std::round(inputs[WET_INPUT].getVoltage()*2) / 10.f * 127;
+      wet = clamp(wet_cv, 0, wet);
+    }
+    if (inputs[HP_INPUT].isConnected()) {
+      int hp_cv = (int) std::round(inputs[HP_INPUT].getVoltage()*2) / 10.f * 127;
+      hp = clamp(hp_cv, 0, hp);
+    }
+    if (inputs[GEN_INPUT].isConnected()) {
+      int gen_cv = (int) std::round(inputs[GEN_INPUT].getVoltage()*2) / 10.f * 127;
+      gen = clamp(gen_cv, 0, gen);
+    }
+    if (inputs[FLUTTER_INPUT].isConnected()) {
+      int flutter_cv = (int) std::round(inputs[FLUTTER_INPUT].getVoltage()*2) / 10.f * 127;
+      flutter = clamp(flutter_cv, 0, flutter);
+    }
+    if (inputs[LP_INPUT].isConnected()) {
+      int lp_cv = (int) std::round(inputs[LP_INPUT].getVoltage()*2) / 10.f * 127;
+      lp = clamp(lp_cv, 0, lp);
+    }
+
     // assign values from knobs (or cv)
     midi_out.setValue(wow, 14);
     midi_out.setValue(wet, 15);
@@ -168,14 +173,6 @@ struct GenerationLoss : Module {
     midi_out.setValue(flutter, 17);
     midi_out.setValue(gen, 18);
     midi_out.setValue(lp, 19);
-
-    // assign values from switches
-    midi_out.setValue(aux_func, 21);
-    midi_out.setValue(dry_func, 22);
-    midi_out.setValue(hiss_func, 23);
-
-    // bypass the aux function and/or pedal
-    midi_out.setValue(bypass, 103);
   }
 };
 

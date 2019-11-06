@@ -37,6 +37,7 @@ struct Mood : Module {
   };
 
   RRMidiOutput midi_out;
+  float rate_limiter_phase = 0.f;
 
   Mood() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -75,72 +76,14 @@ struct Mood : Module {
     else
       midi_out.setChannel(channel);
 
-    // knob values
-    int time = (int) floor(params[TIME_PARAM].getValue() + 0.5);
-    int mix = (int) floor(params[MIX_PARAM].getValue() + 0.5);
-    int length = (int) floor(params[LENGTH_PARAM].getValue() + 0.5);
-    int modify_blood = (int) floor(params[MODIFY_BLOOD_PARAM].getValue() + 0.5);
-    int clock = (int) floor(params[CLOCK_PARAM].getValue() + 0.5);
-    int modify_loop = (int) floor(params[MODIFY_LOOP_PARAM].getValue() + 0.5);
+    // pedal bypass switches
+    int enable_blood = (int) floor(params[BYPASS_BLOOD_PARAM].getValue());
+    int enable_loop = (int) floor(params[BYPASS_LOOP_PARAM].getValue());
 
     // switch values
     int blood_prog = (int) floor(params[BLOOD_PROGRAM_PARAM].getValue());
     int route_prog = (int) floor(params[ROUTING_PARAM].getValue());
     int loop_prog = (int) floor(params[LOOP_PROGRAM_PARAM].getValue());
-
-    // read cv voltages and override values of knobs, use the knob value as a ceiling
-    if (inputs[TIME_INPUT].isConnected()) {
-      int time_cv = (int) floor((inputs[TIME_INPUT].getVoltage() * 16.9f));
-      if (time_cv > time)
-        time_cv = time;
-      time = time_cv;
-    }
-
-    if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) floor((inputs[MIX_INPUT].getVoltage() * 16.9f));
-      if (mix_cv > mix)
-        mix_cv = mix;
-      mix = mix_cv;
-    }
-
-    if (inputs[LENGTH_INPUT].isConnected()) {
-      int length_cv = (int) floor((inputs[LENGTH_INPUT].getVoltage() * 16.9f));
-      if (length_cv > length)
-        length_cv = length;
-      length = length_cv;
-    }
-
-    if (inputs[CLOCK_INPUT].isConnected()) {
-      int clock_cv = (int) floor((inputs[CLOCK_INPUT].getVoltage() * 16.9f));
-      if (clock_cv > clock)
-        clock_cv = clock;
-      clock = clock_cv;
-    }
-
-    if (inputs[MODIFY_BLOOD_INPUT].isConnected()) {
-      int modify_blood_cv = (int) floor((inputs[MODIFY_BLOOD_INPUT].getVoltage() * 16.9f));
-      if (modify_blood_cv > modify_blood)
-        modify_blood_cv = modify_blood;
-      modify_blood = modify_blood_cv;
-    }
-
-    if (inputs[MODIFY_LOOP_INPUT].isConnected()) {
-      int modify_loop_cv = (int) floor((inputs[MODIFY_LOOP_INPUT].getVoltage() * 16.9f));
-      if (modify_loop_cv > modify_loop)
-        modify_loop_cv = modify_loop;
-      modify_loop = modify_loop_cv;
-    }
-
-    int enable_blood = (int) floor(params[BYPASS_BLOOD_PARAM].getValue());
-    int enable_loop = (int) floor(params[BYPASS_LOOP_PARAM].getValue());
-
-    // assign values from knobs (or cv)
-    midi_out.setValue(time, 14);
-    midi_out.setValue(mix, 15);
-    midi_out.setValue(length, 16);
-    midi_out.setValue(modify_blood, 17);
-    midi_out.setValue(clock, 18);
-    midi_out.setValue(modify_loop, 19);
 
     // assign values from switches
     midi_out.setValue(blood_prog, 21);
@@ -186,6 +129,60 @@ struct Mood : Module {
 
     // bypass the blood and/or loop channels
     midi_out.setValue(bypass, 103);
+
+    // apply rate limiting here so that we do not flood the
+    // system with midi messages caused by the CV inputs.
+    const float rate_limiter_period = 0.005f;
+    rate_limiter_phase += args.sampleTime / rate_limiter_period;
+    if (rate_limiter_phase >= 1.f) {
+      // reduce the phase and proceed
+      rate_limiter_phase -= 1.f;
+    } else {
+      // skip this process iteration
+      return;
+    }
+
+    // knob values
+    int time = (int) std::round(params[TIME_PARAM].getValue());
+    int mix = (int) std::round(params[MIX_PARAM].getValue());
+    int length = (int) std::round(params[LENGTH_PARAM].getValue());
+    int modify_blood = (int) std::round(params[MODIFY_BLOOD_PARAM].getValue());
+    int clock = (int) std::round(params[CLOCK_PARAM].getValue());
+    int modify_loop = (int) std::round(params[MODIFY_LOOP_PARAM].getValue());
+
+    // read cv voltages and override values of knobs, use the knob value as a ceiling
+    if (inputs[TIME_INPUT].isConnected()) {
+      int time_cv = (int) std::round(inputs[TIME_INPUT].getVoltage()*2) / 10.f * 127;
+      time = clamp(time_cv, 0, time);
+    }
+    if (inputs[MIX_INPUT].isConnected()) {
+      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      mix = clamp(mix_cv, 0, mix);
+    }
+    if (inputs[LENGTH_INPUT].isConnected()) {
+      int length_cv = (int) std::round(inputs[LENGTH_INPUT].getVoltage()*2) / 10.f * 127;
+      length = clamp(length_cv, 0, length);
+    }
+    if (inputs[CLOCK_INPUT].isConnected()) {
+      int clock_cv = (int) std::round(inputs[CLOCK_INPUT].getVoltage()*2) / 10.f * 127;
+      clock = clamp(clock_cv, 0, clock);
+    }
+    if (inputs[MODIFY_BLOOD_INPUT].isConnected()) {
+      int modify_blood_cv = (int) std::round(inputs[MODIFY_BLOOD_INPUT].getVoltage()*2) / 10.f * 127;
+      modify_blood = clamp(modify_blood_cv, 0, modify_blood);
+    }
+    if (inputs[MODIFY_LOOP_INPUT].isConnected()) {
+      int modify_loop_cv = (int) std::round(inputs[MODIFY_LOOP_INPUT].getVoltage()*2) / 10.f * 127;
+      modify_loop = clamp(modify_loop_cv, 0, modify_loop);
+    }
+
+    // assign values from knobs (or cv)
+    midi_out.setValue(time, 14);
+    midi_out.setValue(mix, 15);
+    midi_out.setValue(length, 16);
+    midi_out.setValue(modify_blood, 17);
+    midi_out.setValue(clock, 18);
+    midi_out.setValue(modify_loop, 19);
   }
 };
 

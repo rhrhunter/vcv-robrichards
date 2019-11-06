@@ -50,7 +50,7 @@ struct WarpedVinyl : Module {
   double curr_rate_usec;
   float next_brightness;
   int curr_tap_tempo_light_color;
-
+  float rate_limiter_phase = 0.f;
   WarpedVinyl() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -198,62 +198,7 @@ struct WarpedVinyl : Module {
         // because this accounts for the drift we may have experienced.
         next_blink_usec = (this_time_usec + curr_rate_usec) - elapsed_usec;
         next_blink_sec = (this_time_sec + curr_rate_sec) - elapsed_sec;
-
       }
-    }
-
-    // knob values
-    int tone = (int) floor(params[TONE_PARAM].getValue() + 0.5);
-    int lag = (int) floor(params[LAG_PARAM].getValue() + 0.5);
-    int mix = (int) floor(params[MIX_PARAM].getValue() + 0.5);
-    int rpm = (int) floor(params[RPM_PARAM].getValue() + 0.5);
-    int depth = (int) floor(params[DEPTH_PARAM].getValue() + 0.5);
-    int warp = (int) floor(params[WARP_PARAM].getValue() + 0.5);
-
-    // left switch values (0,1,2,3,4,5)
-    int tap_division = (int) floor(params[TAP_DIVISION_PARAM].getValue());
-
-    // read cv voltages and override values of knobs, use the knob value as a ceiling
-    if (inputs[TONE_INPUT].isConnected()) {
-      int tone_cv = (int) floor((inputs[TONE_INPUT].getVoltage() * 16.9f));
-      if (tone_cv > tone)
-        tone_cv = tone;
-      tone = tone_cv;
-    }
-
-    if (inputs[LAG_INPUT].isConnected()) {
-      int lag_cv = (int) floor((inputs[LAG_INPUT].getVoltage() * 16.9f));
-      if (lag_cv > lag)
-        lag_cv = lag;
-      lag = lag_cv;
-    }
-
-    if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) floor((inputs[MIX_INPUT].getVoltage() * 16.9f));
-      if (mix_cv > mix)
-        mix_cv = mix;
-      mix = mix_cv;
-    }
-
-    if (inputs[RPM_INPUT].isConnected()) {
-      int rpm_cv = (int) floor((inputs[RPM_INPUT].getVoltage() * 16.9f));
-      if (rpm_cv > rpm)
-        rpm_cv = rpm;
-      rpm = rpm_cv;
-    }
-
-    if (inputs[DEPTH_INPUT].isConnected()) {
-      int depth_cv = (int) floor((inputs[DEPTH_INPUT].getVoltage() * 16.9f));
-      if (depth_cv > depth)
-        depth_cv = depth;
-      depth = depth_cv;
-    }
-
-    if (inputs[WARP_INPUT].isConnected()) {
-      int warp_cv = (int) floor((inputs[WARP_INPUT].getVoltage() * 16.9f));
-      if (warp_cv > warp)
-        warp_cv = warp;
-      warp = warp_cv;
     }
 
     // bypass or enable the pedal
@@ -268,6 +213,61 @@ struct WarpedVinyl : Module {
       bypass = 0;
     }
 
+    // enable or bypass the pedal
+    midi_out.setValue(bypass, 102);
+
+    // left switch values (0,1,2,3,4,5)
+    int tap_division = (int) floor(params[TAP_DIVISION_PARAM].getValue());
+
+    // assign values from switches
+    midi_out.setValue(tap_division, 21);
+
+    // apply rate limiting here so that we do not flood the
+    // system with midi messages caused by the CV inputs.
+    const float rate_limiter_period = 0.005f;
+    rate_limiter_phase += args.sampleTime / rate_limiter_period;
+    if (rate_limiter_phase >= 1.f) {
+      // reduce the phase and proceed
+      rate_limiter_phase -= 1.f;
+    } else {
+      // skip this process iteration
+      return;
+    }
+
+    // knob values
+    int tone = (int) std::round(params[TONE_PARAM].getValue());
+    int lag = (int) std::round(params[LAG_PARAM].getValue());
+    int mix = (int) std::round(params[MIX_PARAM].getValue());
+    int rpm = (int) std::round(params[RPM_PARAM].getValue());
+    int depth = (int) std::round(params[DEPTH_PARAM].getValue());
+    int warp = (int) std::round(params[WARP_PARAM].getValue());
+
+    // read cv voltages and override values of knobs, use the knob value as a ceiling
+    if (inputs[TONE_INPUT].isConnected()) {
+      int tone_cv = (int) std::round(inputs[TONE_INPUT].getVoltage()*2) / 10.f * 127;
+      tone = clamp(tone_cv, 0, tone);
+    }
+    if (inputs[LAG_INPUT].isConnected()) {
+      int lag_cv = (int) std::round(inputs[LAG_INPUT].getVoltage()*2) / 10.f * 127;
+      lag = clamp(lag_cv, 0, lag);
+    }
+    if (inputs[MIX_INPUT].isConnected()) {
+      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      mix = clamp(mix_cv, 0, mix);
+    }
+    if (inputs[RPM_INPUT].isConnected()) {
+      int rpm_cv = (int) std::round(inputs[RPM_INPUT].getVoltage()*2) / 10.f * 127;
+      rpm = clamp(rpm_cv, 0, rpm);
+    }
+    if (inputs[DEPTH_INPUT].isConnected()) {
+      int depth_cv = (int) std::round(inputs[DEPTH_INPUT].getVoltage()*2) / 10.f * 127;
+      depth = clamp(depth_cv, 0, depth);
+    }
+    if (inputs[WARP_INPUT].isConnected()) {
+      int warp_cv = (int) std::round(inputs[WARP_INPUT].getVoltage()*2) / 10.f * 127;
+      warp = clamp(warp_cv, 0, warp);
+    }
+
     // assign values from knobs (or cv)
     midi_out.setValue(tone, 14);
     midi_out.setValue(lag, 15);
@@ -275,12 +275,6 @@ struct WarpedVinyl : Module {
     midi_out.setValue(rpm, 17);
     midi_out.setValue(depth, 18);
     midi_out.setValue(warp, 19);
-
-    // assign values from switches
-    midi_out.setValue(tap_division, 21);
-
-    // enable or bypass the pedal
-    midi_out.setValue(bypass, 102);
   }
 };
 

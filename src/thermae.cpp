@@ -42,6 +42,7 @@ struct Thermae : Module {
   };
 
   RRMidiOutput midi_out;
+  float rate_limiter_phase = 0.f;
 
   // tap tempo variables
   bool can_tap_tempo;
@@ -225,62 +226,6 @@ struct Thermae : Module {
       }
     }
 
-    // knob values
-    int mix = (int) floor(params[MIX_PARAM].getValue() + 0.5);
-    int lpf = (int) floor(params[LPF_PARAM].getValue() + 0.5);
-    int regen = (int) floor(params[REGEN_PARAM].getValue() + 0.5);
-    int glide = (int) floor(params[GLIDE_PARAM].getValue() + 0.5);
-    int int1 = (int) floor(params[INT1_PARAM].getValue() + 0.5);
-    int int2 = (int) floor(params[INT2_PARAM].getValue() + 0.5);
-
-    // 3way switch values (1,2,3)
-    int l_toggle = (int) floor(params[L_TOGGLE_PARAM].getValue());
-    int m_toggle = (int) floor(params[M_TOGGLE_PARAM].getValue());
-    int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());
-
-    // read cv voltages and override values of knobs, use the knob value as a ceiling
-    if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) floor((inputs[MIX_INPUT].getVoltage() * 16.9f));
-      if (mix_cv > mix)
-        mix_cv = mix;
-      mix = mix_cv;
-    }
-
-    if (inputs[LPF_INPUT].isConnected()) {
-      int lpf_cv = (int) floor((inputs[LPF_INPUT].getVoltage() * 16.9f));
-      if (lpf_cv > lpf)
-        lpf_cv = lpf;
-      lpf = lpf_cv;
-    }
-
-    if (inputs[REGEN_INPUT].isConnected()) {
-      int regen_cv = (int) floor((inputs[REGEN_INPUT].getVoltage() * 16.9f));
-      if (regen_cv > regen)
-        regen_cv = regen;
-      regen = regen_cv;
-    }
-
-    if (inputs[GLIDE_INPUT].isConnected()) {
-      int glide_cv = (int) floor((inputs[GLIDE_INPUT].getVoltage() * 16.9f));
-      if (glide_cv > glide)
-        glide_cv = glide;
-      glide = glide_cv;
-    }
-
-    if (inputs[INT1_INPUT].isConnected()) {
-      int int1_cv = (int) floor((inputs[INT1_INPUT].getVoltage() * 16.9f));
-      if (int1_cv > int1)
-        int1_cv = int1;
-      int1 = int1_cv;
-    }
-
-    if (inputs[INT2_INPUT].isConnected()) {
-      int int2_cv = (int) floor((inputs[INT2_INPUT].getVoltage() * 16.9f));
-      if (int2_cv > int2)
-        int2_cv = int2;
-      int2 = int2_cv;
-    }
-
     // bypass or enable the pedal
     int enable_pedal = (int) floor(params[BYPASS_PARAM].getValue());
     int bypass;
@@ -293,13 +238,13 @@ struct Thermae : Module {
       bypass = 0;
     }
 
-    // assign values from knobs (or cv)
-    midi_out.setValue(mix, 14);
-    midi_out.setValue(lpf, 15);
-    midi_out.setValue(regen, 16);
-    midi_out.setValue(glide, 17);
-    midi_out.setValue(int1, 18);
-    midi_out.setValue(int2, 19);
+    // enable or bypass the pedal
+    midi_out.setValue(bypass, 102);
+
+    // 3way switch values (1,2,3)
+    int l_toggle = (int) floor(params[L_TOGGLE_PARAM].getValue());
+    int m_toggle = (int) floor(params[M_TOGGLE_PARAM].getValue());
+    int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());
 
     // assign values from switches
     midi_out.setValue(l_toggle, 21);
@@ -310,8 +255,59 @@ struct Thermae : Module {
     midi_out.setValue(hold_mode, 24);
     midi_out.setValue(slowdown_mode, 25);
 
-    // enable or bypass the pedal
-    midi_out.setValue(bypass, 102);
+    // apply rate limiting here so that we do not flood the
+    // system with midi messages caused by the CV inputs.
+    const float rate_limiter_period = 0.005f;
+    rate_limiter_phase += args.sampleTime / rate_limiter_period;
+    if (rate_limiter_phase >= 1.f) {
+      // reduce the phase and proceed
+      rate_limiter_phase -= 1.f;
+    } else {
+      // skip this process iteration
+      return;
+    }
+
+    // knob values
+    int mix = (int) std::round(params[MIX_PARAM].getValue());
+    int lpf = (int) std::round(params[LPF_PARAM].getValue());
+    int regen = (int) std::round(params[REGEN_PARAM].getValue());
+    int glide = (int) std::round(params[GLIDE_PARAM].getValue());
+    int int1 = (int) std::round(params[INT1_PARAM].getValue());
+    int int2 = (int) std::round(params[INT2_PARAM].getValue());
+
+    // read cv voltages and override values of knobs, use the knob value as a ceiling
+    if (inputs[MIX_INPUT].isConnected()) {
+      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      mix = clamp(mix_cv, 0, mix);
+    }
+    if (inputs[LPF_INPUT].isConnected()) {
+      int lpf_cv = (int) std::round(inputs[LPF_INPUT].getVoltage()*2) / 10.f * 127;
+      lpf = clamp(lpf_cv, 0, lpf);
+    }
+    if (inputs[REGEN_INPUT].isConnected()) {
+      int regen_cv = (int) std::round(inputs[REGEN_INPUT].getVoltage()*2) / 10.f * 127;
+      regen = clamp(regen_cv, 0, regen);
+    }
+    if (inputs[GLIDE_INPUT].isConnected()) {
+      int glide_cv = (int) std::round(inputs[GLIDE_INPUT].getVoltage()*2) / 10.f * 127;
+      glide = clamp(glide_cv, 0, glide);
+    }
+    if (inputs[INT1_INPUT].isConnected()) {
+      int int1_cv = (int) std::round(inputs[INT1_INPUT].getVoltage()*2) / 10.f * 127;
+      int1 = clamp(int1_cv, 0, int1);
+    }
+    if (inputs[INT2_INPUT].isConnected()) {
+      int int2_cv = (int) std::round(inputs[INT2_INPUT].getVoltage()*2) / 10.f * 127;
+      int2 = clamp(int2_cv, 0, int2);
+    }
+
+    // assign values from knobs (or cv)
+    midi_out.setValue(mix, 14);
+    midi_out.setValue(lpf, 15);
+    midi_out.setValue(regen, 16);
+    midi_out.setValue(glide, 17);
+    midi_out.setValue(int1, 18);
+    midi_out.setValue(int2, 19);
   }
 };
 
@@ -352,7 +348,7 @@ struct ThermaeWidget : ModuleWidget {
 
     // slowdown mode toggle and hold mode toggle
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(46, 90)), module, Thermae::SLOWDOWN_MODE_PARAM));
-    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(54, 90)), module, Thermae::HOLD_MODE_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(54, 90)), module, Thermae::HOLD_MODE_PARAM));
 
     // bypass switches & tap tempo
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Thermae::TAP_TEMPO_LIGHT));
