@@ -7,10 +7,10 @@ Here you'll find unofficial Midi controller plugins for various Chase Bliss Peda
 
 Current supported interfaces:
 
-* M O O D
-* Dark World
 * Thermae
+* Dark World
 * Warped Vinyl
+* M O O D
 * Generation Loss
 
 Enjoy.
