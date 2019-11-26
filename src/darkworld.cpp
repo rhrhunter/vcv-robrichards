@@ -15,7 +15,6 @@ struct Darkworld : Module {
                  DARK_PROGRAM_PARAM,
                  ROUTING_PARAM,
                  WORLD_PROGRAM_PARAM,
-                 MIDI_CHANNEL_PARAM,
                  BYPASS_DARK_PARAM,
                  BYPASS_WORLD_PARAM,
                  NUM_PARAMS
@@ -56,9 +55,6 @@ struct Darkworld : Module {
     configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Routing Mode (Parallel, D>>W, W>>D)");
     configParam(WORLD_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "World Program (Hall, Plate, Spring)");
 
-    // midi configuration knobs
-    configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 2.f, "MIDI Channel");
-
     // bypass buttons
     configParam(BYPASS_DARK_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Dark");
     configParam(BYPASS_WORLD_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass World");
@@ -69,12 +65,9 @@ struct Darkworld : Module {
   }
 
   void process(const ProcessArgs& args) override {
-    // configure the midi channel, return if it is not set
-    int channel = (int) floor(params[MIDI_CHANNEL_PARAM].getValue() + 0.5);
-    if (channel <= 0)
+    // only proceed if a midi channel is set
+    if (midi_out.channel <= 0)
       return;
-    else
-      midi_out.setChannel(channel);
 
     // read the bypass button values
     int enable_dark = (int) floor(params[BYPASS_DARK_PARAM].getValue());
@@ -190,25 +183,25 @@ struct DarkworldWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, Darkworld::DECAY_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, Darkworld::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, Darkworld::DWELL_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, Darkworld::MODIFY_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, Darkworld::TONE_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, Darkworld::PRE_DELAY_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, Darkworld::DECAY_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, Darkworld::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, Darkworld::DWELL_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, Darkworld::MODIFY_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, Darkworld::TONE_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, Darkworld::PRE_DELAY_PARAM));
 
     // ports
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, Darkworld::DECAY_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 30)), module, Darkworld::MIX_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 30)), module, Darkworld::DWELL_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 65)), module, Darkworld::MODIFY_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 65)), module, Darkworld::TONE_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, Darkworld::PRE_DELAY_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, Darkworld::DECAY_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 25)), module, Darkworld::MIX_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 25)), module, Darkworld::DWELL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 53)), module, Darkworld::MODIFY_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, Darkworld::TONE_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, Darkworld::PRE_DELAY_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, Darkworld::DARK_PROGRAM_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, Darkworld::ROUTING_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Darkworld::WORLD_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Darkworld::DARK_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Darkworld::ROUTING_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Darkworld::WORLD_PROGRAM_PARAM));
 
     // bypass switches
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, Darkworld::DARK_LIGHT));
@@ -218,14 +211,10 @@ struct DarkworldWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Darkworld::MIDI_CHANNEL_PARAM));
-    MidiChannelDisplay *mcd = new MidiChannelDisplay();
-    mcd->box.pos = Vec(50, 285);
-    mcd->box.size = Vec(32, 20);
-    mcd->value = &((module->midi_out).midi_channel);
-    mcd->module = (void *) module;
-    addChild(mcd);
-
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    midiWidget->box.size = mm2px(Vec(33.840, 28));
+    midiWidget->setMidiPort(module ? &module->midi_out : NULL);
+    addChild(midiWidget);
   }
 };
 

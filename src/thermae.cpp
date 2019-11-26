@@ -18,7 +18,6 @@ struct Thermae : Module {
                  R_TOGGLE_PARAM,
                  HOLD_MODE_PARAM,
                  SLOWDOWN_MODE_PARAM,
-                 MIDI_CHANNEL_PARAM,
                  BYPASS_PARAM,
                  TAP_TEMPO_PARAM,
                  NUM_PARAMS
@@ -76,9 +75,6 @@ struct Thermae : Module {
     configParam(HOLD_MODE_PARAM, 0.f, 1.f, 0.f, "Hold Mode (Self Oscillation)");
     configParam(SLOWDOWN_MODE_PARAM, 0.f, 1.f, 0.f, "Slowdown Mode");
 
-    // midi configuration knobs
-    configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 4.f, "MIDI Channel");
-
     // bypass button
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Pedal Bypass");
 
@@ -109,12 +105,9 @@ struct Thermae : Module {
   }
 
   void process(const ProcessArgs& args) override {
-    // configure the midi channel, return if it is not set
-    int channel = (int) floor(params[MIDI_CHANNEL_PARAM].getValue() + 0.5);
-    if (channel <= 0)
+    // only proceed if a midi channel is set
+    if (midi_out.channel <= 0)
       return;
-    else
-      midi_out.setChannel(channel);
 
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {
@@ -331,32 +324,32 @@ struct ThermaeWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, Thermae::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, Thermae::LPF_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, Thermae::REGEN_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, Thermae::GLIDE_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, Thermae::INT1_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, Thermae::INT2_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, Thermae::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, Thermae::LPF_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, Thermae::REGEN_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, Thermae::GLIDE_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, Thermae::INT1_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, Thermae::INT2_PARAM));
 
     // ports
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, Thermae::MIX_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 30)), module, Thermae::LPF_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 30)), module, Thermae::REGEN_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 65)), module, Thermae::GLIDE_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 65)), module, Thermae::INT1_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, Thermae::INT2_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, Thermae::MIX_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 25)), module, Thermae::LPF_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 25)), module, Thermae::REGEN_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 53)), module, Thermae::GLIDE_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, Thermae::INT1_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, Thermae::INT2_INPUT));
 
     // clock port
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 100)), module, Thermae::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 92)), module, Thermae::CLOCK_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, Thermae::L_TOGGLE_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, Thermae::M_TOGGLE_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Thermae::R_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Thermae::L_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Thermae::M_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Thermae::R_TOGGLE_PARAM));
 
     // slowdown mode toggle and hold mode toggle
-    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(46, 90)), module, Thermae::SLOWDOWN_MODE_PARAM));
-    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(54, 90)), module, Thermae::HOLD_MODE_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(46, 82)), module, Thermae::SLOWDOWN_MODE_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(54, 82)), module, Thermae::HOLD_MODE_PARAM));
 
     // bypass switches & tap tempo
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Thermae::TAP_TEMPO_LIGHT));
@@ -364,18 +357,12 @@ struct ThermaeWidget : ModuleWidget {
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Thermae::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
 
-
     // midi configuration displays
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Thermae::MIDI_CHANNEL_PARAM));
-    MidiChannelDisplay *mcd = new MidiChannelDisplay();
-    mcd->box.pos = Vec(50, 285);
-    mcd->box.size = Vec(32, 20);
-    mcd->value = &((module->midi_out).midi_channel);
-    mcd->module = (void *) module;
-    addChild(mcd);
-
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    midiWidget->box.size = mm2px(Vec(33.840, 28));
+    midiWidget->setMidiPort(module ? &module->midi_out : NULL);
+    addChild(midiWidget);
   }
 };
-
 
 Model* modelThermae = createModel<Thermae, ThermaeWidget>("thermae");

@@ -15,7 +15,6 @@ struct GenerationLoss : Module {
                  AUX_FUNC_PARAM,
                  DRY_PARAM,
                  HISS_PARAM,
-                 MIDI_CHANNEL_PARAM,
                  BYPASS_AUX_PARAM,
                  BYPASS_PEDAL_PARAM,
                  NUM_PARAMS
@@ -56,9 +55,6 @@ struct GenerationLoss : Module {
     configParam(DRY_PARAM, 1.0f, 3.0f, 2.0f, "Dry Selection (None, Small, Unity)");
     configParam(HISS_PARAM, 1.0f, 3.0f, 2.0f, "Hiss Selection (None, Mild, Heavy)");
 
-    // midi configuration knobs
-    configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 6.f, "MIDI Channel");
-
     // bypass buttons
     configParam(BYPASS_AUX_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass AUX Function");
     configParam(BYPASS_PEDAL_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Pedal");
@@ -69,12 +65,9 @@ struct GenerationLoss : Module {
   }
 
   void process(const ProcessArgs& args) override {
-    // configure the midi channel, return if it is not set
-    int channel = (int) floor(params[MIDI_CHANNEL_PARAM].getValue() + 0.5);
-    if (channel <= 0)
+    // only proceed if a midi channel is set
+    if (midi_out.channel <= 0)
       return;
-    else
-      midi_out.setChannel(channel);
 
     // read the bypass button values
     int enable_aux = (int) floor(params[BYPASS_AUX_PARAM].getValue());
@@ -189,25 +182,25 @@ struct GenerationLossWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, GenerationLoss::WOW_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, GenerationLoss::WET_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, GenerationLoss::HP_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, GenerationLoss::FLUTTER_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, GenerationLoss::GEN_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, GenerationLoss::LP_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, GenerationLoss::WOW_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, GenerationLoss::WET_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, GenerationLoss::HP_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, GenerationLoss::FLUTTER_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, GenerationLoss::GEN_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, GenerationLoss::LP_PARAM));
 
     // ports
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, GenerationLoss::WOW_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 30)), module, GenerationLoss::WET_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 30)), module, GenerationLoss::HP_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 65)), module, GenerationLoss::FLUTTER_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 65)), module, GenerationLoss::GEN_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, GenerationLoss::LP_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, GenerationLoss::WOW_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 25)), module, GenerationLoss::WET_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 25)), module, GenerationLoss::HP_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 53)), module, GenerationLoss::FLUTTER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, GenerationLoss::GEN_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, GenerationLoss::LP_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, GenerationLoss::AUX_FUNC_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, GenerationLoss::DRY_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, GenerationLoss::HISS_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, GenerationLoss::AUX_FUNC_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, GenerationLoss::DRY_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, GenerationLoss::HISS_PARAM));
 
     // bypass switches
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, GenerationLoss::AUX_LIGHT));
@@ -216,14 +209,10 @@ struct GenerationLossWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, GenerationLoss::BYPASS_PEDAL_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, GenerationLoss::MIDI_CHANNEL_PARAM));
-    MidiChannelDisplay *mcd = new MidiChannelDisplay();
-    mcd->box.pos = Vec(50, 285);
-    mcd->box.size = Vec(32, 20);
-    mcd->value = &((module->midi_out).midi_channel);
-    mcd->module = (void *) module;
-    addChild(mcd);
-
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    midiWidget->box.size = mm2px(Vec(33.840, 28));
+    midiWidget->setMidiPort(module ? &module->midi_out : NULL);
+    addChild(midiWidget);
   }
 };
 

@@ -15,7 +15,6 @@ struct WarpedVinyl : Module {
                  DEPTH_PARAM,
                  WARP_PARAM,
                  TAP_DIVISION_PARAM,
-                 MIDI_CHANNEL_PARAM,
                  BYPASS_PARAM,
                  TAP_TEMPO_PARAM,
                  NUM_PARAMS
@@ -66,9 +65,6 @@ struct WarpedVinyl : Module {
     // 0.0f is top position
     configParam(TAP_DIVISION_PARAM, 0, 5, 0, "Tap Divisions (whole,half,quarter triplet,quarter,eight,sixteenth)");
 
-    // midi configuration knobs
-    configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 3.f, "MIDI Channel");
-
     // bypass button
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Pedal Bypass");
 
@@ -99,12 +95,9 @@ struct WarpedVinyl : Module {
   }
 
   void process(const ProcessArgs& args) override {
-    // configure the midi channel, return if it is not set
-    int channel = (int) floor(params[MIDI_CHANNEL_PARAM].getValue() + 0.5);
-    if (channel <= 0)
+    // only proceed if a midi channel is set
+    if (midi_out.channel <= 0)
       return;
-    else
-      midi_out.setChannel(channel);
 
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {
@@ -299,26 +292,26 @@ struct WarpedVinylWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, WarpedVinyl::TONE_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, WarpedVinyl::LAG_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, WarpedVinyl::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, WarpedVinyl::RPM_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, WarpedVinyl::DEPTH_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, WarpedVinyl::WARP_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, WarpedVinyl::TONE_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, WarpedVinyl::LAG_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, WarpedVinyl::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, WarpedVinyl::RPM_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, WarpedVinyl::DEPTH_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, WarpedVinyl::WARP_PARAM));
 
     // ports
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, WarpedVinyl::TONE_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 30)), module, WarpedVinyl::LAG_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 30)), module, WarpedVinyl::MIX_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 65)), module, WarpedVinyl::RPM_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 65)), module, WarpedVinyl::DEPTH_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, WarpedVinyl::WARP_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, WarpedVinyl::TONE_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 25)), module, WarpedVinyl::LAG_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 25)), module, WarpedVinyl::MIX_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 53)), module, WarpedVinyl::RPM_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, WarpedVinyl::DEPTH_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, WarpedVinyl::WARP_INPUT));
 
     // clock port
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 100)), module, WarpedVinyl::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 92)), module, WarpedVinyl::CLOCK_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, WarpedVinyl::TAP_DIVISION_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, WarpedVinyl::TAP_DIVISION_PARAM));
 
     // bypass switches & tap tempo
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, WarpedVinyl::TAP_TEMPO_LIGHT));
@@ -327,16 +320,11 @@ struct WarpedVinylWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, WarpedVinyl::MIDI_CHANNEL_PARAM));
-    MidiChannelDisplay *mcd = new MidiChannelDisplay();
-    mcd->box.pos = Vec(50, 285);
-    mcd->box.size = Vec(32, 20);
-    mcd->value = &((module->midi_out).midi_channel);
-    mcd->module = (void *) module;
-    addChild(mcd);
-
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    midiWidget->box.size = mm2px(Vec(33.840, 28));
+    midiWidget->setMidiPort(module ? &module->midi_out : NULL);
+    addChild(midiWidget);
   }
 };
-
 
 Model* modelWarpedVinyl = createModel<WarpedVinyl, WarpedVinylWidget>("warpedvinyl");

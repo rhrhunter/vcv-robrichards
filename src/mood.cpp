@@ -15,7 +15,6 @@ struct Mood : Module {
                  BLOOD_PROGRAM_PARAM,
                  ROUTING_PARAM,
                  LOOP_PROGRAM_PARAM,
-                 MIDI_CHANNEL_PARAM,
                  BYPASS_BLOOD_PARAM,
                  BYPASS_LOOP_PARAM,
                  NUM_PARAMS
@@ -56,9 +55,6 @@ struct Mood : Module {
     configParam(ROUTING_PARAM, 1.0f, 3.0f, 2.0f, "Blood Routing (In, Loop+In, Loop)");
     configParam(LOOP_PROGRAM_PARAM, 1.0f, 3.0f, 2.0f, "Loop Program (Env, Tape, Stretch)");
 
-    // midi configuration knobs
-    configParam(MIDI_CHANNEL_PARAM, 1.f, 16.f, 5.f, "MIDI Channel");
-
     // bypass buttons
     configParam(BYPASS_BLOOD_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Blood");
     configParam(BYPASS_LOOP_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Loop");
@@ -69,12 +65,9 @@ struct Mood : Module {
   }
 
   void process(const ProcessArgs& args) override {
-    // configure the midi channel, return if it is not set
-    int channel = (int) floor(params[MIDI_CHANNEL_PARAM].getValue() + 0.5);
-    if (channel <= 0)
+    // only proceed if a midi channel is set
+    if (midi_out.channel <= 0)
       return;
-    else
-      midi_out.setChannel(channel);
 
     // pedal bypass switches
     int enable_blood = (int) floor(params[BYPASS_BLOOD_PARAM].getValue());
@@ -199,25 +192,25 @@ struct MoodWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 15)), module, Mood::TIME_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 15)), module, Mood::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 15)), module, Mood::LENGTH_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 50)), module, Mood::MODIFY_BLOOD_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 50)), module, Mood::CLOCK_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 50)), module, Mood::MODIFY_LOOP_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, Mood::TIME_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, Mood::MIX_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, Mood::LENGTH_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, Mood::MODIFY_BLOOD_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, Mood::CLOCK_PARAM));
+    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, Mood::MODIFY_LOOP_PARAM));
 
     // ports
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, Mood::TIME_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 30)), module, Mood::MIX_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 30)), module, Mood::LENGTH_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 65)), module, Mood::MODIFY_BLOOD_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 65)), module, Mood::CLOCK_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 65)), module, Mood::MODIFY_LOOP_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, Mood::TIME_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 25)), module, Mood::MIX_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 25)), module, Mood::LENGTH_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 53)), module, Mood::MODIFY_BLOOD_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, Mood::CLOCK_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, Mood::MODIFY_LOOP_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 80)), module, Mood::BLOOD_PROGRAM_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 80)), module, Mood::ROUTING_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 80)), module, Mood::LOOP_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Mood::BLOOD_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Mood::ROUTING_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Mood::LOOP_PROGRAM_PARAM));
 
     // bypass switches and Leds
     addChild(createLightCentered<LargeLight<GreenLight>>(mm2px(Vec(15, 109)), module, Mood::BLOOD_LIGHT));
@@ -226,14 +219,10 @@ struct MoodWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 100)), module, Mood::MIDI_CHANNEL_PARAM));
-    MidiChannelDisplay *mcd = new MidiChannelDisplay();
-    mcd->box.pos = Vec(50, 285);
-    mcd->box.size = Vec(32, 20);
-    mcd->value = &((module->midi_out).midi_channel);
-    mcd->module = (void *) module;
-    addChild(mcd);
-
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    midiWidget->box.size = mm2px(Vec(33.840, 28));
+    midiWidget->setMidiPort(module ? &module->midi_out : NULL);
+    addChild(midiWidget);
   }
 };
 
