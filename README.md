@@ -24,3 +24,12 @@ the most recent version of the [Rack SDK](https://vcvrack.com/downloads/Rack-SDK
 `RACK_SDK=~/Downloads/Rack-SDK make install`
 
 Then launch Rack.
+
+## Features
+* Dynamic modulation of all knobs using CV inputs, via CV->CC 
+* 3-way programmable switches (All)
+* Clock SYNC inputs (Thermae & Warped Vinyl)
+* Tap Tempo switch (Thermae & Warped Vinyl)
+* "Slow down" mode toggle (Thermae)
+* "Self-oscillation" mode via momentary toggle (Thermae)
+* Midi tempo divisions (Warped Vinyl)
