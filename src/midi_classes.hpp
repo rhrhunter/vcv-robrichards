@@ -56,6 +56,10 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     }
   }
 
+  void resetCCCache(int cc) {
+    lastMidiCCValues[cc] = -1;
+  }
+
   bool setValue(int value, int cc) {
     if (value == lastMidiCCValues[cc]) {
       return false;

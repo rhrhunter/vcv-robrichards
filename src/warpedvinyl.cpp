@@ -5,6 +5,7 @@
 #include "midi_classes.hpp"
 
 #include <sys/time.h>
+#include <dsp/digital.hpp>
 
 struct WarpedVinyl : Module {
   enum ParamIds {
@@ -50,6 +51,10 @@ struct WarpedVinyl : Module {
   float next_brightness;
   int curr_tap_tempo_light_color;
   float rate_limiter_phase = 0.f;
+
+  // clock re-enable
+  dsp::ClockDivider clock_enable;
+
   WarpedVinyl() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -71,10 +76,6 @@ struct WarpedVinyl : Module {
     // tap tempo buttons
     configParam(TAP_TEMPO_PARAM, 0.f, 1.f, 0.f, "Tap Tempo");
 
-    // DeviceIds start counting from 0, not 1
-    midi_out.setDeviceId(3);
-    midi_out.setChannel(3);
-
     // initialize whether we allow tap tempo messages or not
     can_tap_tempo = true;
 
@@ -92,6 +93,10 @@ struct WarpedVinyl : Module {
 
     // tap tempo light colors: 1=red, 0=green
     curr_tap_tempo_light_color = 1;
+
+    // re-enable the midi clock every so often
+    // if the clock input is in use
+    clock_enable.setDivision(32);
   }
 
   void process(const ProcessArgs& args) override {
@@ -102,7 +107,11 @@ struct WarpedVinyl : Module {
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
-      // turn on the clock (if not on already)
+
+      // turn on the clock (force it every so often)
+      if (clock_enable.process()) {
+        midi_out.resetCCCache(51);
+      }
       midi_out.setValue(127, 51);
 
       // send a clock message

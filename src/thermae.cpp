@@ -81,10 +81,6 @@ struct Thermae : Module {
     // tap tempo buttons
     configParam(TAP_TEMPO_PARAM, 0.f, 1.f, 0.f, "Tap Tempo");
 
-    // DeviceIds start counting from 0, not 1
-    midi_out.setDeviceId(3);
-    midi_out.setChannel(4);
-
     // initialize whether we allow tap tempo messages or not
     can_tap_tempo = true;
 

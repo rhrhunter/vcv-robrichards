@@ -58,10 +58,6 @@ struct GenerationLoss : Module {
     // bypass buttons
     configParam(BYPASS_AUX_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass AUX Function");
     configParam(BYPASS_PEDAL_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Pedal");
-
-    // DeviceIds start counting from 0, not 1
-    midi_out.setDeviceId(3);
-    midi_out.setChannel(6);
   }
 
   void process(const ProcessArgs& args) override {
