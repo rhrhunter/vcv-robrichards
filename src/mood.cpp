@@ -61,8 +61,8 @@ struct Mood : Module {
   }
 
   void process(const ProcessArgs& args) override {
-    // only proceed if a midi channel is set
-    if (midi_out.channel <= 0)
+    // only proceed if midi is activated
+    if (!midi_out.active())
       return;
 
     // pedal bypass switches

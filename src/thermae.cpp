@@ -4,6 +4,7 @@
 #include "guicomponents.hpp"
 #include "midi_classes.hpp"
 #include <sys/time.h>
+#include <dsp/digital.hpp>
 
 struct Thermae : Module {
   enum ParamIds {
@@ -54,6 +55,11 @@ struct Thermae : Module {
   float next_brightness;
   int curr_tap_tempo_light_color;
 
+  // periodic internal clock processing
+  dsp::ClockDivider enable_midi_clk;
+  dsp::ClockDivider disable_hold_mode_clk;
+  int disable_hold_mode_attempts = 0;
+
   Thermae() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -98,16 +104,32 @@ struct Thermae : Module {
 
     // tap tempo light colors: 1=red, 0=green
     curr_tap_tempo_light_color = 1;
+
+    // keep an internal clock to disable hold mode (~every 1s) for up
+    // to 5 times after it has been turned on.
+    disable_hold_mode_clk.setDivision(65536);
+
+    // keep an internal clock to re-enable the midi clock on the pedal (~every 6s)
+    enable_midi_clk.setDivision(524288);
   }
 
   void process(const ProcessArgs& args) override {
-    // only proceed if a midi channel is set
-    if (midi_out.channel <= 0)
+    // only proceed if midi is activated
+    if (!midi_out.active())
       return;
 
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
+
+      // periodically reset the CC cache for the midi clock message,
+      // to ensure that we turn it on every so often
+      if (enable_midi_clk.process()) {
+        midi_out.resetCCCache(51);
+      }
+      // turn on midi clock
+      midi_out.setValue(127, 51);
+
       midi_out.setClock(clock);
     }
 
@@ -247,6 +269,18 @@ struct Thermae : Module {
     midi_out.setValue(l_toggle, 21);
     midi_out.setValue(m_toggle, 22);
     midi_out.setValue(r_toggle, 23);
+
+    // periodically reset the CC message cache for hold mode if it is
+    // not turned on by the user. This is so that it doesn't get stuck turned on.
+    if (!hold_mode) {
+      if (disable_hold_mode_attempts > 0 && disable_hold_mode_clk.process()) {
+        disable_hold_mode_attempts--;
+        midi_out.resetCCCache(24);
+      }
+    } else {
+      // hold mode is being requested, reset the hold mode attempts
+      disable_hold_mode_attempts = 5;
+    }
 
     // enable/disable hold mode and/or slowdown mode
     midi_out.setValue(hold_mode, 24);

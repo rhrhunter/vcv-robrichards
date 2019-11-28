@@ -3,7 +3,6 @@
 #include <math.h>
 #include "guicomponents.hpp"
 #include "midi_classes.hpp"
-
 #include <sys/time.h>
 #include <dsp/digital.hpp>
 
@@ -52,8 +51,8 @@ struct WarpedVinyl : Module {
   int curr_tap_tempo_light_color;
   float rate_limiter_phase = 0.f;
 
-  // clock re-enable
-  dsp::ClockDivider clock_enable;
+  // periodic internal clock processing
+  dsp::ClockDivider enable_midi_clk;
 
   WarpedVinyl() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -94,24 +93,25 @@ struct WarpedVinyl : Module {
     // tap tempo light colors: 1=red, 0=green
     curr_tap_tempo_light_color = 1;
 
-    // re-enable the midi clock every so often
-    // if the clock input is in use
-    clock_enable.setDivision(32);
+    // keep an internal clock to re-enable the midi clock on the pedal (~every 6s)
+    enable_midi_clk.setDivision(524288);
   }
 
   void process(const ProcessArgs& args) override {
-    // only proceed if a midi channel is set
-    if (midi_out.channel <= 0)
+    // only proceed if midi is activated
+    if (!midi_out.active())
       return;
 
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
 
-      // turn on the clock (force it every so often)
-      if (clock_enable.process()) {
+      // periodically reset the CC cache for the midi clock message,
+      // to ensure that we turn it on every so often
+      if (enable_midi_clk.process()) {
         midi_out.resetCCCache(51);
       }
+      // turn on midi clock
       midi_out.setValue(127, 51);
 
       // send a clock message

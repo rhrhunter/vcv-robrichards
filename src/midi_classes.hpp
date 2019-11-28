@@ -8,12 +8,8 @@ namespace rack {
 
 struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
   int lastMidiCCValues[128];
-  int midi_device_id;
-  int midi_channel;
 
   RRMidiOutput() {
-    midi_device_id = -1;
-    midi_channel = 0;
     reset();
   }
 
@@ -31,27 +27,10 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
 
   void setDeviceId(int id) override {
     // only update the channel if it changed
-    if (midi_device_id != id) {
+    if (deviceId != id) {
       midi::Output::setDeviceId(id);
-      midi_device_id = id;
       std::string dev_name = getDeviceName(id);
       INFO("Set dev id to %d (%s)", id, dev_name.c_str());
-      //std::vector<int> ids = getDeviceIds();
-      //for(unsigned long i = 0; i < ids.size(); i++){
-      //  std::string dev_name = getDeviceName(i);
-      //  INFO("id: %d, device: %s", i, dev_name.c_str());
-      //}
-      reset();
-    }
-  }
-
-  void setChannel(int channel) {
-    // only update the channel if it changed
-    if (midi_channel != channel) {
-      // midi channels internally start counting at 0, so subtract one
-      midi::Port::setChannel(channel-1);
-      midi_channel = channel;
-      INFO("Set channel to %d", channel);
       reset();
     }
   }
@@ -60,14 +39,19 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     lastMidiCCValues[cc] = -1;
   }
 
+  bool active() {
+    return deviceId > -1 && channel > -1;
+  }
+
   bool setValue(int value, int cc) {
+    // check the cache for cc messages
     if (value == lastMidiCCValues[cc]) {
       return false;
     }
     lastMidiCCValues[cc] = value;
     //INFO("Setting cc:%d to value:%d", cc, value);
 
-    // CC
+    // send CC message
     midi::Message m;
     m.setStatus(0xb);
     m.setNote(cc);
