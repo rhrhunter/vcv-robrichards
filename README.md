@@ -13,6 +13,8 @@ Current supported interfaces:
 * M O O D
 * Generation Loss
 
+**NOTE: You will need the physical CBA pedals (and a Midi-To-USB converter) to use these modules.**
+
 Enjoy.
 
 ## Installation Steps
@@ -28,8 +30,10 @@ Then launch Rack.
 ## Features
 * Dynamic modulation of all knobs using CV inputs, via CV->CC 
 * 3-way programmable switches (All)
+* Stomp switch controls (All)
 * Clock SYNC inputs (Thermae & Warped Vinyl)
 * Tap Tempo switch (Thermae & Warped Vinyl)
 * "Slow down" mode toggle (Thermae)
 * "Self-oscillation" mode via momentary toggle (Thermae)
 * Midi tempo divisions (Warped Vinyl)
+
