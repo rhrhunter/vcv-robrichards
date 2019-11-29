@@ -1,47 +1,47 @@
 {
   "slug": "RobRichards",
   "name": "RobRichards",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "GPLv3",
   "brand": "RobRichards",
   "author": "RobRichards",
-  "authorEmail": "",
-  "authorUrl": "",
-  "pluginUrl": "",
-  "manualUrl": "",
-  "sourceUrl": "",
+  "authorEmail": "robrichards@hunter-rivera.com",
+  "authorUrl": "https://robrich.bandcamp.com/",
+  "pluginUrl": "https://github.com/rhrhunter/vcv-robrichards",
+  "manualUrl": "https://github.com/rhrhunter/vcv-robrichards",
+  "sourceUrl": "https://github.com/rhrhunter/vcv-robrichards",
   "donateUrl": "",
   "changelogUrl": "",
   "modules": [
     {
       "slug": "darkworld",
-      "name": "darkworld",
-      "description": "VCV MIDI Implementation for Chase Bliss Darkworld",
-      "tags": ["midi", "fx", "darkworld", "reverb"]
+      "name": "MIDI Controller: CBA Darkworld",
+      "description": "VCV MIDI Implementation for ChaseBliss Audio Darkworld",
+      "tags": ["midi", "darkworld", "reverb"]
     },
     {
       "slug": "warpedvinyl",
-      "name": "warpedvinyl",
-      "description": "VCV MIDI Implementation for Chase Bliss Warped Vinyl Hifi",
-      "tags": ["midi", "fx", "warpedvinyl", "chorus", "vibrato"]
+      "name": "MIDI Controller: CBA Warped Vinyl",
+      "description": "VCV MIDI Implementation for ChaseBliss Audio Warped Vinyl Hifi",
+      "tags": ["midi", "warpedvinyl", "chorus", "vibrato"]
     },
     {
       "slug": "mood",
-      "name": "mood",
-      "description": "VCV MIDI Implementation for Chase Bliss MOOD",
-      "tags": ["midi", "fx", "mood", "looper"]
+      "name": "MIDI Controller: CBA M O O D",
+      "description": "VCV MIDI Implementation for ChaseBliss Audio M O O D",
+      "tags": ["midi", "mood", "looper"]
     },
     {
       "slug": "genloss",
-      "name": "genloss",
-      "description": "VCV MIDI Implementation for Chase Bliss Generation Loss",
-      "tags": ["midi", "fx", "genloss", "lofi"]
+      "name": "MIDI Controller: CBA Generation Loss",
+      "description": "VCV MIDI Implementation for ChaseBliss Audio Generation Loss",
+      "tags": ["midi", "genloss", "lofi"]
     },
     {
       "slug": "thermae",
-      "name": "thermae",
-      "description": "VCV MIDI Implementation for Chase Bliss Thermae",
-      "tags": ["midi", "fx", "thermae", "delay", "pitch shift"]
-    }                
+      "name": "MIDI Controller: CBA Thermae",
+      "description": "VCV MIDI Implementation for ChaseBliss Audio Thermae",
+      "tags": ["midi", "thermae", "delay", "pitch shifter"]
+    }
   ]
 }

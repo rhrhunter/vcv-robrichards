@@ -2,9 +2,9 @@
 
 #include <math.h>
 #include "guicomponents.hpp"
-#include "midi_classes.hpp"
+#include "rr_module.hpp"
 
-struct Mood : Module {
+struct Mood : RRModule {
   enum ParamIds {
                  TIME_PARAM,
                  MIX_PARAM,
@@ -34,9 +34,6 @@ struct Mood : Module {
                   ENUMS(LOOP_LIGHT, 2),
                   NUM_LIGHTS
   };
-
-  RRMidiOutput midi_out;
-  float rate_limiter_phase = 0.f;
 
   Mood() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -121,15 +118,8 @@ struct Mood : Module {
 
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
-    const float rate_limiter_period = 0.005f;
-    rate_limiter_phase += args.sampleTime / rate_limiter_period;
-    if (rate_limiter_phase >= 1.f) {
-      // reduce the phase and proceed
-      rate_limiter_phase -= 1.f;
-    } else {
-      // skip this process iteration
+    if (should_rate_limit(0.005f, args.sampleTime))
       return;
-    }
 
     // knob values
     int time = (int) std::round(params[TIME_PARAM].getValue());
