@@ -31,9 +31,10 @@ Then launch Rack.
 * Dynamic modulation of all knobs using CV inputs, via CV->CC 
 * 3-way programmable switches (All)
 * Stomp switch controls (All)
+* Expression CV Input (All)
 * Clock SYNC inputs (Thermae & Warped Vinyl)
 * Tap Tempo switch (Thermae & Warped Vinyl)
-* "Slow down" mode toggle (Thermae)
-* "Self-oscillation" mode via momentary toggle (Thermae)
-* Midi tempo divisions (Warped Vinyl)
+* "Slow-down" mode toggle (Thermae)
+* "Self-oscillation/Hold" mode via momentary toggle (Thermae)
+* Midi Note tempo divisions (Warped Vinyl)
 
