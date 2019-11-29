@@ -16,31 +16,31 @@
     {
       "slug": "darkworld",
       "name": "MIDI Controller: CBA Darkworld",
-      "description": "VCV MIDI Implementation for ChaseBliss Audio Darkworld",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'Darkworld'",
       "tags": ["midi", "darkworld", "reverb"]
     },
     {
       "slug": "warpedvinyl",
       "name": "MIDI Controller: CBA Warped Vinyl",
-      "description": "VCV MIDI Implementation for ChaseBliss Audio Warped Vinyl Hifi",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'Warped Vinyl Hifi'",
       "tags": ["midi", "warpedvinyl", "chorus", "vibrato"]
     },
     {
       "slug": "mood",
       "name": "MIDI Controller: CBA M O O D",
-      "description": "VCV MIDI Implementation for ChaseBliss Audio M O O D",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'M O O D'",
       "tags": ["midi", "mood", "looper"]
     },
     {
       "slug": "genloss",
       "name": "MIDI Controller: CBA Generation Loss",
-      "description": "VCV MIDI Implementation for ChaseBliss Audio Generation Loss",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'Generation Loss'",
       "tags": ["midi", "genloss", "lofi"]
     },
     {
       "slug": "thermae",
       "name": "MIDI Controller: CBA Thermae",
-      "description": "VCV MIDI Implementation for ChaseBliss Audio Thermae",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'Thermae'",
       "tags": ["midi", "thermae", "delay", "pitch shifter"]
     }
   ]
