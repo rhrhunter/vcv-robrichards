@@ -26,6 +26,7 @@ struct GenerationLoss : RRModule {
                   FLUTTER_INPUT,
                   GEN_INPUT,
                   LP_INPUT,
+                  EXPR_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -118,6 +119,7 @@ struct GenerationLoss : RRModule {
     int flutter = (int) std::round(params[FLUTTER_PARAM].getValue());
     int gen = (int) std::round(params[GEN_PARAM].getValue());
     int lp = (int) std::round(params[LP_PARAM].getValue());
+    int expr = -1;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[WOW_INPUT].isConnected()) {
@@ -144,6 +146,10 @@ struct GenerationLoss : RRModule {
       int lp_cv = (int) std::round(inputs[LP_INPUT].getVoltage()*2) / 10.f * 127;
       lp = clamp(lp_cv, 0, lp);
     }
+    if (inputs[EXPR_INPUT].isConnected()) {
+      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      expr = clamp(expr_cv, 0, 127);
+    }
 
     // assign values from knobs (or cv)
     midi_out.setValue(wow, 14);
@@ -152,6 +158,10 @@ struct GenerationLoss : RRModule {
     midi_out.setValue(flutter, 17);
     midi_out.setValue(gen, 18);
     midi_out.setValue(lp, 19);
+
+    // assign value for expression
+    if (expr > 0)
+      midi_out.setValue(expr, 100);
   }
 };
 
@@ -159,7 +169,7 @@ struct GenerationLoss : RRModule {
 struct GenerationLossWidget : ModuleWidget {
   GenerationLossWidget(GenerationLoss* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/genloss_blank.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/genloss_text.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -183,6 +193,9 @@ struct GenerationLossWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, GenerationLoss::GEN_INPUT));
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, GenerationLoss::LP_INPUT));
 
+    // expression port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, GenerationLoss::EXPR_INPUT));
+
     // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, GenerationLoss::AUX_FUNC_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, GenerationLoss::DRY_PARAM));
@@ -195,7 +208,7 @@ struct GenerationLossWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, GenerationLoss::BYPASS_PEDAL_PARAM));
 
     // midi configuration displays
-    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3, 75)));
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);

@@ -26,6 +26,7 @@ struct Darkworld : RRModule {
                   MODIFY_INPUT,
                   TONE_INPUT,
                   PRE_DELAY_INPUT,
+                  EXPR_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -118,6 +119,7 @@ struct Darkworld : RRModule {
     int modify = (int) std::round(params[MODIFY_PARAM].getValue());
     int tone = (int) std::round(params[TONE_PARAM].getValue());
     int pre_delay = (int) std::round(params[PRE_DELAY_PARAM].getValue());
+    int expr = -1;
 
     // read cv voltages and override values of knobs,
     // clamp down the cv value to be between 0 and the value of the knob
@@ -145,6 +147,10 @@ struct Darkworld : RRModule {
       int pre_delay_cv = (int) std::round(inputs[PRE_DELAY_INPUT].getVoltage()*2) / 10.f * 127;
       pre_delay = clamp(pre_delay_cv, 0, pre_delay);
     }
+    if (inputs[EXPR_INPUT].isConnected()) {
+      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      expr = clamp(expr_cv, 0, 127);
+    }
 
     // assign values from knobs (or cv)
     midi_out.setValue(decay, 14);
@@ -153,6 +159,12 @@ struct Darkworld : RRModule {
     midi_out.setValue(modify, 17);
     midi_out.setValue(tone, 18);
     midi_out.setValue(pre_delay, 19);
+
+    // assign value for expression
+    if (expr > 0)
+      midi_out.setValue(expr, 100);
+
+    return;
   }
 };
 
@@ -160,7 +172,7 @@ struct Darkworld : RRModule {
 struct DarkworldWidget : ModuleWidget {
   DarkworldWidget(Darkworld* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_blank.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_text.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -196,8 +208,11 @@ struct DarkworldWidget : ModuleWidget {
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Darkworld::WORLD_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
 
+    // expression port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, Darkworld::EXPR_INPUT));
+
     // midi configuration displays
-    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3, 75)));
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);

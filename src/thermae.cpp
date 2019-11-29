@@ -30,6 +30,7 @@ struct Thermae : RRModule {
                   INT1_INPUT,
                   INT2_INPUT,
                   CLOCK_INPUT,
+                  EXPR_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -166,6 +167,7 @@ struct Thermae : RRModule {
     int glide = (int) std::round(params[GLIDE_PARAM].getValue());
     int int1 = (int) std::round(params[INT1_PARAM].getValue());
     int int2 = (int) std::round(params[INT2_PARAM].getValue());
+    int expr = -1;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[MIX_INPUT].isConnected()) {
@@ -192,6 +194,10 @@ struct Thermae : RRModule {
       int int2_cv = (int) std::round(inputs[INT2_INPUT].getVoltage()*2) / 10.f * 127;
       int2 = clamp(int2_cv, 0, int2);
     }
+    if (inputs[EXPR_INPUT].isConnected()) {
+      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      expr = clamp(expr_cv, 0, 127);
+    }
 
     // assign values from knobs (or cv)
     midi_out.setValue(mix, 14);
@@ -200,13 +206,19 @@ struct Thermae : RRModule {
     midi_out.setValue(glide, 17);
     midi_out.setValue(int1, 18);
     midi_out.setValue(int2, 19);
+
+    // assign value for expression
+    if (expr > 0)
+      midi_out.setValue(expr, 100);
+
+    return;
   }
 };
 
 struct ThermaeWidget : ModuleWidget {
   ThermaeWidget(Thermae* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/thermae_blank.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/thermae_text.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -230,8 +242,11 @@ struct ThermaeWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, Thermae::INT1_INPUT));
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, Thermae::INT2_INPUT));
 
+    // expression port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, Thermae::EXPR_INPUT));
+
     // clock port
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 92)), module, Thermae::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55, 92)), module, Thermae::CLOCK_INPUT));
 
     // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Thermae::L_TOGGLE_PARAM));
@@ -239,8 +254,8 @@ struct ThermaeWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Thermae::R_TOGGLE_PARAM));
 
     // slowdown mode toggle and hold mode toggle
-    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(46, 82)), module, Thermae::SLOWDOWN_MODE_PARAM));
-    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(54, 82)), module, Thermae::HOLD_MODE_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Thermae::SLOWDOWN_MODE_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(55, 82)), module, Thermae::HOLD_MODE_PARAM));
 
     // bypass switches & tap tempo
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Thermae::TAP_TEMPO_LIGHT));
@@ -248,8 +263,8 @@ struct ThermaeWidget : ModuleWidget {
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Thermae::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
 
-    // midi configuration displays
-    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    // midi configuration display
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3, 75)));
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);

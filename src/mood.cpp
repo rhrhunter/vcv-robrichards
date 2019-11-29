@@ -26,6 +26,7 @@ struct Mood : RRModule {
                   MODIFY_BLOOD_INPUT,
                   CLOCK_INPUT,
                   MODIFY_LOOP_INPUT,
+                  EXPR_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -128,6 +129,7 @@ struct Mood : RRModule {
     int modify_blood = (int) std::round(params[MODIFY_BLOOD_PARAM].getValue());
     int clock = (int) std::round(params[CLOCK_PARAM].getValue());
     int modify_loop = (int) std::round(params[MODIFY_LOOP_PARAM].getValue());
+    int expr = -1;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[TIME_INPUT].isConnected()) {
@@ -154,6 +156,10 @@ struct Mood : RRModule {
       int modify_loop_cv = (int) std::round(inputs[MODIFY_LOOP_INPUT].getVoltage()*2) / 10.f * 127;
       modify_loop = clamp(modify_loop_cv, 0, modify_loop);
     }
+    if (inputs[EXPR_INPUT].isConnected()) {
+      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      expr = clamp(expr_cv, 0, 127);
+    }
 
     // assign values from knobs (or cv)
     midi_out.setValue(time, 14);
@@ -162,6 +168,12 @@ struct Mood : RRModule {
     midi_out.setValue(modify_blood, 17);
     midi_out.setValue(clock, 18);
     midi_out.setValue(modify_loop, 19);
+
+    // assign value for expression
+    if (expr > 0)
+      midi_out.setValue(expr, 100);
+
+    return;
   }
 };
 
@@ -169,7 +181,7 @@ struct Mood : RRModule {
 struct MoodWidget : ModuleWidget {
   MoodWidget(Mood* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/mood_blank.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/mood_text.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -193,6 +205,9 @@ struct MoodWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, Mood::CLOCK_INPUT));
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, Mood::MODIFY_LOOP_INPUT));
 
+    // expression port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, Mood::EXPR_INPUT));
+
     // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Mood::BLOOD_PROGRAM_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Mood::ROUTING_PARAM));
@@ -205,7 +220,7 @@ struct MoodWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
 
     // midi configuration displays
-    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3, 75)));
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);

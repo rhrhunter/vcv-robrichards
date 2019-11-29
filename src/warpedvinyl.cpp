@@ -27,6 +27,7 @@ struct WarpedVinyl : RRModule {
                   DEPTH_INPUT,
                   WARP_INPUT,
                   CLOCK_INPUT,
+                  EXPR_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -110,6 +111,7 @@ struct WarpedVinyl : RRModule {
     int rpm = (int) std::round(params[RPM_PARAM].getValue());
     int depth = (int) std::round(params[DEPTH_PARAM].getValue());
     int warp = (int) std::round(params[WARP_PARAM].getValue());
+    int expr = -1;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[TONE_INPUT].isConnected()) {
@@ -136,6 +138,10 @@ struct WarpedVinyl : RRModule {
       int warp_cv = (int) std::round(inputs[WARP_INPUT].getVoltage()*2) / 10.f * 127;
       warp = clamp(warp_cv, 0, warp);
     }
+    if (inputs[EXPR_INPUT].isConnected()) {
+      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      expr = clamp(expr_cv, 0, 127);
+    }
 
     // assign values from knobs (or cv)
     midi_out.setValue(tone, 14);
@@ -144,13 +150,19 @@ struct WarpedVinyl : RRModule {
     midi_out.setValue(rpm, 17);
     midi_out.setValue(depth, 18);
     midi_out.setValue(warp, 19);
+
+    // assign value for expression
+    if (expr > 0)
+      midi_out.setValue(expr, 100);
+
+    return;
   }
 };
 
 struct WarpedVinylWidget : ModuleWidget {
   WarpedVinylWidget(WarpedVinyl* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/warpedvinyl_blank.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/warpedvinyl_text.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -174,8 +186,11 @@ struct WarpedVinylWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(30, 53)), module, WarpedVinyl::DEPTH_INPUT));
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, WarpedVinyl::WARP_INPUT));
 
+    // expression port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, WarpedVinyl::EXPR_INPUT));
+
     // clock port
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(50, 92)), module, WarpedVinyl::CLOCK_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55, 92)), module, WarpedVinyl::CLOCK_INPUT));
 
     // program switches
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, WarpedVinyl::NOTE_DIVISION_PARAM));
@@ -186,8 +201,8 @@ struct WarpedVinylWidget : ModuleWidget {
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, WarpedVinyl::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
 
-    // midi configuration displays
-    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(6, 75)));
+    // midi configuration display
+    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3, 75)));
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);
