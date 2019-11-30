@@ -1,0 +1,12 @@
+version: 2
+jobs:
+  vcvplugin_docker_build_ubuntu1804_rack116:
+    machine: true
+    steps:
+      - checkout
+      - run: ./test/build-ubuntu1804-rack116.sh
+workflows:
+  version: 2
+  vcvplugin_build:
+    jobs:
+      - vcvplugin_docker_build_ubuntu1804_rack116
