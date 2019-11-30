@@ -171,12 +171,12 @@ struct WarpedVinylWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, WarpedVinyl::TONE_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, WarpedVinyl::LAG_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, WarpedVinyl::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, WarpedVinyl::RPM_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, WarpedVinyl::DEPTH_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, WarpedVinyl::WARP_PARAM));
+    addParam(createParamCentered<CBAKnobWV>(mm2px(Vec(10, 12)), module, WarpedVinyl::TONE_PARAM));
+    addParam(createParamCentered<CBAKnobWV>(mm2px(Vec(30, 12)), module, WarpedVinyl::LAG_PARAM));
+    addParam(createParamCentered<CBAKnobWV>(mm2px(Vec(50, 12)), module, WarpedVinyl::MIX_PARAM));
+    addParam(createParamCentered<CBAKnobWV>(mm2px(Vec(10, 40)), module, WarpedVinyl::RPM_PARAM));
+    addParam(createParamCentered<CBAKnobWV>(mm2px(Vec(30, 40)), module, WarpedVinyl::DEPTH_PARAM));
+    addParam(createParamCentered<CBAKnobWV>(mm2px(Vec(50, 40)), module, WarpedVinyl::WARP_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, WarpedVinyl::TONE_INPUT));

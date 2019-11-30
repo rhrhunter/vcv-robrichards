@@ -13,6 +13,37 @@ namespace rack {
     }
   };
 
+  struct CBAKnobDW : RoundKnob {
+    CBAKnobDW() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_darkworld.svg")));
+    }
+  };
+
+  struct CBAKnobThermae : RoundKnob {
+    CBAKnobThermae() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_thermae.svg")));
+    }
+  };    
+
+  struct CBAKnobMood : RoundKnob {
+    CBAKnobMood() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_mood.svg")));
+    }
+  };    
+
+  struct CBAKnobGL : RoundKnob {
+    CBAKnobGL() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_genloss.svg")));
+    }
+  };    
+
+  struct CBAKnobWV : RoundKnob {
+    CBAKnobWV() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_warpedvinyl.svg")));
+    }
+  };    
+  
+  
   struct CBASwitch : app::SvgSwitch {
     CBASwitch() {
       addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/CKSSThree_2.svg")));

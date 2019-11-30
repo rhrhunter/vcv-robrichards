@@ -178,12 +178,12 @@ struct GenerationLossWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, GenerationLoss::WOW_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, GenerationLoss::WET_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, GenerationLoss::HP_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, GenerationLoss::FLUTTER_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, GenerationLoss::GEN_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, GenerationLoss::LP_PARAM));
+    addParam(createParamCentered<CBAKnobGL>(mm2px(Vec(10, 12)), module, GenerationLoss::WOW_PARAM));
+    addParam(createParamCentered<CBAKnobGL>(mm2px(Vec(30, 12)), module, GenerationLoss::WET_PARAM));
+    addParam(createParamCentered<CBAKnobGL>(mm2px(Vec(50, 12)), module, GenerationLoss::HP_PARAM));
+    addParam(createParamCentered<CBAKnobGL>(mm2px(Vec(10, 40)), module, GenerationLoss::FLUTTER_PARAM));
+    addParam(createParamCentered<CBAKnobGL>(mm2px(Vec(30, 40)), module, GenerationLoss::GEN_PARAM));
+    addParam(createParamCentered<CBAKnobGL>(mm2px(Vec(50, 40)), module, GenerationLoss::LP_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, GenerationLoss::WOW_INPUT));

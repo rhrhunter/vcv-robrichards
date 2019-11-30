@@ -227,12 +227,12 @@ struct ThermaeWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, Thermae::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, Thermae::LPF_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, Thermae::REGEN_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, Thermae::GLIDE_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, Thermae::INT1_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, Thermae::INT2_PARAM));
+    addParam(createParamCentered<CBAKnobThermae>(mm2px(Vec(10, 12)), module, Thermae::MIX_PARAM));
+    addParam(createParamCentered<CBAKnobThermae>(mm2px(Vec(30, 12)), module, Thermae::LPF_PARAM));
+    addParam(createParamCentered<CBAKnobThermae>(mm2px(Vec(50, 12)), module, Thermae::REGEN_PARAM));
+    addParam(createParamCentered<CBAKnobThermae>(mm2px(Vec(10, 40)), module, Thermae::GLIDE_PARAM));
+    addParam(createParamCentered<CBAKnobThermae>(mm2px(Vec(30, 40)), module, Thermae::INT1_PARAM));
+    addParam(createParamCentered<CBAKnobThermae>(mm2px(Vec(50, 40)), module, Thermae::INT2_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, Thermae::MIX_INPUT));

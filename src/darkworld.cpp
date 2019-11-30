@@ -181,12 +181,12 @@ struct DarkworldWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
     // knobs
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 12)), module, Darkworld::DECAY_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 12)), module, Darkworld::MIX_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 12)), module, Darkworld::DWELL_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(10, 40)), module, Darkworld::MODIFY_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(30, 40)), module, Darkworld::TONE_PARAM));
-    addParam(createParamCentered<CBAKnob>(mm2px(Vec(50, 40)), module, Darkworld::PRE_DELAY_PARAM));
+    addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(10, 12)), module, Darkworld::DECAY_PARAM));
+    addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(30, 12)), module, Darkworld::MIX_PARAM));
+    addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(50, 12)), module, Darkworld::DWELL_PARAM));
+    addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(10, 40)), module, Darkworld::MODIFY_PARAM));
+    addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(30, 40)), module, Darkworld::TONE_PARAM));
+    addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(50, 40)), module, Darkworld::PRE_DELAY_PARAM));
 
     // ports
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 25)), module, Darkworld::DECAY_INPUT));
