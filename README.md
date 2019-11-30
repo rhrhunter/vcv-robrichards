@@ -19,9 +19,16 @@ Enjoy.
 
 ## Installation Steps
 
-Since these are not distributable on the VCV plug-in library, you'll have to compile
-from source and install locally into your Rack Installation. To do this, you'll need to download
-the most recent version of the [Rack SDK](https://vcvrack.com/downloads/Rack-SDK-1.1.6.zip), unzip it to some directory (e.g. ~/Downloads/Rack-SDK), and run the following:
+Since these are not distributable on the VCV plug-in library (yet), you'll have to compile
+from source and install locally into your Rack Installation.
+
+To do this, first set up your development environment for your platform using this guide: https://vcvrack.com/manual/Building.html#setting-up-your-development-environment.
+
+**Note: you do not need to compile Rack.**
+
+You will then need to download the most recent version of the [Rack SDK](https://vcvrack.com/downloads/Rack-SDK-1.1.6.zip) and unzip it to some directory (e.g. ~/Downloads/Rack-SDK). 
+
+Finally, clone this git repo, change directories into it, and run the following to compile and install the plugin in your Rack installation.
 
 `RACK_SDK=~/Downloads/Rack-SDK make install`
 
@@ -37,4 +44,3 @@ Then launch Rack.
 * "Slow-down" mode toggle (Thermae)
 * "Self-oscillation/Hold" mode via momentary toggle (Thermae)
 * Midi Note tempo divisions (Warped Vinyl)
-
