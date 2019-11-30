@@ -4,7 +4,6 @@
 #include "guicomponents.hpp"
 #include "rr_module.hpp"
 #include <sys/time.h>
-#include <dsp/digital.hpp>
 
 struct WarpedVinyl : RRModule {
   enum ParamIds {

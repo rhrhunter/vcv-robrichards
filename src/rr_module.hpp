@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include "plugin.hpp"
 #include "rr_midi.hpp"
+#include <dsp/digital.hpp>
 
 using namespace std;
 
