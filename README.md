@@ -1,4 +1,6 @@
 # vcv-robrichards
+[![CircleCI](https://circleci.com/gh/rhrhunter/vcv-robrichards/tree/master.svg?style=svg)](https://circleci.com/gh/rhrhunter/vcv-robrichards/tree/master)
+
 VCV Plugins by RobRichards
 
 ![RobRichards Plugins](plugins.png)
