@@ -3,7 +3,7 @@ VCV Plugins by RobRichards
 
 ![RobRichards Plugins](plugins.png)
 
-Here you'll find unofficial Midi controller plugins for various Chase Bliss Pedals.
+Here you'll find unofficial Midi controller plugins for various Chase Bliss Audio Pedals.
 
 Current supported interfaces:
 
@@ -13,7 +13,7 @@ Current supported interfaces:
 * M O O D
 * Generation Loss
 
-**NOTE: You will need the physical CBA pedals (and a Midi-To-USB converter) to use these modules.**
+**NOTE: In order to use these modules, you will need the physical CBA pedals, a MIDI-to-TRS converter (e.g. 'Chase Bliss Audio Midibox'), and a USB-to-MIDI Cable.**
 
 Enjoy.
 
