@@ -3,6 +3,7 @@
 #include <math.h>
 #include "guicomponents.hpp"
 #include "rr_module.hpp"
+#include "rr_midiwidget.hpp"
 #include <dsp/digital.hpp>
 
 struct Thermae : RRModule {
@@ -264,7 +265,7 @@ struct ThermaeWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
 
     // midi configuration display
-    MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3, 75)));
+    RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);
