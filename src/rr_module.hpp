@@ -27,6 +27,9 @@ struct RRModule : Module {
   double curr_rate_usec = 0;
   float next_brightness = 0.f;
 
+  // random things
+  bool lights_off = true;
+
   // periodic internal clock processing
   dsp::ClockDivider enable_midi_clk;
 
@@ -49,6 +52,16 @@ struct RRModule : Module {
       // apply rate limiting
       return true;
     }
+  }
+
+  bool disable_module() {
+    bool was_disabled = lights_off;
+    lights_off = true;
+    return was_disabled;
+  }
+
+  void enable_module() {
+    lights_off = false;
   }
 
   void process_midi_clock(bool enable_clock) {

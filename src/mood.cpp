@@ -70,8 +70,18 @@ struct Mood : RRModule {
 
   void process(const ProcessArgs& args) override {
     // only proceed if midi is activated
-    if (!midi_out.active())
+    if (!midi_out.active()) {
+      if (!disable_module()) {
+        // turn off the lights if the module is not disabled
+        lights[LOOP_LIGHT + 0].setBrightness(0.f);
+        lights[LOOP_LIGHT + 1].setBrightness(0.f);
+        lights[BLOOD_LIGHT].setBrightness(0.f);
+      }
       return;
+    } else {
+      // enable_module
+      enable_module();
+    }
 
     // pedal bypass switches
     int enable_blood = (int) floor(params[BYPASS_BLOOD_PARAM].getValue());

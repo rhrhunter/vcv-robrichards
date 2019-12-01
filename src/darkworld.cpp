@@ -61,8 +61,17 @@ struct Darkworld : RRModule {
 
   void process(const ProcessArgs& args) override {
     // only proceed if midi is activated
-    if (!midi_out.active())
+    if (!midi_out.active()) {
+      if (!disable_module()) {
+        // turn off the lights if the module is not disabled
+        lights[DARK_LIGHT].setBrightness(0.f);
+        lights[WORLD_LIGHT].setBrightness(0.f);
+      }
       return;
+    } else {
+      // enable_module
+      enable_module();
+    }
 
     // read the bypass button values
     int enable_dark = (int) floor(params[BYPASS_DARK_PARAM].getValue());
@@ -169,7 +178,6 @@ struct Darkworld : RRModule {
   }
 };
 
-
 struct DarkworldWidget : ModuleWidget {
   DarkworldWidget(Darkworld* module) {
     setModule(module);
@@ -219,6 +227,5 @@ struct DarkworldWidget : ModuleWidget {
     addChild(midiWidget);
   }
 };
-
 
 Model* modelDarkworld = createModel<Darkworld, DarkworldWidget>("darkworld");

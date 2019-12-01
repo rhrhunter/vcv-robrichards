@@ -20,8 +20,9 @@ namespace rack {
     midi::Port* port;
     int chosenDriverId = -1;
     void onAction(const event::Action& e) override {
-      if (!port)
+      if (!port) {
         return;
+      }
 
       ui::Menu* menu = createMenu();
       menu->addChild(createMenuLabel("MIDI driver"));
@@ -35,8 +36,9 @@ namespace rack {
       }
     }
     void step() override {
-      if (!text.empty() && port && chosenDriverId == port->driverId)
+      if (!text.empty() && port && chosenDriverId == port->driverId) {
         return;
+      }
 
       text = port ? port->getDriverName(port->driverId) : "";
       if (text.empty()) {
@@ -71,8 +73,9 @@ namespace rack {
     midi::Port* port;
     int chosenChannel = -1;
     void onAction(const event::Action& e) override {
-      if (!port)
+      if (!port) {
         return;
+      }
 
       ui::Menu* menu = createMenu();
       menu->addChild(createMenuLabel("MIDI channel"));
@@ -88,9 +91,9 @@ namespace rack {
     void step() override {
       if (!text.empty() && port && chosenChannel == port->channel)
         return;
-
       text = port ? port->getChannelName(port->channel) : "Channel 1";
-      chosenChannel = port->channel;
+      if (port)
+        chosenChannel = port->channel;
     }
   };
 
@@ -150,7 +153,6 @@ namespace rack {
       clearChildren();
 
       math::Vec pos;
-
       driverChoice = createWidget<RRMidiDriverChoice>(pos);
       driverChoice->box.size.x = box.size.x;
       driverChoice->port = port;
@@ -165,8 +167,8 @@ namespace rack {
       deviceChoice->box.size.x = box.size.x;
       deviceChoice->port = port;
       addChild(deviceChoice);
-      pos = deviceChoice->box.getBottomLeft();
 
+      pos = deviceChoice->box.getBottomLeft();
       deviceSeparator = createWidget<LedDisplaySeparator>(pos);
       deviceSeparator->box.size.x = box.size.x;
       addChild(deviceSeparator);
@@ -175,6 +177,7 @@ namespace rack {
       channelChoice->box.size.x = box.size.x;
       channelChoice->port = port;
       addChild(channelChoice);
+
     }
 
   };

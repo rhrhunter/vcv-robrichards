@@ -61,8 +61,17 @@ struct WarpedVinyl : RRModule {
 
   void process(const ProcessArgs& args) override {
     // only proceed if midi is activated
-    if (!midi_out.active())
+    if (!midi_out.active()) {
+      if (!disable_module()) {
+        // turn off the lights if the module is not disabled
+        lights[TAP_TEMPO_LIGHT].setBrightness(0.f);
+        lights[BYPASS_LIGHT].setBrightness(0.f);
+      }
       return;
+    } else {
+      // enable_module
+      enable_module();
+    }
 
     // handle a clock message
     if (inputs[CLOCK_INPUT].isConnected()) {

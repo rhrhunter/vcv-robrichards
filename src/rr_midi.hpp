@@ -30,7 +30,6 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     if (deviceId != id) {
       midi::Output::setDeviceId(id);
       std::string dev_name = getDeviceName(id);
-      INFO("Set dev id to %d (%s)", id, dev_name.c_str());
       reset();
     }
   }
@@ -49,7 +48,6 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
       return false;
     }
     lastMidiCCValues[cc] = value;
-    //INFO("Setting cc:%d to value:%d", cc, value);
 
     // send CC message
     midi::Message m;

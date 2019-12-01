@@ -61,8 +61,17 @@ struct GenerationLoss : RRModule {
 
   void process(const ProcessArgs& args) override {
     // only proceed if midi is activated
-    if (!midi_out.active())
+    if (!midi_out.active()) {
+      if (!disable_module()) {
+        // turn off the lights if the module is not disabled
+        lights[AUX_LIGHT].setBrightness(0.f);
+        lights[BYPASS_LIGHT].setBrightness(0.f);
+      }
       return;
+    } else {
+      // enable_module
+      enable_module();
+    }
 
     // read the bypass button values
     int enable_aux = (int) floor(params[BYPASS_AUX_PARAM].getValue());
