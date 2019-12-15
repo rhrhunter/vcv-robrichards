@@ -31,6 +31,12 @@ namespace rack {
     }
   };
 
+  struct CBAKnobBlooper : RoundKnob {
+    CBAKnobBlooper() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_blooper.svg")));
+    }
+  };
+  
   struct CBAKnobGL : RoundKnob {
     CBAKnobGL() {
       setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_genloss.svg")));

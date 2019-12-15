@@ -42,6 +42,12 @@
       "name": "MIDI Controller: CBA Thermae",
       "description": "VCV MIDI Implementation for Chase Bliss Audio 'Thermae'",
       "tags": ["midi", "thermae", "delay", "pitch shifter"]
-    }
+    },
+    {
+      "slug": "blooper",
+      "name": "MIDI Controller: CBA Blooper",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'Blooper'",
+      "tags": ["midi", "blooper", "looper", "sampler"]
+    }    
   ]
 }

@@ -12,3 +12,4 @@ extern Model* modelWarpedVinyl;
 extern Model* modelMood;
 extern Model* modelGenerationLoss;
 extern Model* modelThermae;
+extern Model* modelBlooper;

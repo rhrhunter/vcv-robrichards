@@ -38,6 +38,10 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     lastMidiCCValues[cc] = -1;
   }
 
+  int getCachedCCValue(int cc) {
+    return lastMidiCCValues[cc];
+  }
+  
   bool active() {
     return deviceId > -1 && channel > -1;
   }
