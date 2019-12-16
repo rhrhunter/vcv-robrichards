@@ -41,6 +41,8 @@ struct Blooper : RRModule {
                   NUM_LIGHTS
   };
 
+  int bypass_state;
+  
   Blooper() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -65,6 +67,8 @@ struct Blooper : RRModule {
     // buttons
     configParam(RECORD_PLAY_LOOP_PARAM, 0.f, 1.f, 0.f, "Record/Play Loop");
     configParam(STOP_LOOP_PARAM, 0.f, 1.f, 0.f, "Stop Loop");
+
+    bypass_state = 0;
   }
 
   void process(const ProcessArgs& args) override {
@@ -87,10 +91,42 @@ struct Blooper : RRModule {
       process_midi_clock(clock);
     }
 
+    // 1) first press of record or play makes pedal record
+    //    and left led lights changes from off to red
+    // 2) 2nd press of record or play makes pedal play
+    //    and left led lights changes from red to green
+    // 3) pressing stop during play states, makes loop stop
+    //    and left led changes from green to flashing green (200ms flashes)
+    // 4) pressing record while in play state will allow for overdubs
+    //    and left led lights changes from green to red 
+    // 5) holding record for a duration of time will
+    //    enable an overdub that lasts as long as the original loop
+    
+    // NOTE:
+    // the length of the first recording dictates when the modifier
+    // lights flash
+    
     // read the bypass button values
-    //int record_or_play_loop = (int) floor(params[RECORD_PLAY_LOOP_PARAM].getValue());
-    //int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
-
+    // int record_or_play_loop = (int) floor(params[RECORD_PLAY_LOOP_PARAM].getValue());
+    // int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
+    // if (bypass_state == 0) {
+    //   // pedal is stopped
+    //   if (record_or_play_loop) {
+    //     // requested to turn on record
+    //     bypass_state = 1;
+    //   }      
+    // } else if (bypass_state == 1) {
+    //   // pedal is recording
+    //   if (record_or_play_loop) {
+    //     // requested to play the loop
+    //     bypass_state = 2;
+    //   }
+      
+    // } else if (bypass_state == 2) {
+    //   // pedal is playing
+    //   if (record_or_play_loop
+    // }
+    
     // 3way switch values (1,2,3)
     int l_toggle = (int) floor(params[L_TOGGLE_PARAM].getValue());
     int m_toggle = (int) floor(params[M_TOGGLE_PARAM].getValue());
@@ -215,11 +251,11 @@ struct BlooperWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Blooper::TOGGLE_MODA_PARAM));
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(55, 82)), module, Blooper::TOGGLE_MODB_PARAM));
 
-    // bypass switches & tap tempo
+    // foot switches 
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Blooper::LEFT_LIGHT));
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, Blooper::RECORD_PLAY_LOOP_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Blooper::RIGHT_LIGHT));
-    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Blooper::STOP_LOOP_PARAM));
+    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(46, 118)), module, Blooper::STOP_LOOP_PARAM));
 
     // midi configuration display
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
