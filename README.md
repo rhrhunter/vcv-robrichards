@@ -14,6 +14,7 @@ Current supported interfaces:
 * Warped Vinyl
 * M O O D
 * Generation Loss
+* Blooper
 
 **NOTE: In order to use these modules, you will need the physical CBA pedals, a MIDI-to-TRS converter (e.g. 'Chase Bliss Audio Midibox'), and a USB-to-MIDI Cable.**
 
@@ -41,8 +42,9 @@ Then launch Rack.
 * 3-way programmable switches (All)
 * Stomp switch controls (All)
 * Expression CV Input (All)
-* Clock SYNC inputs (Thermae & Warped Vinyl)
+* Clock SYNC inputs (Thermae, Warped Vinyl, & Blooper)
 * Tap Tempo switch (Thermae & Warped Vinyl)
 * "Slow-down" mode toggle (Thermae)
 * "Self-oscillation/Hold" mode via momentary toggle (Thermae)
 * Midi Note tempo divisions (Warped Vinyl)
+* Modifier Toggles (Blooper)

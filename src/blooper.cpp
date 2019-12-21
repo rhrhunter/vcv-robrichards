@@ -219,7 +219,7 @@ struct Blooper : RRModule {
     // 5) holding record for a duration of time will
     //    enable an overdub that lasts as long as the original loop
     
-    // NOTE:
+    // TODO
     // the length of the first recording dictates when the modifier
     // lights flash
     
@@ -229,25 +229,31 @@ struct Blooper : RRModule {
     int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
     int erase_loop = (int) floor(params[ERASE_LOOP_PARAM].getValue());    
     if (bypass_state == 0) {
-       // pedal is stopped
+       // pedal is stopped (or the state is unknown)
       if (record_loop) {
         // requested to turn on record
         bypass_state = 1;
-        INFO("0 => 1");                                
         // send a record message
         record();
-      }      
+      } else if (play_loop) {
+        bypass_state = 2;
+        play();
+      } else if (stop_loop) {
+        bypass_state = 3;
+        stop();
+      } else if (erase_loop) {
+        bypass_state = 0;
+        erase();
+      }
     } else if (bypass_state == 1) {
       // pedal is recording
       if (play_loop) {
         // requested to play the loop
         bypass_state = 2;
-        INFO("1 => 2");                        
         play();
       } else if (stop_loop) {
         // requested to stop the loop
         bypass_state = 3;
-        INFO("1 => 3");                
         stop();
       } else if (erase_loop) {
         bypass_state = 0;
@@ -258,11 +264,9 @@ struct Blooper : RRModule {
       if (record_loop) {
         // requested to overdub something
         bypass_state = 1;
-        INFO("2 => 1");        
         over_dub();
       } else if (stop_loop) {
         // requested to stop the loop
-        INFO("2 => 3");
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
@@ -273,9 +277,12 @@ struct Blooper : RRModule {
       // pedal is stopped
       if (play_loop) {
         // requested to play the loop
-        INFO("3 => 2");
         bypass_state = 2;
         play();
+      } else if (stop_loop) {
+        // requested to stop the loop
+        bypass_state = 3;
+        stop();        
       } else if (erase_loop) {
         bypass_state = 0;
         erase();
