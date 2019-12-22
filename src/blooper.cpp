@@ -21,9 +21,9 @@ struct Blooper : RRModule {
                  TOGGLE_MODA_PARAM,
                  TOGGLE_MODB_PARAM,
                  RECORD_LOOP_PARAM,
-                 PLAY_LOOP_PARAM,                 
+                 PLAY_LOOP_PARAM,
                  STOP_LOOP_PARAM,
-                 ERASE_LOOP_PARAM,                 
+                 ERASE_LOOP_PARAM,
                  NUM_PARAMS
   };
   enum InputIds  {
@@ -47,9 +47,12 @@ struct Blooper : RRModule {
   // internal clock measurements
   struct timeval last_blink_time;
   double blink_off_until_usec = 0;
-  double blink_off_until_sec = 0;  
+  double blink_off_until_sec = 0;
   int bypass_state;
-  
+
+  // erase state grace period
+  struct timeval erase_grace_period;
+
   Blooper() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -69,43 +72,75 @@ struct Blooper : RRModule {
 
     // front buttons
     configParam(TOGGLE_MODA_PARAM, 0.0f, 1.0f, 0.0f, "Modifier A (enable/disable)");
-    configParam(TOGGLE_MODB_PARAM, 0.0f, 1.0f, 0.0f, "Modifier B (enable/disable)");    
-    
-    // buttons
-    configParam(RECORD_LOOP_PARAM, 0.f, 1.f, 0.f, "Record Loop");
-    configParam(PLAY_LOOP_PARAM, 0.f, 1.f, 0.f, "Play Loop");   
-    configParam(STOP_LOOP_PARAM, 0.f, 1.f, 0.f, "Stop Loop");
-    configParam(ERASE_LOOP_PARAM, 0.f, 1.f, 0.f, "Erase Loop");    
+    configParam(TOGGLE_MODB_PARAM, 0.0f, 1.0f, 0.0f, "Modifier B (enable/disable)");
 
-    // led states
-    gettimeofday(&last_blink_time, NULL);    
+    // buttons
+    configParam(RECORD_LOOP_PARAM, 0.f, 1.f, 0.f, "Record/Overdub");
+    configParam(PLAY_LOOP_PARAM, 0.f, 1.f, 0.f, "Play");
+    configParam(STOP_LOOP_PARAM, 0.f, 1.f, 0.f, "Stop");
+    configParam(ERASE_LOOP_PARAM, 0.f, 1.f, 0.f, "Erase");
+
+    // pedal bypass state (play, recording, overdubbing, stopped, erasing, etc...)
     bypass_state = 0;
+
+    // blinking rate
+    gettimeofday(&last_blink_time, NULL);
   }
 
   void record() {
+    // send a record message
     midi_out.setValue(1, 11);
   }
 
   void play() {
+    // send a play message
     midi_out.setValue(2, 11);
-  }  
-  
-  void over_dub() {
-    midi_out.setValue(3, 11);    
   }
-  
+
+  void over_dub() {
+    // send an over dub message
+    midi_out.setValue(3, 11);
+  }
+
   void stop() {
+    // send a stop message
     midi_out.setValue(4, 11);
   }
-  
+
   void erase() {
+    // send an erase message
     midi_out.setValue(7, 11);
-  }  
-  
-  float flash_loop_led(float blink_rate) {
+
+    // collect a timestamp to know when the
+    // erase grace period starts
+    gettimeofday(&erase_grace_period, NULL);
+  }
+
+  bool should_transition_to_off_state(float time_until) {
+    // get a new measurement
+    struct timeval ctime;
+    gettimeofday(&ctime, NULL);
+    double this_time_usec = (double) ctime.tv_usec;
+    double this_time_sec = (double) ctime.tv_sec;
+
+    // calculate whether we should transition to the off state
+    double last_time_usec = (double) erase_grace_period.tv_usec;
+    double last_time_sec = (double) erase_grace_period.tv_sec;
+    double diff_sec = this_time_sec - last_time_sec;
+    double diff_usec = this_time_usec - last_time_usec;
+    float diff = (float) (diff_sec + (diff_usec/1000000));
+    if (diff > time_until) {
+      // transition to off
+      return true;
+    } else {
+      // stay in current state
+      return false;
+    }
+  }
+
+  float flash_led(float blink_rate) {
     // collect a current time stamp and compare it to a previously stored time stamp
-    // measure the amount of time from the previous tap tempo to this tap tempo.
-    // this will be the tap tempo rate (for the tap tempo LED).
+    // measure the amount of time from the previous LED flash
     double last_time_usec = (double) last_blink_time.tv_usec;
     double last_time_sec = (double) last_blink_time.tv_sec;
 
@@ -142,7 +177,7 @@ struct Blooper : RRModule {
       return 1.f;
     }
   }
-  
+
   void process(const ProcessArgs& args) override {
     // only proceed if midi is activated
     if (!midi_out.active()) {
@@ -185,29 +220,56 @@ struct Blooper : RRModule {
     else
       midi_out.setValue(127,31);
 
-    // turn on lights
-    if (bypass_state == 1) {
+    // toggle the lights based on the current state
+    if (bypass_state == 0) {
+      // pedal is not playing / unknown state
+      lights[LEFT_LIGHT + 0].setBrightness(0.f);
+      lights[LEFT_LIGHT + 1].setBrightness(0.f);
+      lights[RIGHT_LIGHT].setBrightness(0.f);
+    } else if (bypass_state == 1) {
       // recording so light will be red
-      lights[LEFT_LIGHT + 1].setBrightness(1.f);
       lights[LEFT_LIGHT].setBrightness(0.f);
+      lights[LEFT_LIGHT + 1].setBrightness(1.f);
+      lights[RIGHT_LIGHT].setBrightness(0.f);
     } else if (bypass_state == 2) {
       // recording is playing so light will be green
+      lights[LEFT_LIGHT].setBrightness(1.f);
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
-      lights[LEFT_LIGHT].setBrightness(1.f);            
+      lights[RIGHT_LIGHT].setBrightness(0.f);
     } else if (bypass_state == 3) {
       // recording is stopped, so flash green
-      lights[LEFT_LIGHT].setBrightness(flash_loop_led(0.50f));      
+      lights[LEFT_LIGHT].setBrightness(flash_led(0.50f));
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
+      lights[RIGHT_LIGHT].setBrightness(0.f);
     } else {
-      lights[LEFT_LIGHT + 0].setBrightness(0.f);      
-      lights[LEFT_LIGHT + 1].setBrightness(0.f);      
+      // recording is being deleted, flash both lights red for 2s
+      lights[LEFT_LIGHT+1].setBrightness(flash_led(0.30f));
+      lights[RIGHT_LIGHT].setBrightness(flash_led(0.30f));
+
+      // turn off the green light
+      lights[LEFT_LIGHT].setBrightness(0);
+
+      // if 2s has passed since we started deleting, transition to off state
+      if (should_transition_to_off_state(2.0f))
+        bypass_state = 0;
     }
-               
+
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
     if (should_rate_limit(0.005f, args.sampleTime))
       return;
-    
+
+    // TODO
+    // the length of the first recording, i.e. the time between pressing record and play
+    // dictates how often the modifier lights flash.
+
+    // read the bypass button values
+    int record_loop = (int) floor(params[RECORD_LOOP_PARAM].getValue());
+    int play_loop = (int) floor(params[PLAY_LOOP_PARAM].getValue());
+    int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
+    int erase_loop = (int) floor(params[ERASE_LOOP_PARAM].getValue());
+
+    // State transitions:
     // 1) first press of record or play makes pedal record
     //    and left led lights changes from off to red
     // 2) 2nd press of record or play makes pedal play
@@ -215,19 +277,10 @@ struct Blooper : RRModule {
     // 3) pressing stop during play states, makes loop stop
     //    and left led changes from green to flashing green (200ms flashes)
     // 4) pressing record while in play state will allow for overdubs
-    //    and left led lights changes from green to red 
+    //    and left led lights changes from green to red
     // 5) holding record for a duration of time will
     //    enable an overdub that lasts as long as the original loop
-    
-    // TODO
-    // the length of the first recording dictates when the modifier
-    // lights flash
-    
-    // read the bypass button values
-    int record_loop = (int) floor(params[RECORD_LOOP_PARAM].getValue());
-    int play_loop = (int) floor(params[PLAY_LOOP_PARAM].getValue());    
-    int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
-    int erase_loop = (int) floor(params[ERASE_LOOP_PARAM].getValue());    
+
     if (bypass_state == 0) {
        // pedal is stopped (or the state is unknown)
       if (record_loop) {
@@ -242,7 +295,8 @@ struct Blooper : RRModule {
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
-        bypass_state = 0;
+        // requested to erase the loop        
+        bypass_state = 4;
         erase();
       }
     } else if (bypass_state == 1) {
@@ -256,9 +310,10 @@ struct Blooper : RRModule {
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
-        bypass_state = 0;
+        // requested to erase the loop        
+        bypass_state = 4;
         erase();
-      }      
+      }
     } else if (bypass_state == 2) {
       // pedal is playing
       if (record_loop) {
@@ -270,9 +325,10 @@ struct Blooper : RRModule {
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
-        bypass_state = 0;
+        // requested to erase the loop        
+        bypass_state = 4;
         erase();
-      }            
+      }
     } else if (bypass_state == 3) {
       // pedal is stopped
       if (play_loop) {
@@ -282,11 +338,16 @@ struct Blooper : RRModule {
       } else if (stop_loop) {
         // requested to stop the loop
         bypass_state = 3;
-        stop();        
+        stop();
       } else if (erase_loop) {
-        bypass_state = 0;
+        // requested to erase the loop
+        bypass_state = 4;
         erase();
-      }            
+      }
+    } else if (bypass_state == 4) {
+      // transient state, loop is being erased
+      // ignore all state change requests until we transition to
+      // the off state.
     }
 
     // knob values
@@ -382,18 +443,19 @@ struct BlooperWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Blooper::M_TOGGLE_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Blooper::R_TOGGLE_PARAM));
 
-    // mod a and mod b enable/disable 
+    // mod a and mod b enable/disable
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Blooper::TOGGLE_MODA_PARAM));
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(55, 82)), module, Blooper::TOGGLE_MODB_PARAM));
 
-    // foot switches 
+    // lights
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Blooper::LEFT_LIGHT));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Blooper::RIGHT_LIGHT));
-    
+
+    // foot switches
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(11, 118)), module, Blooper::RECORD_LOOP_PARAM));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(24, 118)), module, Blooper::PLAY_LOOP_PARAM));    
+    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(24, 118)), module, Blooper::PLAY_LOOP_PARAM));
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(37, 118)), module, Blooper::STOP_LOOP_PARAM));
-        addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(50, 118)), module, Blooper::ERASE_LOOP_PARAM));
+    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(50, 118)), module, Blooper::ERASE_LOOP_PARAM));
 
     // midi configuration display
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
