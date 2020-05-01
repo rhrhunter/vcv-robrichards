@@ -28,6 +28,10 @@ struct Darkworld : RRModule {
                   TONE_INPUT,
                   PRE_DELAY_INPUT,
                   EXPR_INPUT,
+                  BYPASS_DARK_INPUT_LOW,
+                  BYPASS_DARK_INPUT_HIGH,
+                  BYPASS_WORLD_INPUT_LOW,
+                  BYPASS_WORLD_INPUT_HIGH,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -36,6 +40,9 @@ struct Darkworld : RRModule {
                   WORLD_LIGHT,
                   NUM_LIGHTS
   };
+
+  dsp::SchmittTrigger dark_trigger_low, dark_trigger_high, world_trigger_low, world_trigger_high;
+
 
   Darkworld() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -71,6 +78,28 @@ struct Darkworld : RRModule {
     } else {
       // enable_module
       enable_module();
+    }
+
+    // read the gate triggers
+    if (inputs[BYPASS_DARK_INPUT_HIGH].isConnected()) {
+      if (dark_trigger_high.process(rescale(inputs[BYPASS_DARK_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes high, turn on the dark channel
+        params[BYPASS_DARK_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_DARK_INPUT_LOW].isConnected()) {
+      if (dark_trigger_low.process(rescale(inputs[BYPASS_DARK_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes low, turn off the dark channel
+        params[BYPASS_DARK_PARAM].setValue(0.f);
+    }
+    if (inputs[BYPASS_WORLD_INPUT_HIGH].isConnected()) {
+      if (world_trigger_high.process(rescale(inputs[BYPASS_WORLD_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes high, turn on the world channel
+        params[BYPASS_WORLD_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_WORLD_INPUT_LOW].isConnected()) {
+      if (world_trigger_low.process(rescale(inputs[BYPASS_WORLD_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes low, turn off the world channel
+        params[BYPASS_WORLD_PARAM].setValue(0.f);
     }
 
     // read the bypass button values
@@ -210,12 +239,17 @@ struct DarkworldWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Darkworld::ROUTING_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Darkworld::WORLD_PROGRAM_PARAM));
 
-    // bypass switches
+    // dark channel led / bypass / high & low gate
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, Darkworld::DARK_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(15, 118)), module, Darkworld::BYPASS_DARK_PARAM));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Darkworld::BYPASS_DARK_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 118)), module, Darkworld::BYPASS_DARK_INPUT_LOW));
 
+    // world channel led / bypass / high & low gate
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Darkworld::WORLD_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Darkworld::BYPASS_WORLD_PARAM));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 109)), module, Darkworld::BYPASS_WORLD_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 118)), module, Darkworld::BYPASS_WORLD_INPUT_LOW));
 
     // expression port
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, Darkworld::EXPR_INPUT));
