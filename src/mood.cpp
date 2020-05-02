@@ -30,6 +30,10 @@ struct Mood : RRModule {
                   CLOCK_INPUT,
                   MODIFY_LOOP_INPUT,
                   EXPR_INPUT,
+                  BYPASS_BLOOD_INPUT_LOW,
+                  BYPASS_BLOOD_INPUT_HIGH,
+                  BYPASS_LOOP_INPUT_LOW,
+                  BYPASS_LOOP_INPUT_HIGH,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -38,6 +42,8 @@ struct Mood : RRModule {
                   ENUMS(LOOP_LIGHT, 2),
                   NUM_LIGHTS
   };
+
+  dsp::SchmittTrigger blood_trigger_low, blood_trigger_high, loop_trigger_low, loop_trigger_high;
 
   // internal clock measurements
   struct timeval last_blink_time;
@@ -81,6 +87,28 @@ struct Mood : RRModule {
     } else {
       // enable_module
       enable_module();
+    }
+
+    // read the gate triggers
+    if (inputs[BYPASS_BLOOD_INPUT_HIGH].isConnected()) {
+      if (blood_trigger_high.process(rescale(inputs[BYPASS_BLOOD_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes high, turn on the blood channel
+        params[BYPASS_BLOOD_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_BLOOD_INPUT_LOW].isConnected()) {
+      if (blood_trigger_low.process(rescale(inputs[BYPASS_BLOOD_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes low, turn off the blood channel
+        params[BYPASS_BLOOD_PARAM].setValue(0.f);
+    }
+    if (inputs[BYPASS_LOOP_INPUT_HIGH].isConnected()) {
+      if (loop_trigger_high.process(rescale(inputs[BYPASS_LOOP_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes high, turn on the loop channel
+        params[BYPASS_LOOP_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_LOOP_INPUT_LOW].isConnected()) {
+      if (loop_trigger_low.process(rescale(inputs[BYPASS_LOOP_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes low, turn off the loop channel
+        params[BYPASS_LOOP_PARAM].setValue(0.f);
     }
 
     // pedal bypass switches
@@ -321,8 +349,14 @@ struct MoodWidget : ModuleWidget {
     // bypass switches and Leds
     addChild(createLightCentered<LargeLight<GreenLight>>(mm2px(Vec(15, 109)), module, Mood::BLOOD_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Mood::BYPASS_BLOOD_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 118)), module, Mood::BYPASS_BLOOD_INPUT_LOW));
+
+    // loop channel led / bypass / high & low gate
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(46, 109)), module, Mood::LOOP_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Mood::BYPASS_LOOP_PARAM));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 109)), module, Mood::BYPASS_LOOP_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 118)), module, Mood::BYPASS_LOOP_INPUT_LOW));
 
     // midi configuration displays
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));

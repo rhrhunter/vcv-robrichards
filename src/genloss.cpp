@@ -28,6 +28,10 @@ struct GenerationLoss : RRModule {
                   GEN_INPUT,
                   LP_INPUT,
                   EXPR_INPUT,
+                  BYPASS_AUX_INPUT_LOW,
+                  BYPASS_AUX_INPUT_HIGH,
+                  BYPASS_PEDAL_INPUT_LOW,
+                  BYPASS_PEDAL_INPUT_HIGH,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -36,6 +40,8 @@ struct GenerationLoss : RRModule {
                   BYPASS_LIGHT,
                   NUM_LIGHTS
   };
+
+  dsp::SchmittTrigger aux_trigger_low, aux_trigger_high, pedal_trigger_low, pedal_trigger_high;
 
   GenerationLoss() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -71,6 +77,28 @@ struct GenerationLoss : RRModule {
     } else {
       // enable_module
       enable_module();
+    }
+
+    // read the gate triggers
+    if (inputs[BYPASS_AUX_INPUT_HIGH].isConnected()) {
+      if (aux_trigger_high.process(rescale(inputs[BYPASS_AUX_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes high, turn on the aux channel
+        params[BYPASS_AUX_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_AUX_INPUT_LOW].isConnected()) {
+      if (aux_trigger_low.process(rescale(inputs[BYPASS_AUX_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes low, turn off the aux channel
+        params[BYPASS_AUX_PARAM].setValue(0.f);
+    }
+    if (inputs[BYPASS_PEDAL_INPUT_HIGH].isConnected()) {
+      if (pedal_trigger_high.process(rescale(inputs[BYPASS_PEDAL_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes high, turn on the pedal channel
+        params[BYPASS_PEDAL_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_PEDAL_INPUT_LOW].isConnected()) {
+      if (pedal_trigger_low.process(rescale(inputs[BYPASS_PEDAL_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+        // if the trigger goes low, turn off the pedal channel
+        params[BYPASS_PEDAL_PARAM].setValue(0.f);
     }
 
     // read the bypass button values
@@ -211,11 +239,17 @@ struct GenerationLossWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, GenerationLoss::DRY_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, GenerationLoss::HISS_PARAM));
 
-    // bypass switches
+    // aux led / button / high & low gate
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, GenerationLoss::AUX_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(15, 118)), module, GenerationLoss::BYPASS_AUX_PARAM));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, GenerationLoss::BYPASS_AUX_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 118)), module, GenerationLoss::BYPASS_AUX_INPUT_LOW));
+
+    // bypass led / button / high & low gate
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, GenerationLoss::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, GenerationLoss::BYPASS_PEDAL_PARAM));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 109)), module, GenerationLoss::BYPASS_PEDAL_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 118)), module, GenerationLoss::BYPASS_PEDAL_INPUT_LOW));
 
     // midi configuration displays
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));

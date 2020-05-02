@@ -43,7 +43,6 @@ struct Darkworld : RRModule {
 
   dsp::SchmittTrigger dark_trigger_low, dark_trigger_high, world_trigger_low, world_trigger_high;
 
-
   Darkworld() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
