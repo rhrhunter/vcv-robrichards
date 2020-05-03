@@ -21,6 +21,7 @@ NOTE: In order to use these modules, you will need:
 1. One of the physical Chase Bliss Audio Pedals listed above.
 2. A MIDI-to-TRS converter (e.g. 'Chase Bliss Audio Midibox' or a 'Disaster Area Designs Midibox').
 3. A means to connect the MIDI-to-TRS converter to your computer via a MIDI Interface (e.g. MOTU Express XT) or special Midi to USB cable.
+4. A computer with VCV Rack installed.
 
 Enjoy.
 
