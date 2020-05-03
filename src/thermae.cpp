@@ -32,6 +32,7 @@ struct Thermae : RRModule {
                   INT2_INPUT,
                   CLOCK_INPUT,
                   EXPR_INPUT,
+                  TAP_TEMPO_INPUT_HIGH,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -47,6 +48,8 @@ struct Thermae : RRModule {
 
   // tap tempo LED colors
   int curr_tap_tempo_light_color = 1; // 1=red, 0=green
+
+  dsp::SchmittTrigger tap_tempo_trigger_high;
 
   Thermae() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -115,9 +118,18 @@ struct Thermae : RRModule {
     if (hold_mode > 0)
       hold_mode = 127;
 
+    // read the gate triggers
+    int tap_gate = 0;
+    if (inputs[TAP_TEMPO_INPUT_HIGH].isConnected()) {
+      if (tap_tempo_trigger_high.process(rescale(inputs[TAP_TEMPO_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+        // if the trigger goes high, trigger a tap tempo
+        tap_gate = 1;
+      }
+    }
+
     // process any tap tempo requests
     int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
-    float tap_tempo_brightness = process_tap_tempo(tap_tempo);
+    float tap_tempo_brightness = process_tap_tempo(tap_gate ? 1 : tap_tempo);
     if (tap_tempo_brightness >= 0) {
       // flash the current color using the processed brightness value
       lights[TAP_TEMPO_LIGHT + curr_tap_tempo_light_color].setBrightness(tap_tempo_brightness);
@@ -273,6 +285,9 @@ struct ThermaeWidget : ModuleWidget {
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, Thermae::TAP_TEMPO_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Thermae::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
+
+    // tap tempo high gate
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Thermae::TAP_TEMPO_INPUT_HIGH));
 
     // midi configuration display
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));

@@ -346,7 +346,7 @@ struct MoodWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Mood::ROUTING_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Mood::LOOP_PROGRAM_PARAM));
 
-    // bypass switches and Leds
+    // blood channel led / bypass / high & low gate
     addChild(createLightCentered<LargeLight<GreenLight>>(mm2px(Vec(15, 109)), module, Mood::BLOOD_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(15, 118)), module, Mood::BYPASS_BLOOD_PARAM));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Mood::BYPASS_BLOOD_INPUT_HIGH));

@@ -28,6 +28,7 @@ struct WarpedVinyl : RRModule {
                   WARP_INPUT,
                   CLOCK_INPUT,
                   EXPR_INPUT,
+                  TAP_TEMPO_INPUT_HIGH,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -36,6 +37,8 @@ struct WarpedVinyl : RRModule {
                   BYPASS_LIGHT,
                   NUM_LIGHTS
   };
+
+  dsp::SchmittTrigger tap_tempo_trigger_high;
 
   WarpedVinyl() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -79,9 +82,18 @@ struct WarpedVinyl : RRModule {
       process_midi_clock(clock);
     }
 
+    // read the gate triggers
+    int tap_gate = 0;
+    if (inputs[TAP_TEMPO_INPUT_HIGH].isConnected()) {
+      if (tap_tempo_trigger_high.process(rescale(inputs[TAP_TEMPO_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+        // if the trigger goes high, trigger a tap tempo
+        tap_gate = 1;
+      }
+    }
+
     // process any tap tempo requests
     int tap_tempo = (int) floor(params[TAP_TEMPO_PARAM].getValue());
-    float tap_tempo_brightness = process_tap_tempo(tap_tempo);
+    float tap_tempo_brightness = process_tap_tempo(tap_gate ? 1 : tap_tempo);
     if (tap_tempo_brightness >= 0) {
       // flash the current color using the processed brightness value
       lights[TAP_TEMPO_LIGHT].setBrightness(tap_tempo_brightness);
@@ -209,6 +221,9 @@ struct WarpedVinylWidget : ModuleWidget {
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, WarpedVinyl::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
+
+    // tap tempo high gate
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, WarpedVinyl::TAP_TEMPO_INPUT_HIGH));
 
     // midi configuration display
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
