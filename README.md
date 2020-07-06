@@ -14,7 +14,7 @@ Current supported interfaces:
 * Warped Vinyl
 * M O O D
 * Generation Loss
-* Blooper (Firmware v1.1)
+* Blooper (Firmware v1.2)
 
 NOTE: In order to use these modules, you will need:
 
