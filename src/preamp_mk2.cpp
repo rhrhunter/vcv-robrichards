@@ -148,6 +148,13 @@ struct PreampMKIIWidget : ModuleWidget {
     addParam(createParam<PreampMKIISlider>(mm2px(Vec(77, 11)), module, PreampMKII::BASS_SLIDER_PARAM));
     addParam(createParam<PreampMKIISlider>(mm2px(Vec(92.5, 11)), module, PreampMKII::GAIN_SLIDER_PARAM));
 
+    // arcade buttons in the middle
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(25.5, 88)), module, PreampMKII::JUMP_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(41.0, 88)), module, PreampMKII::MIDS_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(56.5, 88)), module, PreampMKII::Q_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(72.0, 88)), module, PreampMKII::DIODE_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(87.5, 88)), module, PreampMKII::FUZZ_ARCADE_PARAM));
+
     // preset change light and button
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42, 113.5)), module, PreampMKII::PRESET_LIGHT));
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(25, 113)), module, PreampMKII::CHANGE_PRESET_PARAM));
