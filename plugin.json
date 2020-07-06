@@ -48,6 +48,12 @@
       "name": "MIDI Controller: CBA Blooper",
       "description": "VCV MIDI Implementation for Chase Bliss Audio 'Blooper'",
       "tags": ["midi", "blooper", "looper", "sampler"]
-    }    
+    },
+    {
+      "slug": "preamp_mk2",
+      "name": "MIDI Controller: CBA Preamp MKII AUTOMATONE",
+      "description": "VCV MIDI Implementation for Chase Bliss Audio 'Preamp MKII'",
+      "tags": ["midi"]
+    }
   ]
 }
