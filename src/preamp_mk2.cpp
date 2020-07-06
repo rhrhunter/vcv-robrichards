@@ -47,15 +47,17 @@ struct PreampMKII : RRModule {
 
     // arcade buttons
     // 0.0f is bottom position
-    configParam(JUMP_ARCADE_PARAM, 1.0f, 3.0f, 2.0f, "Preset Jump (Off, 1, 5)");
-    configParam(MIDS_ARCADE_PARAM, 1.0f, 3.0f, 2.0f, "Mids Routine (Off, Pre, Post)");
-    configParam(Q_ARCADE_PARAM, 1.0f, 3.0f, 2.0f, "Frequency Width 'Q' (Low, Mid, High)");
-    configParam(DIODE_ARCADE_PARAM, 1.0f, 3.0f, 2.0f, "Diode Type (Off, Sil, Germ)");
-    configParam(FUZZ_ARCADE_PARAM, 1.0f, 3.0f, 2.0f, "Fuzz Type (Off, Open, Gated)");
+    configParam(JUMP_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Preset Jump (Off, 1, 5)");
+    configParam(MIDS_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Mids Routine (Off, Pre, Post)");
+    configParam(Q_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Frequency Width 'Q' (Low, Mid, High)");
+    configParam(DIODE_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Diode Type (Off, Sil, Germ)");
+    configParam(FUZZ_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Fuzz Type (Off, Open, Gated)");
 
     // bypass buttons
     configParam(CHANGE_PRESET_PARAM, 0.f, 1.f, 0.f, "Change Preset");
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Pedal");
+    midi_out.setDeviceId(8);
+    midi_out.setChannel(1);
   }
 
   void process(const ProcessArgs& args) override {

@@ -51,7 +51,7 @@
      inkscape:window-height="880"
      inkscape:window-width="1600"
      showgrid="false"
-     inkscape:current-layer="layer6"
+     inkscape:current-layer="layer5"
      inkscape:document-units="mm"
      inkscape:cy="243.30242"
      inkscape:cx="211.6207"
@@ -449,6 +449,7 @@
     </g>
   </g>
   <g
+     sodipodi:insensitive="true"
      style="display:inline"
      inkscape:label="middle_text"
      id="layer5"
@@ -575,6 +576,7 @@
     </g>
   </g>
   <g
+     sodipodi:insensitive="true"
      style="display:inline"
      inkscape:groupmode="layer"
      id="layer6"
