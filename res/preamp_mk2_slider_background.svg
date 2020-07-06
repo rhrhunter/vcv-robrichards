@@ -7,13 +7,13 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="preamp_mk2_slider_track.svg"
+   sodipodi:docname="preamp_mk2_slider_background.svg"
    inkscape:version="1.0beta1 (76ce730, 2019-10-19)"
    id="svg3882"
    version="1.1"
-   viewBox="0 0 210 297"
-   height="297mm"
-   width="210mm">
+   viewBox="0 0 3 53"
+   height="53mm"
+   width="3mm">
   <defs
      id="defs3876" />
   <sodipodi:namedview
@@ -26,9 +26,9 @@
      inkscape:document-rotation="0"
      inkscape:current-layer="layer1"
      inkscape:document-units="mm"
-     inkscape:cy="561.25984"
-     inkscape:cx="396.85039"
-     inkscape:zoom="0.42331174"
+     inkscape:cy="89"
+     inkscape:cx="20"
+     inkscape:zoom="1"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -50,14 +50,16 @@
   <g
      id="layer1"
      inkscape:groupmode="layer"
-     inkscape:label="Layer 1">
+     inkscape:label="Layer 1"
+     style="display:inline">
     <rect
-       ry="3.3917484"
-       y="3.1541483"
-       x="100.15417"
-       height="293.10223"
-       width="9.6246729"
+       ry="0.63290405"
+       y="-0.37284982"
+       x="-3.7552385"
+       height="54.693211"
+       width="3.5047958"
        id="rect4445"
-       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.618538;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:0.997076;paint-order:stroke markers fill" />
+       style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.161236;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:0.997076;paint-order:stroke markers fill"
+       transform="scale(-1,1)" />
   </g>
 </svg>

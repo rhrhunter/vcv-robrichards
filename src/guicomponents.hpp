@@ -36,7 +36,7 @@ namespace rack {
       setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_blooper.svg")));
     }
   };
-  
+
   struct CBAKnobGL : RoundKnob {
     CBAKnobGL() {
       setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_genloss.svg")));
@@ -124,6 +124,20 @@ namespace rack {
       momentary = false;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
+    }
+  };
+
+  struct PreampMKIISlider : SvgSlider {
+    PreampMKIISlider() {
+      Vec margin = Vec(1, 1);
+      maxHandlePos = Vec(-15.0, -13.0).plus(margin);
+      minHandlePos = Vec(-15.0, 130.0).plus(margin);
+      setBackgroundSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/preamp_mk2_slider_background.svg")));
+      setHandleSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_slider_handle.svg")));
+
+      background->box.pos = margin;
+
+      box.size = background->box.size.plus(margin.mult(2));
     }
   };
 

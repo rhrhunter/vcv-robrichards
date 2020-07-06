@@ -8,200 +8,48 @@
    xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="preamp_mk2_slider_handle.svg"
-   inkscape:version="1.0beta1 (76ce730, 2019-10-19)"
-   id="svg953"
+   width="14mm"
+   height="15mm"
+   viewBox="0 0 14 15"
    version="1.1"
-   viewBox="0 0 210 297"
-   height="297mm"
-   width="210mm">
+   id="svg953"
+   inkscape:version="1.0beta1 (76ce730, 2019-10-19)"
+   sodipodi:docname="preamp_mk2_slider_handle.svg">
   <defs
      id="defs947">
     <pattern
-       patternTransform="matrix(8.6687185,0,0,10.16998,17.393968,-2.3123556)"
-       id="pattern3745"
+       inkscape:collect="always"
        xlink:href="#Packedcircles"
-       inkscape:collect="always" />
+       id="pattern3745"
+       patternTransform="matrix(8.6687185,0,0,10.16998,17.393968,-2.3123556)" />
     <pattern
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="1"
-       height="1.73205080756"
-       patternTransform="translate(0,0) scale(10,10)"
+       inkscape:stockid="Packed circles"
        id="Packedcircles"
-       inkscape:stockid="Packed circles">
-      <circle
-         style="fill:black;stroke:none"
-         cx="0"
-         cy="0.5"
-         r="0.5"
-         id="circle2620" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="1"
-         cy="0.5"
-         r="0.5"
-         id="circle2622" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="0.5"
-         cy="1.36602540378"
-         r="0.5"
-         id="circle2624" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="0.5"
-         cy="-0.366025403784"
-         r="0.5"
-         id="circle2626" />
-    </pattern>
-    <pattern
-       inkscape:collect="always"
-       xlink:href="#Packedcircles-3"
-       id="pattern3745-1"
-       patternTransform="matrix(8.6687185,0,0,10.16998,17.612909,167.80961)" />
-    <pattern
-       inkscape:stockid="Packed circles"
-       id="Packedcircles-3"
        patternTransform="translate(0,0) scale(10,10)"
        height="1.73205080756"
        width="1"
        patternUnits="userSpaceOnUse"
        inkscape:collect="always">
       <circle
-         id="circle2620-7"
+         id="circle2620"
          r="0.5"
          cy="0.5"
          cx="0"
          style="fill:black;stroke:none" />
       <circle
-         id="circle2622-7"
+         id="circle2622"
          r="0.5"
          cy="0.5"
          cx="1"
          style="fill:black;stroke:none" />
       <circle
-         id="circle2624-4"
+         id="circle2624"
          r="0.5"
          cy="1.36602540378"
          cx="0.5"
          style="fill:black;stroke:none" />
       <circle
-         id="circle2626-6"
-         r="0.5"
-         cy="-0.366025403784"
-         cx="0.5"
-         style="fill:black;stroke:none" />
-    </pattern>
-    <pattern
-       inkscape:collect="always"
-       xlink:href="#Packedcircles-5-1"
-       id="pattern3657-5"
-       patternTransform="matrix(8.6687185,0,0,10.2893,17.486776,170.3623)" />
-    <pattern
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="1"
-       height="1.73205080756"
-       patternTransform="translate(0,0) scale(10,10)"
-       id="Packedcircles-5-1"
-       inkscape:stockid="Packed circles">
-      <circle
-         style="fill:black;stroke:none"
-         cx="0"
-         cy="0.5"
-         r="0.5"
-         id="circle2620-8-2" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="1"
-         cy="0.5"
-         r="0.5"
-         id="circle2622-1-6" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="0.5"
-         cy="1.36602540378"
-         r="0.5"
-         id="circle2624-6-5" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="0.5"
-         cy="-0.366025403784"
-         r="0.5"
-         id="circle2626-3-7" />
-    </pattern>
-    <pattern
-       patternTransform="matrix(8.6687185,0,0,10.417666,18.41739,-3.2749625)"
-       id="pattern3745-1-1"
-       xlink:href="#Packedcircles-3-9"
-       inkscape:collect="always" />
-    <pattern
-       inkscape:collect="always"
-       patternUnits="userSpaceOnUse"
-       width="1"
-       height="1.73205080756"
-       patternTransform="translate(0,0) scale(10,10)"
-       id="Packedcircles-3-9"
-       inkscape:stockid="Packed circles">
-      <circle
-         style="fill:black;stroke:none"
-         cx="0"
-         cy="0.5"
-         r="0.5"
-         id="circle2620-7-9" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="1"
-         cy="0.5"
-         r="0.5"
-         id="circle2622-7-5" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="0.5"
-         cy="1.36602540378"
-         r="0.5"
-         id="circle2624-4-9" />
-      <circle
-         style="fill:black;stroke:none"
-         cx="0.5"
-         cy="-0.366025403784"
-         r="0.5"
-         id="circle2626-6-2" />
-    </pattern>
-    <pattern
-       patternTransform="matrix(8.6687185,0,0,10.539892,18.29126,-0.66010283)"
-       id="pattern3657-5-0"
-       xlink:href="#Packedcircles-5-1-6"
-       inkscape:collect="always" />
-    <pattern
-       inkscape:stockid="Packed circles"
-       id="Packedcircles-5-1-6"
-       patternTransform="translate(0,0) scale(10,10)"
-       height="1.73205080756"
-       width="1"
-       patternUnits="userSpaceOnUse"
-       inkscape:collect="always">
-      <circle
-         id="circle2620-8-2-9"
-         r="0.5"
-         cy="0.5"
-         cx="0"
-         style="fill:black;stroke:none" />
-      <circle
-         id="circle2622-1-6-4"
-         r="0.5"
-         cy="0.5"
-         cx="1"
-         style="fill:black;stroke:none" />
-      <circle
-         id="circle2624-6-5-6"
-         r="0.5"
-         cy="1.36602540378"
-         cx="0.5"
-         style="fill:black;stroke:none" />
-      <circle
-         id="circle2626-3-7-9"
+         id="circle2626"
          r="0.5"
          cy="-0.366025403784"
          cx="0.5"
@@ -209,27 +57,28 @@
     </pattern>
   </defs>
   <sodipodi:namedview
-     inkscape:window-maximized="1"
-     inkscape:window-y="23"
-     inkscape:window-x="0"
-     inkscape:window-height="1339"
-     inkscape:window-width="2560"
-     inkscape:snap-nodes="true"
-     inkscape:snap-others="false"
-     inkscape:object-nodes="false"
-     showgrid="false"
-     inkscape:document-rotation="0"
-     inkscape:current-layer="svg953"
-     inkscape:document-units="mm"
-     inkscape:cy="632.22527"
-     inkscape:cx="400"
-     inkscape:zoom="0.24748737"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
+     inkscape:snap-page="true"
+     id="base"
      pagecolor="#ffffff"
-     id="base" />
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11.143055"
+     inkscape:cx="28.526893"
+     inkscape:cy="29.466427"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:object-nodes="false"
+     inkscape:snap-others="true"
+     inkscape:snap-nodes="false"
+     inkscape:window-width="1600"
+     inkscape:window-height="880"
+     inkscape:window-x="737"
+     inkscape:window-y="192"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata950">
     <rdf:RDF>
@@ -243,66 +92,52 @@
     </rdf:RDF>
   </metadata>
   <g
-     sodipodi:insensitive="true"
-     id="layer1"
+     style="display:inline"
+     inkscape:label="grips"
      inkscape:groupmode="layer"
-     inkscape:label="grips">
+     id="layer1">
     <rect
-       ry="6.9878445"
-       y="169.34721"
-       x="-0.73588198"
-       height="127.62114"
-       width="211.66638"
-       id="rect1534-4-9"
-       style="opacity:0.17037;isolation:auto;mix-blend-mode:lighten;fill:url(#pattern3745-1);fill-opacity:1;fill-rule:nonzero;stroke:#7b7676;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.637427;paint-order:stroke markers fill" />
+       ry="0.33363119"
+       y="0.091867991"
+       x="0.095756426"
+       height="6.0932088"
+       width="13.82859"
+       id="rect1534-3"
+       style="display:inline;opacity:1;fill:#aaaaaa;fill-opacity:1;stroke:#696969;stroke-width:0.192473;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill" />
     <rect
-       style="opacity:0.17037;isolation:auto;mix-blend-mode:lighten;fill:url(#pattern3657-5);fill-opacity:1;fill-rule:nonzero;stroke:#7b7676;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.637427;paint-order:stroke markers fill"
-       id="rect1534-4-8-5"
-       width="211.66638"
-       height="129.11848"
-       x="-0.86201924"
-       y="171.91792"
-       ry="7.0698299" />
-    <rect
-       style="opacity:0.17037;isolation:auto;mix-blend-mode:lighten;fill:url(#pattern3745-1-1);fill-opacity:1;fill-rule:nonzero;stroke:#7b7676;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.637427;paint-order:stroke markers fill"
-       id="rect1534-4-9-2"
-       width="211.6664"
-       height="130.72929"
-       x="0.068603277"
-       y="-1.699908"
-       ry="7.1580305" />
-    <rect
-       ry="7.2420125"
-       y="0.93341005"
-       x="-0.057541132"
-       height="132.26311"
-       width="211.6664"
-       id="rect1534-4-8-5-3"
-       style="opacity:0.17037;isolation:auto;mix-blend-mode:lighten;fill:url(#pattern3657-5-0);fill-opacity:1;fill-rule:nonzero;stroke:#7b7676;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.637427;paint-order:stroke markers fill" />
+       style="display:inline;opacity:1;fill:#747474;fill-opacity:1;stroke:#696969;stroke-width:0.191365;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
+       id="rect1534-3-9"
+       width="13.829087"
+       height="6.0230813"
+       x="0.095718317"
+       y="8.9544573"
+       ry="0.32979146" />
   </g>
   <g
      sodipodi:insensitive="true"
-     inkscape:label="handle"
+     style="display:inline"
+     inkscape:groupmode="layer"
      id="layer2"
-     inkscape:groupmode="layer">
+     inkscape:label="handle">
     <rect
-       ry="3.4573095"
-       y="120.35648"
-       x="-0.15959124"
-       height="63.141907"
-       width="211.24564"
+       style="opacity:1;fill:#c2c2c0;fill-opacity:1;stroke:#000000;stroke-width:0.14416;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect1534"
-       style="opacity:1;fill:#c2c2c0;fill-opacity:1;stroke:#000000;stroke-width:2.41991;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill" />
+       width="13.9506"
+       height="3.3931856"
+       x="0.053272549"
+       y="5.8024893"
+       ry="0.18579251" />
   </g>
   <g
      sodipodi:insensitive="true"
-     inkscape:label="line"
+     style="display:inline"
+     inkscape:groupmode="layer"
      id="layer3"
-     inkscape:groupmode="layer">
+     inkscape:label="line">
     <path
-       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#000000;stroke-width:0.316591;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 14.011889,7.5945481 C 0.00654959,7.5659855 0.00654959,7.5659855 0.00654959,7.5659855"
        id="path3874"
-       d="M 211.56366,153.48619 C -0.8635747,152.95089 -0.8635747,152.95089 -0.8635747,152.95089"
-       style="fill:none;stroke:#000000;stroke-width:5.33763;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       inkscape:connector-curvature="0" />
   </g>
 </svg>

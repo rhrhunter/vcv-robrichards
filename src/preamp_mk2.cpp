@@ -134,26 +134,27 @@ struct PreampMKIIWidget : ModuleWidget {
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_paths.svg")));
 
     // screws
-    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, 1)));
+    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH + 10, 1)));
+    addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, RACK_GRID_HEIGHT - RACK_GRID_WIDTH - 1)));
+    addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH + 10 , RACK_GRID_HEIGHT - RACK_GRID_WIDTH - 1)));
 
     // sliders
-    // addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(10, 12)), module, PreampMKII::DECAY_PARAM));
-    // addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(30, 12)), module, PreampMKII::MIX_PARAM));
-    // addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(50, 12)), module, PreampMKII::DWELL_PARAM));
-    // addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(10, 40)), module, PreampMKII::MODIFY_PARAM));
-    // addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(30, 40)), module, PreampMKII::TONE_PARAM));
-    // addParam(createParamCentered<CBAKnobDW>(mm2px(Vec(50, 40)), module, PreampMKII::PRE_DELAY_PARAM));
+    //addParam(createParam<MSMSlider>(Vec(32, 90), module, SimpleSlider::SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(15, 11)), module, PreampMKII::VOLUME_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(30.5, 11)), module, PreampMKII::TREBLE_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(46, 11)), module, PreampMKII::MIDS_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(61.5, 11)), module, PreampMKII::FREQ_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(77, 11)), module, PreampMKII::BASS_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(92.5, 11)), module, PreampMKII::GAIN_SLIDER_PARAM));
 
     // preset change light and button
-    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, PreampMKII::PRESET_LIGHT));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, PreampMKII::CHANGE_PRESET_PARAM));
+    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42, 113.5)), module, PreampMKII::PRESET_LIGHT));
+    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(25, 113)), module, PreampMKII::CHANGE_PRESET_PARAM));
 
     // bypass pedal light and button
-    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, PreampMKII::BYPASS_LIGHT));
-    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, PreampMKII::BYPASS_PARAM));
+    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(70.5, 113.5)), module, PreampMKII::BYPASS_LIGHT));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(87.5, 113)), module, PreampMKII::BYPASS_PARAM));
 
     // midi configuration displays
     //RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
