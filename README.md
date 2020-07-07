@@ -70,6 +70,6 @@ Then launch Rack.
 As a precaution, the high and low gate triggers are not implemented on pedals that contain bypass relay switches. This is primarily to prevent wear & tear that could physically damage the pedal. Therefore, the MIDI controllers for Thermae, Warped Vinyl, and Generation Loss do not have this implemented.
 
 ## Known Issues (at least with my hardware)
-1. **M O O D** - I suspect it does not respond correctly to Midi Message CC15=127 (Mix knob fully-CW). Instead of having a completely wet mix, it appears to be identical to sending CC15=126. 
-2. **Preamp MKII** - The 'Jump' arcade button does not respond to CC22=1 nor CC22=2. Instead it only appears to respond to CC2=3, which instead of sending the state of the option to "5 (Blue Light)", it instead toggles between the three options. This is contrary to the specification in the Midi Implementation Manual for Preamk MKII.
+1. **M O O D** - I suspect it does not respond correctly to Midi Message **CC15=127** (Mix knob fully-CW). Instead of having a completely wet mix, it appears to be identical to sending **CC15=126**, where a small bit of the dry signal is still audible. 
+2. **Preamp MKII** - The 'Jump' arcade button does not respond to **CC22=1** nor **CC22=2**. Instead it only appears to respond to **CC22=3**, which instead of sending the state of the option to "5 (Blue Light)", it instead toggles between the three options. This is contrary to the specification in the Midi Implementation Manual for Preamk MKII.
 
