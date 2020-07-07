@@ -29,7 +29,6 @@ struct PreampMKII : RRModule {
   };
   enum OutputIds { NUM_OUTPUTS };
   enum LightIds  {
-                  PRESET_LIGHT,
                   BYPASS_LIGHT,
                   NUM_LIGHTS
   };
@@ -46,7 +45,9 @@ struct PreampMKII : RRModule {
     configParam(GAIN_SLIDER_PARAM, 0.f, 127.f, 0.f, "Gain");
 
     // arcade buttons
-    // 0.0f is bottom position
+    // 1.0f is the black text
+    // 2.0f is the blue text
+    // 3.0f is the red text
     configParam(JUMP_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Preset Jump (Off, 1, 5)");
     configParam(MIDS_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Mids Routine (Off, Pre, Post)");
     configParam(Q_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Frequency Width 'Q' (Low, Mid, High)");
@@ -56,8 +57,6 @@ struct PreampMKII : RRModule {
     // bypass buttons
     configParam(CHANGE_PRESET_PARAM, 0.f, 1.f, 0.f, "Change Preset");
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Pedal");
-    midi_out.setDeviceId(8);
-    midi_out.setChannel(1);
   }
 
   void process(const ProcessArgs& args) override {
@@ -65,7 +64,6 @@ struct PreampMKII : RRModule {
     if (!midi_out.active()) {
       if (!disable_module()) {
         // turn off the lights if the module is not disabled
-        lights[PRESET_LIGHT].setBrightness(0.f);
         lights[BYPASS_LIGHT].setBrightness(0.f);
       }
       return;
@@ -88,7 +86,7 @@ struct PreampMKII : RRModule {
       bypass = 0;
     }
 
-    // bypass the dark and/or world channels
+    // bypass (or enable) the pedal
     midi_out.setValue(bypass, 102);
 
     // read the three-way arcade buttons values
@@ -106,7 +104,7 @@ struct PreampMKII : RRModule {
     midi_out.setValue(fuzz_arcade, 26);
 
     // apply rate limiting here so that we do not flood the
-    // system with midi messages caused by the CV inputs.
+    // system with midi messages caused by the the user.
     if (should_rate_limit(0.005f, args.sampleTime))
       return;
 
@@ -133,7 +131,7 @@ struct PreampMKII : RRModule {
 struct PreampMKIIWidget : ModuleWidget {
   PreampMKIIWidget(PreampMKII* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_paths.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, 1)));
@@ -157,19 +155,18 @@ struct PreampMKIIWidget : ModuleWidget {
     addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(72.0, 88)), module, PreampMKII::DIODE_ARCADE_PARAM));
     addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(87.5, 88)), module, PreampMKII::FUZZ_ARCADE_PARAM));
 
-    // preset change light and button
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(42, 113.5)), module, PreampMKII::PRESET_LIGHT));
+    // preset change button
     addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(25, 113)), module, PreampMKII::CHANGE_PRESET_PARAM));
 
     // bypass pedal light and button
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(70.5, 113.5)), module, PreampMKII::BYPASS_LIGHT));
+    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(75, 113)), module, PreampMKII::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(87.5, 113)), module, PreampMKII::BYPASS_PARAM));
 
     // midi configuration displays
-    //RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
-    //midiWidget->box.size = mm2px(Vec(33.840, 28));
-    //midiWidget->setMidiPort(module ? &module->midi_out : NULL);
-    //addChild(midiWidget);
+    RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(35, 99.5)));
+    midiWidget->box.size = mm2px(Vec(33.840, 28));
+    midiWidget->setMidiPort(module ? &module->midi_out : NULL);
+    addChild(midiWidget);
   }
 };
 
