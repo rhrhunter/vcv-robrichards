@@ -41,7 +41,7 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
   int getCachedCCValue(int cc) {
     return lastMidiCCValues[cc];
   }
-  
+
   bool active() {
     return deviceId > -1 && channel > -1;
   }
@@ -53,6 +53,16 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     }
     lastMidiCCValues[cc] = value;
 
+    // send CC message
+    midi::Message m;
+    m.setStatus(0xb);
+    m.setNote(cc);
+    m.setValue(value);
+    sendMessage(m);
+    return true;
+  }
+
+  bool setValueNoCache(int value, int cc) {
     // send CC message
     midi::Message m;
     m.setStatus(0xb);
