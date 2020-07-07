@@ -52,24 +52,25 @@ Finally, clone this git repo, change directories into it, and run the following 
 Then launch Rack.
 
 ## Features
-* Dynamic modulation of all knobs using CV inputs, via CV->CC
+* Dynamic modulation of all knobs using CV inputs, via CV -> CC
 * 3-way programmable switches (All)
 * Stomp switch controls (All)
 * Expression CV Input (All)
-* Bypass high and low gate triggers (All Channels -> Dark World & MOOD) (AUX -> Generation Loss)
-* Clock SYNC inputs (Thermae, Warped Vinyl, & Blooper)
-* Tap Tempo switch (Thermae & Warped Vinyl)
-* Tap Tempo high gate trigger (Thermae & Warped Vinyl)
-* "Slow-down" mode toggle (Thermae)
-* "Self-oscillation/Hold" mode via momentary toggle (Thermae)
-* Midi Note tempo divisions (Warped Vinyl)
-* Modifier Toggles (Blooper)
+* Bypass high and low gate triggers (All Channels -> **Dark World** & **M O O D**) (AUX -> **Generation Loss**)
+* Clock SYNC inputs (**Thermae**, **Warped Vinyl**, & **Blooper**)
+* Tap Tempo switch (**Thermae** & **Warped Vinyl**)
+* Tap Tempo high gate trigger (**Thermae** & **Warped Vinyl**)
+* "Slow-down" mode toggle (**Thermae**)
+* "Self-oscillation/Hold" mode via momentary toggle (**Thermae**)
+* Midi Note tempo divisions (**Warped Vinyl**)
+* Modifier Toggles (**Blooper**)
+* Actual control of motorized faders (**Preamp MKII**)
 
 ## Notes
 
-As a precaution, the high and low gate triggers are not implemented on pedals that contain bypass relay switches. This is primarily to prevent wear & tear that could physically damage the pedal. Therefore, the MIDI controllers for Thermae, Warped Vinyl, and Generation Loss do not have this implemented.
+As a precaution, the high and low gate triggers are not implemented on pedals that contain bypass relay switches. This is primarily to prevent wear & tear that could physically damage the pedal. Therefore, the MIDI controllers for **Thermae**, **Warped Vinyl**, and **Generation Loss** do not have this implemented.
 
 ## Known Issues (at least with my hardware)
 1. **M O O D** - I suspect it does not respond correctly to Midi Message **CC15=127** (Mix knob fully-CW). Instead of having a completely wet mix, it appears to be identical to sending **CC15=126**, where a small bit of the dry signal is still audible. 
-2. **Preamp MKII** - The 'Jump' arcade button does not respond to **CC22=1** nor **CC22=2**. Instead it only appears to respond to **CC22=3**, which instead of sending the state of the option to "5 (Blue Light)", it instead toggles between the three options. This is contrary to the specification in the Midi Implementation Manual for Preamk MKII.
+2. **Preamp MKII** - The 'Jump' arcade button does not respond to **CC22=1** nor **CC22=2**. It only appears to respond to **CC22=3**, which instead of sending the state of the arcade button to "5 (Blue Light)", it actually toggles *between* the three options. This is contrary to the specification in the Midi Implementation Manual for Preamk MKII.
 
