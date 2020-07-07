@@ -7,34 +7,34 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   sodipodi:docname="preamp_mk2_slider_background.svg"
-   inkscape:version="1.0beta1 (76ce730, 2019-10-19)"
-   id="svg3882"
-   version="1.1"
-   viewBox="0 0 3 53"
+   width="14mm"
    height="53mm"
-   width="3mm">
+   viewBox="0 0 14 53"
+   version="1.1"
+   id="svg3882"
+   inkscape:version="1.0beta1 (76ce730, 2019-10-19)"
+   sodipodi:docname="preamp_mk2_slider_background.svg">
   <defs
      id="defs3876" />
   <sodipodi:namedview
-     inkscape:window-maximized="0"
-     inkscape:window-y="23"
-     inkscape:window-x="0"
-     inkscape:window-height="880"
-     inkscape:window-width="1600"
-     showgrid="false"
-     inkscape:document-rotation="0"
-     inkscape:current-layer="layer1"
-     inkscape:document-units="mm"
-     inkscape:cy="89"
-     inkscape:cx="20"
-     inkscape:zoom="1"
-     inkscape:pageshadow="2"
-     inkscape:pageopacity="0.0"
-     borderopacity="1.0"
-     bordercolor="#666666"
+     id="base"
      pagecolor="#ffffff"
-     id="base" />
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.2413051"
+     inkscape:cx="7.5697914"
+     inkscape:cy="101.94805"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1600"
+     inkscape:window-height="880"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:window-maximized="0" />
   <metadata
      id="metadata3879">
     <rdf:RDF>
@@ -48,18 +48,18 @@
     </rdf:RDF>
   </metadata>
   <g
-     id="layer1"
-     inkscape:groupmode="layer"
+     style="display:inline"
      inkscape:label="Layer 1"
-     style="display:inline">
+     inkscape:groupmode="layer"
+     id="layer1">
     <rect
-       ry="0.63290405"
-       y="-0.37284982"
-       x="-3.7552385"
-       height="54.693211"
-       width="3.5047958"
-       id="rect4445"
+       transform="scale(-1,1)"
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.161236;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:0.997076;paint-order:stroke markers fill"
-       transform="scale(-1,1)" />
+       id="rect4445"
+       width="3.5047958"
+       height="54.693211"
+       x="-9.0469055"
+       y="-0.37284982"
+       ry="0.63290405" />
   </g>
 </svg>

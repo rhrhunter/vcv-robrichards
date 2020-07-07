@@ -138,8 +138,8 @@ namespace rack {
   struct PreampMKIISlider : SvgSlider {
     PreampMKIISlider() {
       Vec margin = Vec(1, 1);
-      maxHandlePos = Vec(-15.0, -13.0).plus(margin);
-      minHandlePos = Vec(-15.0, 130.0).plus(margin);
+      maxHandlePos = Vec(0.0, -13.0).plus(margin);
+      minHandlePos = Vec(0.0, 130.0).plus(margin);
       setBackgroundSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/preamp_mk2_slider_background.svg")));
       setHandleSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_slider_handle.svg")));
 

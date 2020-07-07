@@ -25,6 +25,7 @@ struct PreampMKII : RRModule {
   enum InputIds  {
                   PRESET_INPUT,
                   BYPASS_INPUT,
+                  EXPR_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -124,6 +125,17 @@ struct PreampMKII : RRModule {
     midi_out.setValue(bass, 18);
     midi_out.setValue(gain, 19);
 
+    // read the expresion input if it is connected and clamp it between 0-127
+    int expr = -1;
+    if (inputs[EXPR_INPUT].isConnected()) {
+      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      expr = clamp(expr_cv, 0, 127);
+
+      // assign value for expression
+      if (expr > 0)
+        midi_out.setValue(expr, 100);
+    }
+
     return;
   }
 };
@@ -140,13 +152,12 @@ struct PreampMKIIWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH + 10 , RACK_GRID_HEIGHT - RACK_GRID_WIDTH - 1)));
 
     // sliders
-    //addParam(createParam<MSMSlider>(Vec(32, 90), module, SimpleSlider::SLIDER_PARAM));
-    addParam(createParam<PreampMKIISlider>(mm2px(Vec(15, 11)), module, PreampMKII::VOLUME_SLIDER_PARAM));
-    addParam(createParam<PreampMKIISlider>(mm2px(Vec(30.5, 11)), module, PreampMKII::TREBLE_SLIDER_PARAM));
-    addParam(createParam<PreampMKIISlider>(mm2px(Vec(46, 11)), module, PreampMKII::MIDS_SLIDER_PARAM));
-    addParam(createParam<PreampMKIISlider>(mm2px(Vec(61.5, 11)), module, PreampMKII::FREQ_SLIDER_PARAM));
-    addParam(createParam<PreampMKIISlider>(mm2px(Vec(77, 11)), module, PreampMKII::BASS_SLIDER_PARAM));
-    addParam(createParam<PreampMKIISlider>(mm2px(Vec(92.5, 11)), module, PreampMKII::GAIN_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(10, 11)), module, PreampMKII::VOLUME_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(25.5, 11)), module, PreampMKII::TREBLE_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(41, 11)), module, PreampMKII::MIDS_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(56.5, 11)), module, PreampMKII::FREQ_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(72, 11)), module, PreampMKII::BASS_SLIDER_PARAM));
+    addParam(createParam<PreampMKIISlider>(mm2px(Vec(87.5, 11)), module, PreampMKII::GAIN_SLIDER_PARAM));
 
     // arcade buttons in the middle
     addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(25.5, 88)), module, PreampMKII::JUMP_ARCADE_PARAM));
@@ -161,6 +172,9 @@ struct PreampMKIIWidget : ModuleWidget {
     // bypass pedal light and button
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(75, 113)), module, PreampMKII::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(87.5, 113)), module, PreampMKII::BYPASS_PARAM));
+
+    // expression port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(13.6, 81.5)), module, PreampMKII::EXPR_INPUT));
 
     // midi configuration displays
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(35, 99.5)));
