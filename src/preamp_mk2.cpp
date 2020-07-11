@@ -4,6 +4,7 @@
 #include "guicomponents.hpp"
 #include "rr_module.hpp"
 #include "rr_midiwidget.hpp"
+#include <dsp/digital.hpp>
 
 struct PreampMKII : RRModule {
   enum ParamIds {
@@ -34,6 +35,8 @@ struct PreampMKII : RRModule {
                   NUM_LIGHTS
   };
 
+  dsp::ClockDivider program_change_clk;
+
   PreampMKII() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
@@ -58,6 +61,12 @@ struct PreampMKII : RRModule {
     // bypass buttons
     configParam(CHANGE_PRESET_PARAM, 0.f, 1.f, 0.f, "Change Preset");
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Pedal");
+
+    // prevent program changes from happening too quickly
+    program_change_clk.setDivision(128);
+
+    // initialize the first preset
+    midi_out.setProgram(0);
   }
 
   void process(const ProcessArgs& args) override {
@@ -108,6 +117,13 @@ struct PreampMKII : RRModule {
     // system with midi messages caused by the the user.
     if (should_rate_limit(0.005f, args.sampleTime))
       return;
+
+    // check if the preset button was pressed (protect it from being spammed)
+    int preset_change = (int) floor(params[CHANGE_PRESET_PARAM].getValue());
+    if (preset_change && program_change_clk.process()) {
+      // increment by 1 and with a max of 30 programs
+      midi_out.incrementProgram(1, 30);
+    }
 
     // slider values
     int volume = (int) std::round(params[VOLUME_SLIDER_PARAM].getValue());

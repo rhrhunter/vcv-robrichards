@@ -8,6 +8,7 @@ namespace rack {
 
 struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
   int lastMidiCCValues[128];
+  int currProgram;
 
   RRMidiOutput() {
     reset();
@@ -18,6 +19,7 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     for (int n = 0; n < 128; n++) {
       lastMidiCCValues[n] = -1;
     }
+    currProgram = -1;
     MidiGenerator::reset();
   }
 
@@ -68,6 +70,31 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     m.setStatus(0xb);
     m.setNote(cc);
     m.setValue(value);
+    sendMessage(m);
+    return true;
+  }
+
+  void incrementProgram(int incrby, int max) {
+    // incr the current program modded by the upper limit
+    int value = (currProgram + incrby) % max;
+    setProgram(value);
+  }
+
+  bool setProgram(int value) {
+    // check the cache to see if we are already on this program
+    if (currProgram == value) {
+      return false;
+    } else {
+      currProgram = value;
+    }
+
+    // send a Program change message (2 bytes) with -
+    // 0x0c as the status byte
+    midi::Message m;
+    m.setSize(2);
+    m.setStatus(0xc);
+    m.setNote(value);
+    DEBUG("Preamp MKII program change: %d", value);
     sendMessage(m);
     return true;
   }
