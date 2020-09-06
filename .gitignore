@@ -2,3 +2,4 @@
 build/
 dist/
 plugin.dylib
+res/*_logo.svg
