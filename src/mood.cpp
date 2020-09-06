@@ -314,7 +314,7 @@ struct Mood : RRModule {
 struct MoodWidget : ModuleWidget {
   MoodWidget(Mood* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/mood_text.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/mood_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -342,9 +342,9 @@ struct MoodWidget : ModuleWidget {
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, Mood::EXPR_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Mood::BLOOD_PROGRAM_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Mood::ROUTING_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Mood::LOOP_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(7, 66)), module, Mood::BLOOD_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(17, 66)), module, Mood::ROUTING_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(47, 66)), module, Mood::LOOP_PROGRAM_PARAM));
 
     // blood channel led / bypass / high & low gate
     addChild(createLightCentered<LargeLight<GreenLight>>(mm2px(Vec(15, 109)), module, Mood::BLOOD_LIGHT));

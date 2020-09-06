@@ -103,16 +103,16 @@ namespace rack {
     }
   };
 
-  struct CBAMomentaryButtonRed : app::SvgSwitch {
-    CBAMomentaryButtonRed() {
+  struct CBAButtonRedMomentary : app::SvgSwitch {
+    CBAButtonRedMomentary() {
       momentary = true;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
     }
   };
 
-  struct CBAMomentaryButtonGray : app::SvgSwitch {
-    CBAMomentaryButtonGray() {
+  struct CBAButtonGrayMomentary : app::SvgSwitch {
+    CBAButtonGrayMomentary() {
       momentary = true;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_1.svg")));
@@ -124,6 +124,21 @@ namespace rack {
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_off.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_blue.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_red.svg")));
+   }
+  };
+
+  struct CBAArcadeButtonOffBlue : app::SvgSwitch {
+    CBAArcadeButtonOffBlue() {
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_off.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_blue.svg")));
+   }
+  };
+
+  struct CBASmallArcadeButtonOffBlueMomentary : app::SvgSwitch {
+    CBASmallArcadeButtonOffBlueMomentary() {
+      momentary = true;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_off_small.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_arcade_blue_small.svg")));
    }
   };
 

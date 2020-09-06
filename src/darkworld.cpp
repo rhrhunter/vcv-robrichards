@@ -209,7 +209,7 @@ struct Darkworld : RRModule {
 struct DarkworldWidget : ModuleWidget {
   DarkworldWidget(Darkworld* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_text.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -234,9 +234,9 @@ struct DarkworldWidget : ModuleWidget {
     addInput(createInputCentered<CL1362Port>(mm2px(Vec(50, 53)), module, Darkworld::PRE_DELAY_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Darkworld::DARK_PROGRAM_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Darkworld::ROUTING_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Darkworld::WORLD_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(7, 66)), module, Darkworld::DARK_PROGRAM_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(27, 66)), module, Darkworld::ROUTING_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(47, 66)), module, Darkworld::WORLD_PROGRAM_PARAM));
 
     // dark channel led / bypass / high & low gate
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, Darkworld::DARK_LIGHT));

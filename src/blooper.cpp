@@ -91,7 +91,7 @@ struct Blooper : RRModule {
 
   void record() {
     // disable one shot record
-    reset_one_shot();
+    reset_one_shot(false);
 
     // send a record message
     midi_out.setValue(1, 11);
@@ -99,7 +99,7 @@ struct Blooper : RRModule {
 
   void play() {
     // disable one shot record
-    reset_one_shot();
+    reset_one_shot(false);
 
     // send a play message
     midi_out.setValue(2, 11);
@@ -107,7 +107,7 @@ struct Blooper : RRModule {
 
   void over_dub() {
     // disable one shot record
-    reset_one_shot();
+    reset_one_shot(false);
 
     // send an over dub message
     midi_out.setValue(3, 11);
@@ -115,7 +115,7 @@ struct Blooper : RRModule {
 
   void stop() {
     // disable one shot record
-    reset_one_shot();
+    reset_one_shot(false);
 
     // send a stop message
     midi_out.setValue(4, 11);
@@ -123,7 +123,7 @@ struct Blooper : RRModule {
 
   void erase() {
     // disable one shot record
-    reset_one_shot();
+    reset_one_shot(false);
 
     // send an erase message
     midi_out.setValue(7, 11);
@@ -141,7 +141,9 @@ struct Blooper : RRModule {
     gettimeofday(&one_shot_grace_period, NULL);
   }
 
-  void reset_one_shot() {
+  void reset_one_shot(bool reset_cache) {
+    if (reset_cache)
+      midi_out.resetCCCache(9);
     midi_out.setValue(0, 9);
   }
 
@@ -225,6 +227,9 @@ struct Blooper : RRModule {
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
       process_midi_clock(clock);
+    } else {
+      // clock is not connected, reset the cache for enabling "listen for clock"
+      reset_midi_clock_cc_cache();
     }
 
     // 3way switch values (1,2,3)
@@ -289,13 +294,13 @@ struct Blooper : RRModule {
       // turn off the green light
       lights[LEFT_LIGHT].setBrightness(0);
 
-      // ideally this should flast the led red for the full duration of the loop
+      // ideally this should flash the led red for the full duration of the loop
       // but we don't have that measurement right now (TODO)
       // for now, just stay in this state for 3s
       if (should_transition_to_state(3.0f, one_shot_grace_period)) {
         bypass_state = 2;
         // disable one shot mode in case it is still on
-        reset_one_shot();
+        reset_one_shot(false);
       }
     }
 
@@ -314,6 +319,11 @@ struct Blooper : RRModule {
     int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
     int erase_loop = (int) floor(params[ERASE_LOOP_PARAM].getValue());
     int one_shot = (int) floor(params[TOGGLE_ONE_SHOT_RECORD_PARAM].getValue());
+
+    // first things first, disable one_shot record if it was not turned on
+    // don't reset the cache
+    if (one_shot == 0)
+      reset_one_shot(false);
 
     // State transitions:
     // 1) first press of record or play makes pedal record
@@ -405,6 +415,17 @@ struct Blooper : RRModule {
       // transient state, loop is being erased
       // ignore all state change requests until we transition to
       // the off state.
+    } else if (bypass_state == 5) {
+      // transient state, currently processing a one-shot record
+      // ignore all state changes except for stop and erase state changes
+      if (stop_loop) {
+        // requested to stop the loop or abort the one shot record
+        bypass_state = 3;
+        stop();
+      } else if (erase_loop) {
+        bypass_state = 4;
+        erase();
+      }
     }
 
     // knob values
@@ -465,7 +486,7 @@ struct Blooper : RRModule {
 struct BlooperWidget : ModuleWidget {
   BlooperWidget(Blooper* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_text_v2.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -496,26 +517,26 @@ struct BlooperWidget : ModuleWidget {
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55, 92)), module, Blooper::CLOCK_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Blooper::L_TOGGLE_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Blooper::M_TOGGLE_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Blooper::R_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(7, 66)), module, Blooper::L_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(27, 66)), module, Blooper::M_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(46.5, 66)), module, Blooper::R_TOGGLE_PARAM));
 
-    // mod a and mod b enable/disable
-    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Blooper::TOGGLE_MODA_PARAM));
-    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(55, 82)), module, Blooper::TOGGLE_MODB_PARAM));
+    // mod a and mod b enable/disable toggles
+    addParam(createParamCentered<CBASmallArcadeButtonOffBlueMomentary>(mm2px(Vec(43.5, 82)), module, Blooper::TOGGLE_MODA_PARAM));
+    addParam(createParamCentered<CBASmallArcadeButtonOffBlueMomentary>(mm2px(Vec(55, 82)), module, Blooper::TOGGLE_MODB_PARAM));
 
     // lights
-    addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(22, 109)), module, Blooper::LEFT_LIGHT));
-    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(39, 109)), module, Blooper::RIGHT_LIGHT));
+    addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(24, 109)), module, Blooper::LEFT_LIGHT));
+    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(37, 109)), module, Blooper::RIGHT_LIGHT));
 
     // toggle one shot record on/off
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(5, 109)), module, Blooper::TOGGLE_ONE_SHOT_RECORD_PARAM));
 
     // foot switches
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(11, 118)), module, Blooper::RECORD_LOOP_PARAM));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(24, 118)), module, Blooper::PLAY_LOOP_PARAM));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(37, 118)), module, Blooper::STOP_LOOP_PARAM));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(50, 118)), module, Blooper::ERASE_LOOP_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(11, 118)), module, Blooper::RECORD_LOOP_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(24, 118)), module, Blooper::PLAY_LOOP_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(37, 118)), module, Blooper::STOP_LOOP_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(50, 118)), module, Blooper::ERASE_LOOP_PARAM));
 
     // midi configuration display
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
