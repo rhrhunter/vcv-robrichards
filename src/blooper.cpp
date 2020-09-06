@@ -24,10 +24,7 @@ struct Blooper : RRModule {
                  PLAY_LOOP_PARAM,
                  STOP_LOOP_PARAM,
                  ERASE_LOOP_PARAM,
-<<<<<<< HEAD
-=======
                  TOGGLE_ONE_SHOT_RECORD_PARAM,
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
                  NUM_PARAMS
   };
   enum InputIds  {
@@ -55,7 +52,7 @@ struct Blooper : RRModule {
   int bypass_state;
 
   // erase state grace period
-  struct timeval erase_grace_period;
+  struct timeval erase_grace_period, one_shot_grace_period;
 
   Blooper() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -80,10 +77,7 @@ struct Blooper : RRModule {
 
     // buttons
     configParam(RECORD_LOOP_PARAM, 0.f, 1.f, 0.f, "Record/Overdub");
-<<<<<<< HEAD
-=======
     configParam(TOGGLE_ONE_SHOT_RECORD_PARAM, 0.f, 1.f, 0.f, "Toggle One Shot Record (on/off)");
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     configParam(PLAY_LOOP_PARAM, 0.f, 1.f, 0.f, "Play");
     configParam(STOP_LOOP_PARAM, 0.f, 1.f, 0.f, "Stop");
     configParam(ERASE_LOOP_PARAM, 0.f, 1.f, 0.f, "Erase");
@@ -96,56 +90,41 @@ struct Blooper : RRModule {
   }
 
   void record() {
-<<<<<<< HEAD
-=======
     // disable one shot record
     reset_one_shot();
 
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     // send a record message
     midi_out.setValue(1, 11);
   }
 
   void play() {
-<<<<<<< HEAD
-=======
     // disable one shot record
     reset_one_shot();
 
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     // send a play message
     midi_out.setValue(2, 11);
   }
 
   void over_dub() {
-<<<<<<< HEAD
-=======
     // disable one shot record
     reset_one_shot();
 
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     // send an over dub message
     midi_out.setValue(3, 11);
   }
 
   void stop() {
-<<<<<<< HEAD
-=======
     // disable one shot record
     reset_one_shot();
 
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     // send a stop message
     midi_out.setValue(4, 11);
   }
 
   void erase() {
-<<<<<<< HEAD
-=======
     // disable one shot record
     reset_one_shot();
 
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     // send an erase message
     midi_out.setValue(7, 11);
 
@@ -154,8 +133,6 @@ struct Blooper : RRModule {
     gettimeofday(&erase_grace_period, NULL);
   }
 
-<<<<<<< HEAD
-=======
   void one_shot_record() {
     // enable one shot record
     midi_out.setValue(1, 9);
@@ -168,22 +145,21 @@ struct Blooper : RRModule {
     midi_out.setValue(0, 9);
   }
 
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
-  bool should_transition_to_off_state(float time_until) {
+  bool should_transition_to_state(float time_until, struct timeval grace_period) {
     // get a new measurement
     struct timeval ctime;
     gettimeofday(&ctime, NULL);
     double this_time_usec = (double) ctime.tv_usec;
     double this_time_sec = (double) ctime.tv_sec;
 
-    // calculate whether we should transition to the off state
-    double last_time_usec = (double) erase_grace_period.tv_usec;
-    double last_time_sec = (double) erase_grace_period.tv_sec;
+    // calculate whether we should transition to the next state
+    double last_time_usec = (double) grace_period.tv_usec;
+    double last_time_sec = (double) grace_period.tv_sec;
     double diff_sec = this_time_sec - last_time_sec;
     double diff_usec = this_time_usec - last_time_usec;
     float diff = (float) (diff_sec + (diff_usec/1000000));
     if (diff > time_until) {
-      // transition to off
+      // transition to next state
       return true;
     } else {
       // stay in current state
@@ -294,7 +270,7 @@ struct Blooper : RRModule {
       lights[LEFT_LIGHT].setBrightness(flash_led(0.50f));
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
-    } else {
+    } else if (bypass_state == 4) {
       // recording is being deleted, flash both lights red for 2s
       lights[LEFT_LIGHT+1].setBrightness(flash_led(0.30f));
       lights[RIGHT_LIGHT].setBrightness(flash_led(0.30f));
@@ -303,10 +279,8 @@ struct Blooper : RRModule {
       lights[LEFT_LIGHT].setBrightness(0);
 
       // if 2s has passed since we started deleting, transition to off state
-      if (should_transition_to_off_state(2.0f))
+      if (should_transition_to_state(2.0f, erase_grace_period))
         bypass_state = 0;
-<<<<<<< HEAD
-=======
     } else if (bypass_state == 5) {
       // a one shot recording operation is in progress, flash the left led red for
       // the duration of the one shot record
@@ -318,12 +292,11 @@ struct Blooper : RRModule {
       // ideally this should flast the led red for the full duration of the loop
       // but we don't have that measurement right now (TODO)
       // for now, just stay in this state for 3s
-      if (should_transition_to_play_state(3.0f)) {
+      if (should_transition_to_state(3.0f, one_shot_grace_period)) {
         bypass_state = 2;
         // disable one shot mode in case it is still on
         reset_one_shot();
       }
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
     }
 
     // apply rate limiting here so that we do not flood the
@@ -340,10 +313,7 @@ struct Blooper : RRModule {
     int play_loop = (int) floor(params[PLAY_LOOP_PARAM].getValue());
     int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
     int erase_loop = (int) floor(params[ERASE_LOOP_PARAM].getValue());
-<<<<<<< HEAD
-=======
     int one_shot = (int) floor(params[TOGGLE_ONE_SHOT_RECORD_PARAM].getValue());
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
 
     // State transitions:
     // 1) first press of record or play makes pedal record
@@ -360,12 +330,6 @@ struct Blooper : RRModule {
     if (bypass_state == 0) {
        // pedal is stopped (or the state is unknown)
       if (record_loop) {
-<<<<<<< HEAD
-        // requested to turn on record
-        bypass_state = 1;
-        // send a record message
-        record();
-=======
         if (one_shot) {
           // requested to do a one shot record
           bypass_state = 5;
@@ -375,7 +339,6 @@ struct Blooper : RRModule {
           bypass_state = 1;
           record();
         }
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
       } else if (play_loop) {
         bypass_state = 2;
         play();
@@ -383,11 +346,7 @@ struct Blooper : RRModule {
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
-<<<<<<< HEAD
-        // requested to erase the loop        
-=======
         // requested to erase the loop
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
         bypass_state = 4;
         erase();
       }
@@ -402,22 +361,13 @@ struct Blooper : RRModule {
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
-<<<<<<< HEAD
-        // requested to erase the loop        
-=======
         // requested to erase the loop
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
         bypass_state = 4;
         erase();
       }
     } else if (bypass_state == 2) {
       // pedal is playing
       if (record_loop) {
-<<<<<<< HEAD
-        // requested to overdub something
-        bypass_state = 1;
-        over_dub();
-=======
         if (one_shot) {
           // requested to do a one shot record
           bypass_state = 5;
@@ -427,17 +377,12 @@ struct Blooper : RRModule {
           bypass_state = 1;
           over_dub();
         }
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
       } else if (stop_loop) {
         // requested to stop the loop
         bypass_state = 3;
         stop();
       } else if (erase_loop) {
-<<<<<<< HEAD
-        // requested to erase the loop        
-=======
         // requested to erase the loop
->>>>>>> df228df... One Shot Record support for blooper + improvements to svg layout
         bypass_state = 4;
         erase();
       }
