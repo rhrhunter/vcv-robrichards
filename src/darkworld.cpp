@@ -209,7 +209,12 @@ struct Darkworld : RRModule {
 struct DarkworldWidget : ModuleWidget {
   DarkworldWidget(Darkworld* module) {
     setModule(module);
+
+#ifdef USE_LOGOS
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_panel_logo.svg")));
+#else
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/darkworld_panel.svg")));
+#endif
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
