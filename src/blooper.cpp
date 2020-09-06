@@ -486,7 +486,12 @@ struct Blooper : RRModule {
 struct BlooperWidget : ModuleWidget {
   BlooperWidget(Blooper* module) {
     setModule(module);
+
+#ifdef USE_LOGOS
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel_logo.svg")));
+#else
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel.svg")));
+#endif
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
