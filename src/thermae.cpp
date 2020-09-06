@@ -102,6 +102,9 @@ struct Thermae : RRModule {
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
       process_midi_clock(clock);
+    } else {
+      // clock is not connected, reset the cache for enabling "listen for clock"
+      reset_midi_clock_cc_cache();
     }
 
     // 2way switch values (0,127)
@@ -241,7 +244,7 @@ struct Thermae : RRModule {
 struct ThermaeWidget : ModuleWidget {
   ThermaeWidget(Thermae* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/thermae_text.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/thermae_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -272,9 +275,9 @@ struct ThermaeWidget : ModuleWidget {
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55, 92)), module, Thermae::CLOCK_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, Thermae::L_TOGGLE_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, Thermae::M_TOGGLE_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, Thermae::R_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(7, 66)), module, Thermae::L_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(27, 66)), module, Thermae::M_TOGGLE_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(47, 66)), module, Thermae::R_TOGGLE_PARAM));
 
     // slowdown mode toggle and hold mode toggle
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Thermae::SLOWDOWN_MODE_PARAM));
@@ -282,7 +285,7 @@ struct ThermaeWidget : ModuleWidget {
 
     // bypass switches & tap tempo
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Thermae::TAP_TEMPO_LIGHT));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, Thermae::TAP_TEMPO_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(15, 118)), module, Thermae::TAP_TEMPO_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Thermae::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Thermae::BYPASS_PARAM));
 

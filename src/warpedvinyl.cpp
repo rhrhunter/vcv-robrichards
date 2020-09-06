@@ -80,6 +80,9 @@ struct WarpedVinyl : RRModule {
     if (inputs[CLOCK_INPUT].isConnected()) {
       bool clock = inputs[CLOCK_INPUT].getVoltage() >= 1.f;
       process_midi_clock(clock);
+    } else {
+      // clock is not connected, reset the cache for enabling "listen for clock"
+      reset_midi_clock_cc_cache();
     }
 
     // read the gate triggers
@@ -183,7 +186,7 @@ struct WarpedVinyl : RRModule {
 struct WarpedVinylWidget : ModuleWidget {
   WarpedVinylWidget(WarpedVinyl* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/warpedvinyl_text.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/warpedvinyl_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -214,11 +217,11 @@ struct WarpedVinylWidget : ModuleWidget {
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(55, 92)), module, WarpedVinyl::CLOCK_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, WarpedVinyl::NOTE_DIVISION_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(7, 66)), module, WarpedVinyl::NOTE_DIVISION_PARAM));
 
     // bypass switches & tap tempo
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, WarpedVinyl::TAP_TEMPO_LIGHT));
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(15, 118)), module, WarpedVinyl::TAP_TEMPO_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, WarpedVinyl::BYPASS_LIGHT));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, WarpedVinyl::BYPASS_PARAM));
 

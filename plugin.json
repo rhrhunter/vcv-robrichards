@@ -15,43 +15,43 @@
   "modules": [
     {
       "slug": "darkworld",
-      "name": "MIDI Controller: CBA Darkworld",
+      "name": "MIDI Controller: Chase Bliss Darkworld",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Darkworld'",
       "tags": ["midi", "darkworld", "reverb"]
     },
     {
       "slug": "warpedvinyl",
-      "name": "MIDI Controller: CBA Warped Vinyl",
+      "name": "MIDI Controller: Chase Bliss Audio Warped Vinyl Hifi",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Warped Vinyl Hifi'",
       "tags": ["midi", "warpedvinyl", "chorus", "vibrato"]
     },
     {
       "slug": "mood",
-      "name": "MIDI Controller: CBA M O O D",
+      "name": "MIDI Controller: Chase Bliss Audio M O O D",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'M O O D'",
       "tags": ["midi", "mood", "looper"]
     },
     {
       "slug": "genloss",
-      "name": "MIDI Controller: CBA Generation Loss",
+      "name": "MIDI Controller: Chase Bliss Audio Generation Loss",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Generation Loss'",
       "tags": ["midi", "genloss", "lofi"]
     },
     {
       "slug": "thermae",
-      "name": "MIDI Controller: CBA Thermae",
+      "name": "MIDI Controller: Chase Bliss Audio Thermae",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Thermae'",
       "tags": ["midi", "thermae", "delay", "pitch shifter"]
     },
     {
       "slug": "blooper",
-      "name": "MIDI Controller: CBA Blooper",
+      "name": "MIDI Controller: Chase Bliss Audio Blooper",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Blooper'",
       "tags": ["midi", "blooper", "looper", "sampler"]
     },
     {
       "slug": "preamp_mk2",
-      "name": "MIDI Controller: CBA Preamp MKII AUTOMATONE",
+      "name": "MIDI Controller: Chase Bliss Audio Preamp MKII AUTOMATONE",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Preamp MKII'",
       "tags": ["midi"]
     }

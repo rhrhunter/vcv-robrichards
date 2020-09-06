@@ -65,15 +65,15 @@ struct RRModule : Module {
   }
 
   void process_midi_clock(bool enable_clock) {
-      // periodically reset the CC cache for the midi clock message,
-      // to ensure that we turn it on every so often
-      if (enable_midi_clk.process()) {
-        midi_out.resetCCCache(51);
-      }
-      // turn on midi clock
+      // turn on midi clock (just in case it is off)
       midi_out.setValue(127, 51);
 
+      // send a clock pulse
       midi_out.setClock(enable_clock);
+  }
+
+  void reset_midi_clock_cc_cache() {
+    midi_out.resetCCCache(51);
   }
 
   float process_tap_tempo(int tap_tempo) {

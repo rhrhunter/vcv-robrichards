@@ -195,7 +195,7 @@ struct GenerationLoss : RRModule {
 struct GenerationLossWidget : ModuleWidget {
   GenerationLossWidget(GenerationLoss* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/genloss_text.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/genloss_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -223,9 +223,9 @@ struct GenerationLossWidget : ModuleWidget {
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.5, 92)), module, GenerationLoss::EXPR_INPUT));
 
     // program switches
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(10, 66)), module, GenerationLoss::AUX_FUNC_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(30, 66)), module, GenerationLoss::DRY_PARAM));
-    addParam(createParamCentered<CBASwitch>(mm2px(Vec(50, 66)), module, GenerationLoss::HISS_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(7, 66)), module, GenerationLoss::AUX_FUNC_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(27, 66)), module, GenerationLoss::DRY_PARAM));
+    addParam(createParamCentered<CBASwitch>(mm2px(Vec(47, 66)), module, GenerationLoss::HISS_PARAM));
 
     // aux led / button / high & low gate
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(15, 109)), module, GenerationLoss::AUX_LIGHT));

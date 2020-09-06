@@ -159,7 +159,7 @@ struct PreampMKII : RRModule {
 struct PreampMKIIWidget : ModuleWidget {
   PreampMKIIWidget(PreampMKII* module) {
     setModule(module);
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_panel.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, 1)));
@@ -183,7 +183,7 @@ struct PreampMKIIWidget : ModuleWidget {
     addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(87.5, 88)), module, PreampMKII::FUZZ_ARCADE_PARAM));
 
     // preset change button
-    addParam(createParamCentered<CBAMomentaryButtonGray>(mm2px(Vec(25, 113)), module, PreampMKII::CHANGE_PRESET_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(25, 113)), module, PreampMKII::CHANGE_PRESET_PARAM));
 
     // bypass pedal light and button
     addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(75, 113)), module, PreampMKII::BYPASS_LIGHT));
