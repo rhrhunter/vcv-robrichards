@@ -159,7 +159,12 @@ struct PreampMKII : RRModule {
 struct PreampMKIIWidget : ModuleWidget {
   PreampMKIIWidget(PreampMKII* module) {
     setModule(module);
+
+#ifdef USE_LOGOS
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_panel_logo.svg")));
+#else
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_panel.svg")));
+#endif
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, 1)));
