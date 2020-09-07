@@ -195,7 +195,12 @@ struct GenerationLoss : RRModule {
 struct GenerationLossWidget : ModuleWidget {
   GenerationLossWidget(GenerationLoss* module) {
     setModule(module);
+
+#ifdef USE_LOGOS
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/genloss_panel_logo.svg")));
+#else
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/genloss_panel.svg")));
+#endif
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));

@@ -186,7 +186,12 @@ struct WarpedVinyl : RRModule {
 struct WarpedVinylWidget : ModuleWidget {
   WarpedVinylWidget(WarpedVinyl* module) {
     setModule(module);
+
+#ifdef USE_LOGOS
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/warpedvinyl_panel_logo.svg")));
+#else
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/warpedvinyl_panel.svg")));
+#endif
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
