@@ -25,6 +25,10 @@ struct Blooper : RRModule {
                  STOP_LOOP_PARAM,
                  ERASE_LOOP_PARAM,
                  TOGGLE_ONE_SHOT_RECORD_PARAM,
+                 TOGGLE_RAMP_PARAM,
+                 RAMP_PARAM,
+                 LOOP_SELECT_INCR_PARAM,
+                 LOOP_SELECT_DECR_PARAM,
                  NUM_PARAMS
   };
   enum InputIds  {
@@ -36,6 +40,10 @@ struct Blooper : RRModule {
                   MODB_INPUT,
                   CLOCK_INPUT,
                   EXPR_INPUT,
+                  RAMP_INPUT,
+                  STOP_GATE_INPUT,
+                  PLAY_GATE_INPUT,
+                  REC_GATE_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -49,10 +57,20 @@ struct Blooper : RRModule {
   struct timeval last_blink_time;
   double blink_off_until_usec = 0;
   double blink_off_until_sec = 0;
+
+  // blooper state machine
   int bypass_state;
 
-  // erase state grace period
+  // loop select program change number
+  bool program_change;
+
+  // cached next value for modA and modB toggles
+  int next_moda_toggle_value = 1;
+  int next_modb_toggle_value = 1;
+
+  // grace period timevals
   struct timeval erase_grace_period, one_shot_grace_period;
+  struct timeval mod_toggle_grace_period, loop_select_grace_period;
 
   Blooper() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -64,6 +82,12 @@ struct Blooper : RRModule {
     configParam(MODA_PARAM, 0.f, 127.f, 64.f, "Mod A");
     configParam(STABILITY_PARAM, 0.f, 127.f, 0.f, "Stability");
     configParam(MODB_PARAM, 0.f, 127.f, 64.f, "Mod B");
+
+    // ramp knob
+    configParam(RAMP_PARAM, 0.f, 127.f, 0.f, "Ramp Amount");
+
+    // toggle ramping switch (default off)
+    configParam(TOGGLE_RAMP_PARAM, 0.f, 1.f, 0.f, "Enable/Disable Ramping");
 
     // 3 way switches
     // 1.0f is top position
@@ -85,8 +109,17 @@ struct Blooper : RRModule {
     // pedal bypass state (play, recording, overdubbing, stopped, erasing, etc...)
     bypass_state = 0;
 
+    // upon initialization, we won't reset the program change loop
+    program_change = false;
+
     // blinking rate
     gettimeofday(&last_blink_time, NULL);
+
+    // initialize te mod toggle grace period
+    gettimeofday(&mod_toggle_grace_period, NULL);
+
+    // initialize the loop select grace period
+    gettimeofday(&loop_select_grace_period, NULL);
   }
 
   void record() {
@@ -244,15 +277,65 @@ struct Blooper : RRModule {
 
     // toggle the either modifier on or off
     int moda_toggle = (int) floor(params[TOGGLE_MODA_PARAM].getValue());
+    if (moda_toggle) {
+      // allow a 250ms grace period between button presses to prevent spam
+      if (should_transition_to_state(0.25f, mod_toggle_grace_period)) {
+        midi_out.setValue(next_moda_toggle_value, 30);
+        if (next_moda_toggle_value == 1)
+          next_moda_toggle_value = 127;
+        else
+          next_moda_toggle_value = 1;
+
+        // remember for next time how long it as been since the toggle was pressed
+        gettimeofday(&mod_toggle_grace_period, NULL);
+      }
+    }
+
     int modb_toggle = (int) floor(params[TOGGLE_MODB_PARAM].getValue());
-    if (moda_toggle)
-      midi_out.setValue(1, 30);
-    else
-      midi_out.setValue(127,30);
-    if (modb_toggle)
-      midi_out.setValue(1, 31);
-    else
-      midi_out.setValue(127,31);
+    if (modb_toggle) {
+      // allow a 250ms grace period between button presses to prevent spam
+      if (should_transition_to_state(0.25f, mod_toggle_grace_period)) {
+        midi_out.setValue(next_modb_toggle_value, 31);
+        if (next_modb_toggle_value == 1)
+          next_modb_toggle_value = 127;
+        else
+          next_modb_toggle_value = 1;
+
+        // remember for next time how long it as been since the toggle was pressed
+        gettimeofday(&mod_toggle_grace_period, NULL);
+      }
+    }
+
+    // check if the preset button was pressed (protect it from being spammed)
+    int loop_change_incr = (int) floor(params[LOOP_SELECT_INCR_PARAM].getValue());
+    int loop_change_decr = (int) floor(params[LOOP_SELECT_DECR_PARAM].getValue());
+
+    if (loop_change_incr || loop_change_decr) {
+      // allow a 1s grace period between loop changes
+      if (should_transition_to_state(1.0f, loop_select_grace_period)) {
+        // stop any existing loops before we do the loop change
+        stop();
+
+        // transition to state 6, wich means we are "loading a loop"
+        bypass_state = 6;
+
+        if (!program_change) {
+          // if we've never done a program change, jump straight to program 0
+          midi_out.setProgram(0);
+          program_change = true;
+        } else {
+          // increment or decrement by 1 the program
+          // with a max of 16 programs (loops).
+          if (loop_change_incr)
+            midi_out.incrementProgram(1, 16);
+          else
+            midi_out.decrementProgram(1, 16);
+        }
+
+        // remember for next time when we performed the loop change
+        gettimeofday(&loop_select_grace_period, NULL);
+      }
+    }
 
     // toggle the lights based on the current state
     if (bypass_state == 0) {
@@ -298,9 +381,28 @@ struct Blooper : RRModule {
       // but we don't have that measurement right now (TODO)
       // for now, just stay in this state for 3s
       if (should_transition_to_state(3.0f, one_shot_grace_period)) {
+        // go straight to a 'playing' state after the one shot recording is done
         bypass_state = 2;
-        // disable one shot mode in case it is still on
-        reset_one_shot(false);
+
+        // force disable one shot mode in case it is still on
+        reset_one_shot(true);
+      }
+    } else if (bypass_state == 6) {
+      // a loop select change is in progress, flash both leds green
+      // for 4 seconds and then transition to the stopped state
+
+      // turn off the left red light
+      lights[LEFT_LIGHT+1].setBrightness(0);
+
+      // flash both lights green
+      lights[LEFT_LIGHT].setBrightness(flash_led(0.30f));
+      lights[RIGHT_LIGHT].setBrightness(flash_led(0.30f));
+
+      // transition to the stopped state after 4.0 seconds
+      if (should_transition_to_state(4.0f, loop_select_grace_period)) {
+        bypass_state = 3;
+        // force disable one shot mode in case it is still on
+        reset_one_shot(true);
       }
     }
 
@@ -488,9 +590,9 @@ struct BlooperWidget : ModuleWidget {
     setModule(module);
 
 #ifdef USE_LOGOS
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel_logo.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel_ext_logo.svg")));
 #else
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/blooper_panel_ext.svg")));
 #endif
 
     // screws
@@ -548,6 +650,27 @@ struct BlooperWidget : ModuleWidget {
     midiWidget->box.size = mm2px(Vec(33.840, 28));
     midiWidget->setMidiPort(module ? &module->midi_out : NULL);
     addChild(midiWidget);
+
+    // extension section
+
+    // CV gates
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 17.5)), module, Blooper::PLAY_GATE_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 31.5)), module, Blooper::STOP_GATE_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 44.5)), module, Blooper::REC_GATE_INPUT));
+
+    // loop selection (increment/decrement)
+    addParam(createParamCentered<PlusButtonMomentary>(mm2px(Vec(76, 60)), module, Blooper::LOOP_SELECT_INCR_PARAM));
+    addParam(createParamCentered<MinusButtonMomentary>(mm2px(Vec(68, 60)), module, Blooper::LOOP_SELECT_DECR_PARAM));
+
+    // toggle ramp mod on/off
+    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(67, 77)), module, Blooper::TOGGLE_RAMP_PARAM));
+
+    // ramp cv input port
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(75, 81)), module, Blooper::RAMP_INPUT));
+
+    // ramp tiny knob
+    addParam(createParamCentered<CBAKnobTinyBlooper>(mm2px(Vec(75, 73)), module, Blooper::RAMP_PARAM));
+
   }
 };
 

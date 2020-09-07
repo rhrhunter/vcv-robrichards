@@ -76,7 +76,18 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
 
   void incrementProgram(int incrby, int max) {
     // incr the current program modded by the upper limit
+    if (currProgram == max)
+      currProgram = 0;
     int value = (currProgram + incrby) % max;
+    setProgram(value);
+  }
+
+  void decrementProgram(int decrby, int max) {
+    // decr the current program modded by the upper limit
+    if (currProgram == 0)
+      currProgram = 16;
+    int value = (currProgram - decrby) % max;
+
     setProgram(value);
   }
 
