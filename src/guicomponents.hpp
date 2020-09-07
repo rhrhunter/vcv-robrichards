@@ -37,6 +37,12 @@ namespace rack {
     }
   };
 
+  struct CBAKnobTinyBlooper : RoundKnob {
+    CBAKnobTinyBlooper() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_tiny_blooper.svg")));
+    }
+  };
+
   struct CBAKnobGL : RoundKnob {
     CBAKnobGL() {
       setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_genloss.svg")));
@@ -108,6 +114,22 @@ namespace rack {
       momentary = true;
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_4.svg")));
       addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cba_button_2.svg")));
+    }
+  };
+
+  struct PlusButtonMomentary : app::SvgSwitch {
+    PlusButtonMomentary() {
+      momentary = true;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/plus_off.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/plus_on.svg")));
+    }
+  };
+
+  struct MinusButtonMomentary : app::SvgSwitch {
+    MinusButtonMomentary() {
+      momentary = true;
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/minus_off.svg")));
+      addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/minus_on.svg")));
     }
   };
 
