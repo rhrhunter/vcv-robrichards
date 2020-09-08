@@ -43,7 +43,7 @@ struct Blooper : RRModule {
                   RAMP_INPUT,
                   STOP_GATE_INPUT,
                   PLAY_GATE_INPUT,
-                  REC_GATE_INPUT,
+                  RECORD_GATE_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -71,6 +71,9 @@ struct Blooper : RRModule {
   // grace period timevals
   struct timeval erase_grace_period, one_shot_grace_period;
   struct timeval mod_toggle_grace_period, loop_select_grace_period;
+
+  // gate triggers
+  dsp::SchmittTrigger stop_gate_trigger, play_gate_trigger, record_gate_trigger;
 
   Blooper() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -403,12 +406,46 @@ struct Blooper : RRModule {
     // the length of the first recording, i.e. the time between pressing record and play
     // dictates how often the modifier lights flash.
 
+    // read the gate triggers
+    bool stop_triggered = false;
+    if (inputs[STOP_GATE_INPUT].isConnected()) {
+      if (stop_gate_trigger.process(rescale(inputs[STOP_GATE_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+        // if the trigger goes high, turn on on stop loop param
+        params[STOP_LOOP_PARAM].setValue(1.f);
+        stop_triggered = true;
+      }
+    }
+    bool play_triggered = false;
+    if (inputs[PLAY_GATE_INPUT].isConnected()) {
+      if (play_gate_trigger.process(rescale(inputs[PLAY_GATE_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+        // if the trigger goes high, turn on on play loop param
+        params[PLAY_LOOP_PARAM].setValue(1.f);
+        play_triggered = true;
+      }
+    }
+    bool rec_triggered = false;
+    if (inputs[RECORD_GATE_INPUT].isConnected()) {
+      if (record_gate_trigger.process(rescale(inputs[RECORD_GATE_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
+        // if the trigger goes high, turn on on rec loop param
+        params[RECORD_LOOP_PARAM].setValue(1.f);
+        rec_triggered = true;
+      }
+    }
+
     // read the bypass button values
     int record_loop = (int) floor(params[RECORD_LOOP_PARAM].getValue());
     int play_loop = (int) floor(params[PLAY_LOOP_PARAM].getValue());
     int stop_loop = (int) floor(params[STOP_LOOP_PARAM].getValue());
     int erase_loop = (int) floor(params[ERASE_LOOP_PARAM].getValue());
     int one_shot = (int) floor(params[TOGGLE_ONE_SHOT_RECORD_PARAM].getValue());
+
+    // turn off the triggers if they are on
+    if (stop_triggered)
+      params[STOP_LOOP_PARAM].setValue(0);
+    if (play_triggered)
+      params[PLAY_LOOP_PARAM].setValue(0);
+    if (rec_triggered)
+      params[RECORD_LOOP_PARAM].setValue(0);
 
     // first things first, disable one_shot record if it was not turned on
     // don't reset the cache
@@ -666,7 +703,7 @@ struct BlooperWidget : ModuleWidget {
     // CV gates
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 17.5)), module, Blooper::PLAY_GATE_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 31.5)), module, Blooper::STOP_GATE_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 44.5)), module, Blooper::REC_GATE_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 44.5)), module, Blooper::RECORD_GATE_INPUT));
 
     // loop selection (increment/decrement)
     addParam(createParamCentered<PlusButtonMomentary>(mm2px(Vec(76, 60)), module, Blooper::LOOP_SELECT_INCR_PARAM));
