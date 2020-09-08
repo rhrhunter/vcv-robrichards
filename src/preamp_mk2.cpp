@@ -35,7 +35,8 @@ struct PreampMKII : RRModule {
                   NUM_LIGHTS
   };
 
-  dsp::ClockDivider program_change_clk;
+  // grace period timevals
+  struct timeval preset_change_grace_period;
 
   PreampMKII() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -62,11 +63,11 @@ struct PreampMKII : RRModule {
     configParam(CHANGE_PRESET_PARAM, 0.f, 1.f, 0.f, "Change Preset");
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Enable/Bypass Pedal");
 
-    // prevent program changes from happening too quickly
-    program_change_clk.setDivision(128);
-
     // initialize the first preset
     midi_out.setProgram(0);
+
+    // initialize the loop select grace period
+    gettimeofday(&preset_change_grace_period, NULL);
   }
 
   void process(const ProcessArgs& args) override {
@@ -113,17 +114,22 @@ struct PreampMKII : RRModule {
     midi_out.setValue(diode_arcade, 25);
     midi_out.setValue(fuzz_arcade, 26);
 
+    // check if the preset button was pressed
+    // protect it from being spammed by limiting it
+    // to once every 500ms.
+    int preset_change = (int) floor(params[CHANGE_PRESET_PARAM].getValue());
+    if (preset_change && should_transition_to_state(0.5f, preset_change_grace_period)) {
+      // increment by 1 and with a max of 30 programs
+      midi_out.incrementProgram(1, 30);
+
+      // start the preset change grace period
+      gettimeofday(&preset_change_grace_period, NULL);
+    }
+
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the the user.
     if (should_rate_limit(0.005f, args.sampleTime))
       return;
-
-    // check if the preset button was pressed (protect it from being spammed)
-    int preset_change = (int) floor(params[CHANGE_PRESET_PARAM].getValue());
-    if (preset_change && program_change_clk.process()) {
-      // increment by 1 and with a max of 30 programs
-      midi_out.incrementProgram(1, 30);
-    }
 
     // slider values
     int volume = (int) std::round(params[VOLUME_SLIDER_PARAM].getValue());

@@ -177,6 +177,28 @@ struct RRModule : Module {
     return ret_brightness;
   }
 
+  bool should_transition_to_state(float time_until, struct timeval grace_period) {
+    // get a new measurement
+    struct timeval ctime;
+    gettimeofday(&ctime, NULL);
+    double this_time_usec = (double) ctime.tv_usec;
+    double this_time_sec = (double) ctime.tv_sec;
+
+    // calculate whether we should transition to the next state
+    double last_time_usec = (double) grace_period.tv_usec;
+    double last_time_sec = (double) grace_period.tv_sec;
+    double diff_sec = this_time_sec - last_time_sec;
+    double diff_usec = this_time_usec - last_time_usec;
+    float diff = (float) (diff_sec + (diff_usec/1000000));
+    if (diff > time_until) {
+      // transition to next state
+      return true;
+    } else {
+      // stay in current state
+      return false;
+    }
+  }
+
 };
 
 }
