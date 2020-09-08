@@ -1,7 +1,7 @@
 {
   "slug": "RobRichards",
   "name": "RobRichards",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "license": "GPLv3",
   "brand": "RobRichards",
   "author": "RobRichards",
@@ -15,7 +15,7 @@
   "modules": [
     {
       "slug": "darkworld",
-      "name": "MIDI Controller: Chase Bliss Darkworld",
+      "name": "MIDI Controller: Chase Bliss Audio Darkworld",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Darkworld'",
       "tags": ["midi", "darkworld", "reverb"]
     },
