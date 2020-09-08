@@ -49,7 +49,7 @@ struct Blooper : RRModule {
   enum OutputIds { NUM_OUTPUTS };
   enum LightIds  {
                   ENUMS(LEFT_LIGHT, 2),
-                  RIGHT_LIGHT,
+                  ENUMS(RIGHT_LIGHT, 2),
                   NUM_LIGHTS
   };
 
@@ -180,28 +180,6 @@ struct Blooper : RRModule {
     midi_out.setValue(0, 9);
   }
 
-  bool should_transition_to_state(float time_until, struct timeval grace_period) {
-    // get a new measurement
-    struct timeval ctime;
-    gettimeofday(&ctime, NULL);
-    double this_time_usec = (double) ctime.tv_usec;
-    double this_time_sec = (double) ctime.tv_sec;
-
-    // calculate whether we should transition to the next state
-    double last_time_usec = (double) grace_period.tv_usec;
-    double last_time_sec = (double) grace_period.tv_sec;
-    double diff_sec = this_time_sec - last_time_sec;
-    double diff_usec = this_time_usec - last_time_usec;
-    float diff = (float) (diff_sec + (diff_usec/1000000));
-    if (diff > time_until) {
-      // transition to next state
-      return true;
-    } else {
-      // stay in current state
-      return false;
-    }
-  }
-
   float flash_led(float blink_rate) {
     // collect a current time stamp and compare it to a previously stored time stamp
     // measure the amount of time from the previous LED flash
@@ -248,7 +226,9 @@ struct Blooper : RRModule {
       if (!disable_module()) {
         // turn off the lights if the module is not disabled
         lights[LEFT_LIGHT].setBrightness(0.f);
+        lights[LEFT_LIGHT+1].setBrightness(0.f);
         lights[RIGHT_LIGHT].setBrightness(0.f);
+        lights[RIGHT_LIGHT+1].setBrightness(0.f);
       }
       return;
     } else {
@@ -310,7 +290,9 @@ struct Blooper : RRModule {
     int loop_change_incr = (int) floor(params[LOOP_SELECT_INCR_PARAM].getValue());
     int loop_change_decr = (int) floor(params[LOOP_SELECT_DECR_PARAM].getValue());
 
-    if (loop_change_incr || loop_change_decr) {
+    // only process the loop change if either button was pressed and we are not already
+    // performing a loop change request (bypass_state == 6)
+    if ((loop_change_incr || loop_change_decr) && bypass_state != 6) {
       // allow a 1s grace period between loop changes
       if (should_transition_to_state(1.0f, loop_select_grace_period)) {
         // stop any existing loops before we do the loop change
@@ -343,28 +325,33 @@ struct Blooper : RRModule {
       lights[LEFT_LIGHT + 0].setBrightness(0.f);
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
+      lights[RIGHT_LIGHT + 1].setBrightness(0.f);
     } else if (bypass_state == 1) {
       // recording so light will be red
       lights[LEFT_LIGHT].setBrightness(0.f);
       lights[LEFT_LIGHT + 1].setBrightness(1.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
+      lights[RIGHT_LIGHT + 1].setBrightness(0.f);
     } else if (bypass_state == 2) {
       // recording is playing so light will be green
       lights[LEFT_LIGHT].setBrightness(1.f);
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
+      lights[RIGHT_LIGHT + 1].setBrightness(0.f);
     } else if (bypass_state == 3) {
       // recording is stopped, so flash green
       lights[LEFT_LIGHT].setBrightness(flash_led(0.50f));
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
+      lights[RIGHT_LIGHT + 1].setBrightness(0.f);
     } else if (bypass_state == 4) {
       // recording is being deleted, flash both lights red for 2s
       lights[LEFT_LIGHT+1].setBrightness(flash_led(0.30f));
-      lights[RIGHT_LIGHT].setBrightness(flash_led(0.30f));
+      lights[RIGHT_LIGHT+1].setBrightness(flash_led(0.30f));
 
-      // turn off the green light
+      // turn off the green lights
       lights[LEFT_LIGHT].setBrightness(0);
+      lights[RIGHT_LIGHT].setBrightness(0);
 
       // if 2s has passed since we started deleting, transition to off state
       if (should_transition_to_state(2.0f, erase_grace_period))
@@ -391,8 +378,9 @@ struct Blooper : RRModule {
       // a loop select change is in progress, flash both leds green
       // for 4 seconds and then transition to the stopped state
 
-      // turn off the left red light
+      // turn off the red lights
       lights[LEFT_LIGHT+1].setBrightness(0);
+      lights[RIGHT_LIGHT+1].setBrightness(0);
 
       // flash both lights green
       lights[LEFT_LIGHT].setBrightness(flash_led(0.30f));
@@ -528,6 +516,10 @@ struct Blooper : RRModule {
         bypass_state = 4;
         erase();
       }
+    } else if (bypass_state == 6) {
+      // transiet state, a loop change is in progress
+      // ignore all state change requests until we complete the transition
+      // to the stopped state.
     }
 
     // knob values
@@ -634,7 +626,7 @@ struct BlooperWidget : ModuleWidget {
 
     // lights
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(24, 109)), module, Blooper::LEFT_LIGHT));
-    addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(37, 109)), module, Blooper::RIGHT_LIGHT));
+    addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(37, 109)), module, Blooper::RIGHT_LIGHT));
 
     // toggle one shot record on/off
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(5, 109)), module, Blooper::TOGGLE_ONE_SHOT_RECORD_PARAM));
