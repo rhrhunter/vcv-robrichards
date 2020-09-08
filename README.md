@@ -63,8 +63,12 @@ Then launch Rack.
 * "Slow-down" mode toggle (**Thermae**)
 * "Self-oscillation/Hold" mode via momentary toggle (**Thermae**)
 * Midi Note tempo divisions (**Warped Vinyl**)
-* Modifier Toggles (**Blooper**)
+* Modifier (A & B) Toggles (**Blooper**)
+* Start/Stop/Record/Overdub gate triggers (**Blooper**)
+* Loop Selection (Up/Down) (**Blooper**)
+* Ramping: Enable/Disable, CV, and knob control (**Blooper**)
 * Actual control of motorized faders (**Preamp MKII**)
+* Preset cycling (**Preamp MK2**)
 
 ## Notes
 
