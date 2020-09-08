@@ -529,6 +529,7 @@ struct Blooper : RRModule {
     int moda = (int) std::round(params[MODA_PARAM].getValue());
     int stability = (int) std::round(params[STABILITY_PARAM].getValue());
     int modb = (int) std::round(params[MODB_PARAM].getValue());
+    int ramp = (int) std::round(params[RAMP_PARAM].getValue());
     int expr = -1;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
@@ -556,6 +557,10 @@ struct Blooper : RRModule {
       int modb_cv = (int) std::round(inputs[MODB_INPUT].getVoltage()*2) / 10.f * 127;
       modb = clamp(modb_cv, 0, modb);
     }
+    if (inputs[RAMP_INPUT].isConnected()) {
+      int ramp_cv = (int) std::round(inputs[RAMP_INPUT].getVoltage()*2) / 10.f * 127;
+      ramp = clamp(ramp_cv, 0, 127);
+    }
     if (inputs[EXPR_INPUT].isConnected()) {
       int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
       expr = clamp(expr_cv, 0, 127);
@@ -572,6 +577,19 @@ struct Blooper : RRModule {
     // assign value for expression
     if (expr > 0)
       midi_out.setValue(expr, 100);
+
+    // assign value for ramping only if ramping is turned on
+    int enable_ramp = (int) floor(params[TOGGLE_RAMP_PARAM].getValue());
+    if (enable_ramp) {
+      // turn on ramping
+      midi_out.setValue(1, 52);
+
+      // set the current ramp value
+      midi_out.setValue(ramp, 20);
+    } else {
+      // turn off ramping
+      midi_out.setValue(0, 52);
+    }
 
     return;
   }
