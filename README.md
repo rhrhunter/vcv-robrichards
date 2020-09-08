@@ -67,6 +67,7 @@ Then launch Rack.
 * Start/Stop/Record/Overdub gate triggers (**Blooper**)
 * Loop Selection (Up/Down) (**Blooper**)
 * Ramping: Enable/Disable, CV, and knob control (**Blooper**)
+* One-Shot Record On/Off toggle (**Blooper**)
 * Actual control of motorized faders (**Preamp MKII**)
 * Preset cycling (**Preamp MK2**)
 
