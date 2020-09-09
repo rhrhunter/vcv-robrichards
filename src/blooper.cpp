@@ -411,6 +411,7 @@ struct Blooper : RRModule {
     if (inputs[STOP_GATE_INPUT].isConnected()) {
       if (stop_gate_trigger.process(rescale(inputs[STOP_GATE_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
         // if the trigger goes high, turn on on stop loop param
+        INFO("PLAY GATE TRIGGERED");
         params[STOP_LOOP_PARAM].setValue(1.f);
         stop_triggered = true;
       }
@@ -419,6 +420,7 @@ struct Blooper : RRModule {
     if (inputs[PLAY_GATE_INPUT].isConnected()) {
       if (play_gate_trigger.process(rescale(inputs[PLAY_GATE_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
         // if the trigger goes high, turn on on play loop param
+        INFO("PLAY GATE TRIGGERED");
         params[PLAY_LOOP_PARAM].setValue(1.f);
         play_triggered = true;
       }
@@ -427,6 +429,7 @@ struct Blooper : RRModule {
     if (inputs[RECORD_GATE_INPUT].isConnected()) {
       if (record_gate_trigger.process(rescale(inputs[RECORD_GATE_INPUT].getVoltage(), 0.1f, 2.f, 0.f, 1.f))) {
         // if the trigger goes high, turn on on rec loop param
+        INFO("RECORD GATE TRIGGERED");
         params[RECORD_LOOP_PARAM].setValue(1.f);
         rec_triggered = true;
       }
@@ -701,8 +704,8 @@ struct BlooperWidget : ModuleWidget {
     // extension section
 
     // CV gates
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 17.5)), module, Blooper::PLAY_GATE_INPUT));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 31.5)), module, Blooper::STOP_GATE_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 17.5)), module, Blooper::STOP_GATE_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 31.5)), module, Blooper::PLAY_GATE_INPUT));
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(72, 44.5)), module, Blooper::RECORD_GATE_INPUT));
 
     // loop selection (increment/decrement)
