@@ -312,6 +312,12 @@ struct Blooper : RRModule {
       }
     }
 
+    // shut off the toggles of the modifiers if we have just processed a gate trigger
+    if (moda_triggered)
+      params[TOGGLE_MODA_PARAM].setValue(0);
+    if (modb_triggered)
+      params[TOGGLE_MODB_PARAM].setValue(0);
+
     // check if the preset button was pressed (protect it from being spammed)
     int loop_change_incr = (int) floor(params[LOOP_SELECT_INCR_PARAM].getValue());
     int loop_change_decr = (int) floor(params[LOOP_SELECT_DECR_PARAM].getValue());
