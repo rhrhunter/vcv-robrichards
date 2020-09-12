@@ -281,7 +281,7 @@ struct Blooper : RRModule {
       }
     }
 
-    // toggle the either modifier on or off
+    // toggle either modifier on or off
     int moda_toggle = (int) floor(params[TOGGLE_MODA_PARAM].getValue());
     if (moda_toggle) {
       // allow a 250ms grace period between button presses to prevent spam
@@ -296,7 +296,6 @@ struct Blooper : RRModule {
         gettimeofday(&mod_toggle_grace_period, NULL);
       }
     }
-
     int modb_toggle = (int) floor(params[TOGGLE_MODB_PARAM].getValue());
     if (modb_toggle) {
       // allow a 250ms grace period between button presses to prevent spam
@@ -351,6 +350,26 @@ struct Blooper : RRModule {
       }
     }
 
+    // ---------------------------
+    // -- Blooper State Machine --
+    // ---------------------------
+    //
+    // STATE 0: Pedal is in an UNKNOWN state
+    // STATE 1: (semi-transient) Pedal is in a RECORDING state
+    //    -- in reality it can only stay in this state for the
+    //       maximum loop duration supported by the pedal 32s.
+    //    -- Can be manually transitioned to STOPPED/PLAYING/ERASING states.
+    // STATE 2: Pedal is in a PLAYING state
+    // STATE 3: Pedal is in a STOPPED state
+    // STATE 4: (full-transient) Pedal is in an ERASING state.
+    //   -- Will transition automatically to a STOPPED state.
+    // STATE 5: (semi-transient) Pedal is undergoing a ONE SHOT Record
+    //   -- Will transition automatically to a PLAYING state.
+    //   -- Can be manually transitioned to STOPPED or ERASING.
+    // STATE 6: (full-transient) Pedal is in a LOOP_CHANGE state.
+    //   -- all messages are ignored for a hardcoded time to allow
+    //      the loop to be loaded. Will transition to a STOPPED state.
+
     // toggle the lights based on the current state
     if (bypass_state == 0) {
       // pedal is not playing / unknown state
@@ -359,13 +378,13 @@ struct Blooper : RRModule {
       lights[RIGHT_LIGHT].setBrightness(0.f);
       lights[RIGHT_LIGHT + 1].setBrightness(0.f);
     } else if (bypass_state == 1) {
-      // recording so light will be red
+      // recording, so light will be red
       lights[LEFT_LIGHT].setBrightness(0.f);
       lights[LEFT_LIGHT + 1].setBrightness(1.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
       lights[RIGHT_LIGHT + 1].setBrightness(0.f);
     } else if (bypass_state == 2) {
-      // recording is playing so light will be green
+      // recording is playing, so light will be green
       lights[LEFT_LIGHT].setBrightness(1.f);
       lights[LEFT_LIGHT + 1].setBrightness(0.f);
       lights[RIGHT_LIGHT].setBrightness(0.f);
@@ -426,15 +445,6 @@ struct Blooper : RRModule {
       }
     }
 
-    // apply rate limiting here so that we do not flood the
-    // system with midi messages caused by the CV inputs.
-    if (should_rate_limit(0.005f, args.sampleTime))
-      return;
-
-    // TODO
-    // the length of the first recording, i.e. the time between pressing record and play
-    // dictates how often the modifier lights flash.
-
     // read the gate triggers
     bool stop_triggered = false;
     if (inputs[STOP_GATE_INPUT].isConnected()) {
@@ -482,20 +492,24 @@ struct Blooper : RRModule {
       reset_one_shot(false);
 
     // State transitions:
-    // 1) first press of record or play makes pedal record
+    // 1) first press of record makes pedal record
     //    and left led lights changes from off to red
-    // 2) 2nd press of record or play makes pedal play
+    // 2) play makes pedal play
     //    and left led lights changes from red to green
     // 3) pressing stop during play states, makes loop stop
     //    and left led changes from green to flashing green (200ms flashes)
     // 4) pressing record while in play state will allow for overdubs
     //    and left led lights changes from green to red
-    // 5) holding record for a duration of time will
-    //    enable an overdub that lasts as long as the original loop
+    // 5) performing a record or overdub with one shot enabled will
+    //    issue an overdab that lasts as long as the original loop.
 
     if (bypass_state == 0) {
-       // pedal is stopped (or the state is unknown)
+       // pedal state is unknown, need to assume all state transitions are possible.
       if (record_loop) {
+        // TODO:
+        // the length of the first recording, i.e. the time between pressing record and play
+        // dictates how often the modifier lights flash. We should calculate this so that
+        // we can predict how long a one shot recording should take
         if (one_shot) {
           // requested to do a one shot record
           bypass_state = 5;
@@ -587,6 +601,12 @@ struct Blooper : RRModule {
       // ignore all state change requests until we complete the transition
       // to the stopped state.
     }
+
+    // apply rate limiting here so that we do not flood the
+    // system with midi messages caused by the CV inputs
+    // or aggressive knob operations by the user.
+    if (should_rate_limit(0.005f, args.sampleTime))
+      return;
 
     // knob values
     int volume = (int) std::round(params[VOLUME_PARAM].getValue());

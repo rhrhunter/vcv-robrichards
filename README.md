@@ -5,7 +5,7 @@ VCV Plugins by RobRichards
 
 ![RobRichards Plugins](plugins.png)
 
-Here you'll find unofficial Midi controller plugins for various Chase Bliss Audio Pedals.
+Here you'll find unofficial MIDI controller plugins for various Chase Bliss Audio Pedals.
 
 Current supported interfaces:
 
@@ -14,7 +14,7 @@ Current supported interfaces:
 * **Warped Vinyl**
 * **M O O D**
 * **Generation Loss**
-* **Blooper** *(Firmware v1.2)*
+* **Blooper** *(Firmware (v2.0)*
 * **Preamp MKII**
 
 NOTE: In order to use these modules, you will need:
@@ -64,7 +64,7 @@ Then launch Rack.
 * "Self-oscillation/Hold" mode via momentary toggle (**Thermae**)
 * Midi Note tempo divisions (**Warped Vinyl**)
 * Modifier (A & B) Toggles (**Blooper**)
-* Start/Stop/Record/Overdub gate triggers (**Blooper**)
+* Start/Stop/Record/Overdub/Modifier CV gate triggers (**Blooper**)
 * Loop Selection (Up/Down) (**Blooper**)
 * Ramping: Enable/Disable, CV, and knob control (**Blooper**)
 * One-Shot Record On/Off toggle (**Blooper**)
@@ -73,11 +73,21 @@ Then launch Rack.
 
 ## Notes
 
-As a precaution, the high and low gate triggers are not implemented on pedals that contain bypass relay switches. This is primarily to prevent wear & tear that could physically damage the pedal. Therefore, the MIDI controllers for **Thermae**, **Warped Vinyl**, and **Generation Loss** do not have this implemented.
+## Support Voltage Range for CV Modulation of Knobs
+
+These plugins support a voltage range of 0-5V. When connecting an LFO to the CV ports, you will want to adjust the offset and scale of the LFO to fall into this range to avoid plateauing your wave forms (min or max).
+
+## Protection Mechanisms
+
+As a precaution, the high and low gate triggers for pedal bypass are not implemented on pedals that contain bypass relay switches. This is primarily to prevent wear & tear that could physically damage the pedal. Therefore, the MIDI controllers for **Thermae**, **Warped Vinyl**, and **Generation Loss** do not have this implemented.
 
 ## Known Issues (at least with my hardware)
 1. **M O O D** - I suspect it does not respond correctly to Midi Message **CC15=127** (Mix knob fully-CW). Instead of having a completely wet mix, it appears to be identical to sending **CC15=126**, where a small bit of the dry signal is still audible.
 2. **Preamp MKII** - The 'Jump' arcade button does not respond to **CC22=1** nor **CC22=2**. It only appears to respond to **CC22=3**, which instead of sending the state of the arcade button to "5 (Blue Light)", it actually toggles *between* the three options. This is contrary to the specification in the Midi Implementation Manual.
+
+## Caveats & Limitations
+
+In my tests, I've discovered that Chase Bliss pedals have an internal MIDI message limiter built in that prevents the pedals from getting overloaded by MIDI spam. Unfortunately this means that modulating many inputs simultaneously on the same pedal may result in messages getting dropped by the pedal itself. The internal MIDI limiter appears to be very strict in that if two messages arrive at virtually the same time, only the first message will be processed. These plugins don't have any adaptive mechanism to stagger or queue up outgoing MIDI messages to compensate for the internal MIDI limiter, so you may experience that the pedals will reject some of your MIDI messages if you try to push these plugins to their limits, i.e. connect an LFO into every port, or perform simultaneous GATE trigger operations.
 
 # Disclaimer/License
 
