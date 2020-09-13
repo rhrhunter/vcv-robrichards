@@ -72,7 +72,7 @@ struct Blooper : RRModule {
 
   // grace period timevals
   struct timeval erase_grace_period, one_shot_grace_period;
-  struct timeval mod_toggle_grace_period, loop_select_grace_period;
+  struct timeval moda_toggle_grace_period, modb_toggle_grace_period, loop_select_grace_period;
 
   // gate triggers
   dsp::SchmittTrigger stop_gate_trigger, play_gate_trigger, record_gate_trigger;
@@ -121,8 +121,9 @@ struct Blooper : RRModule {
     // blinking rate
     gettimeofday(&last_blink_time, NULL);
 
-    // initialize te mod toggle grace period
-    gettimeofday(&mod_toggle_grace_period, NULL);
+    // initialize te mod toggle grace periods
+    gettimeofday(&moda_toggle_grace_period, NULL);
+    gettimeofday(&modb_toggle_grace_period, NULL);
 
     // initialize the loop select grace period
     gettimeofday(&loop_select_grace_period, NULL);
@@ -285,7 +286,7 @@ struct Blooper : RRModule {
     int moda_toggle = (int) floor(params[TOGGLE_MODA_PARAM].getValue());
     if (moda_toggle) {
       // allow a 250ms grace period between button presses to prevent spam
-      if (should_transition_to_state(0.25f, mod_toggle_grace_period)) {
+      if (should_transition_to_state(0.25f, moda_toggle_grace_period)) {
         midi_out.setValue(next_moda_toggle_value, 30);
         if (next_moda_toggle_value == 1)
           next_moda_toggle_value = 127;
@@ -293,13 +294,13 @@ struct Blooper : RRModule {
           next_moda_toggle_value = 1;
 
         // remember for next time how long it as been since the toggle was pressed
-        gettimeofday(&mod_toggle_grace_period, NULL);
+        gettimeofday(&moda_toggle_grace_period, NULL);
       }
     }
     int modb_toggle = (int) floor(params[TOGGLE_MODB_PARAM].getValue());
     if (modb_toggle) {
       // allow a 250ms grace period between button presses to prevent spam
-      if (should_transition_to_state(0.25f, mod_toggle_grace_period)) {
+      if (should_transition_to_state(0.25f, modb_toggle_grace_period)) {
         midi_out.setValue(next_modb_toggle_value, 31);
         if (next_modb_toggle_value == 1)
           next_modb_toggle_value = 127;
@@ -307,7 +308,7 @@ struct Blooper : RRModule {
           next_modb_toggle_value = 1;
 
         // remember for next time how long it as been since the toggle was pressed
-        gettimeofday(&mod_toggle_grace_period, NULL);
+        gettimeofday(&modb_toggle_grace_period, NULL);
       }
     }
 
