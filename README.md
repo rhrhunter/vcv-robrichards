@@ -14,7 +14,7 @@ Current supported interfaces:
 * **Warped Vinyl**
 * **M O O D**
 * **Generation Loss**
-* **Blooper** *(Firmware (v2.0)*
+* **Blooper** *(Firmware (v2.1)*
 * **Preamp MKII**
 
 NOTE: In order to use these modules, you will need:
@@ -87,7 +87,7 @@ As a precaution, the high and low gate triggers for pedal bypass are not impleme
 
 ### Caveats & Limitations
 
-In my tests, I've discovered that Chase Bliss pedals have an internal MIDI message limiter built in that prevents the pedals from getting overloaded by MIDI spam. Unfortunately this means that modulating many inputs simultaneously on the same pedal may result in messages getting dropped by the pedal itself. The internal MIDI limiter appears to be very strict in that if two messages arrive at virtually the same time, only the first message will be processed. These plugins don't have any adaptive mechanism to stagger or queue up outgoing MIDI messages to compensate for the internal MIDI limiter, so you may experience that the pedals will reject some of your MIDI messages if you try to push these plugins to their limits, i.e. connect an LFO into every port, or perform simultaneous GATE trigger operations.
+Chase Bliss Pedals do not respond well to the Running Status feature in the Midi protocol. To overcome this, every midi message that is sent to a CBA device is followed with dummy midi message to invalid the Running Status optimization feature. Although this means that double the amount of messages are being sent to the devices, it ensures that no messages are dropped by the devices.
 
 # Disclaimer/License
 

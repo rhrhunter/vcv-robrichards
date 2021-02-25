@@ -61,6 +61,17 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     m.setNote(cc);
     m.setValue(value);
     sendMessage(m);
+
+    // follow with a bogus midi message (key pressure) that
+    // the pedals don't understand to invalidate
+    // MIDI's Running Status feature that causes CBA
+    // pedals to drop consecutive messages.
+    midi::Message m2;
+    m2.setStatus(0xa);
+    m2.setNote(60);
+    m2.setValue(1);
+    sendMessage(m2);
+
     return true;
   }
 
@@ -71,6 +82,17 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     m.setNote(cc);
     m.setValue(value);
     sendMessage(m);
+
+    // follow with a bogus midi message (key pressure) that
+    // the pedals don't understand to invalidate
+    // MIDI's Running Status feature that causes CBA
+    // pedals to drop consecutive messages.
+    midi::Message m2;
+    m2.setStatus(0xa);
+    m2.setNote(60);
+    m2.setValue(1);
+    sendMessage(m2);
+
     return true;
   }
 
