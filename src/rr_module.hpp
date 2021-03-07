@@ -66,7 +66,7 @@ struct RRModule : Module {
 
   void process_midi_clock(bool enable_clock) {
       // turn on midi clock (just in case it is off)
-      midi_out.setValue(127, 51);
+      midi_out.sendCachedCC(127, 51);
 
       // send a clock pulse
       midi_out.setClock(enable_clock);
@@ -82,8 +82,7 @@ struct RRModule : Module {
     // if the tap tempo button was pressed, force a midi message to be sent
     if (can_tap_tempo && tap_tempo) {
       // we are allowing tap tempo actions and they tapped the tempo button
-      midi_out.resetCCCache(93);
-      midi_out.setValue(1, 93);
+      midi_out.sendCC(1, 93);
       can_tap_tempo = false;
 
       // measure the amount of time from the previous tap tempo to this tap tempo.

@@ -48,43 +48,46 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     return deviceId > -1 && channel > -1;
   }
 
-  bool setValue(int value, int cc) {
+  bool sendCachedCC(int value, int cc) {
     // check the cache for cc messages
     if (value == lastMidiCCValues[cc]) {
       return false;
     }
     lastMidiCCValues[cc] = value;
 
+    // send the CC midi message
+    bool ret = sendCC(value, cc);
+
+    // follow up with a dummy message
+    sendDummyMessage();
+    return ret;
+  }
+
+  bool sendCachedCCNoDummy(int value, int cc) {
+    // check the cache for cc messages
+    if (value == lastMidiCCValues[cc]) {
+      return false;
+    }
+    lastMidiCCValues[cc] = value;
+
+    // send the CC midi message
+    return sendCC(value, cc);
+  }
+
+  bool sendCC(int value, int cc) {
     // send CC message
     midi::Message m;
     m.setStatus(0xb);
     m.setNote(cc);
     m.setValue(value);
     sendMessage(m);
-
-    // follow with a bogus midi message (key pressure) that
-    // the pedals don't understand to invalidate
-    // MIDI's Running Status feature that causes CBA
-    // pedals to drop consecutive messages.
-    midi::Message m2;
-    m2.setStatus(0xa);
-    m2.setNote(60);
-    m2.setValue(1);
-    sendMessage(m2);
 
     return true;
   }
 
-  bool setValueNoCache(int value, int cc) {
-    // send CC message
-    midi::Message m;
-    m.setStatus(0xb);
-    m.setNote(cc);
-    m.setValue(value);
-    sendMessage(m);
-
-    // follow with a bogus midi message (key pressure) that
-    // the pedals don't understand to invalidate
+  void sendDummyMessage() {
+    // send a bogus midi message (key pressure) that
+    // the CBA pedals don't understand to invalidate
     // MIDI's Running Status feature that causes CBA
     // pedals to drop consecutive messages.
     midi::Message m2;
@@ -92,8 +95,6 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     m2.setNote(60);
     m2.setValue(1);
     sendMessage(m2);
-
-    return true;
   }
 
   void incrementProgram(int incrby, int max) {

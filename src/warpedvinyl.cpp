@@ -115,13 +115,13 @@ struct WarpedVinyl : RRModule {
     }
 
     // enable or bypass the pedal
-    midi_out.setValue(bypass, 102);
+    midi_out.sendCachedCC(bypass, 102);
 
     // left switch values (0,1,2,3,4,5)
     int note_division = (int) floor(params[NOTE_DIVISION_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(note_division, 21);
+    midi_out.sendCachedCC(note_division, 21);
 
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
@@ -168,16 +168,16 @@ struct WarpedVinyl : RRModule {
     }
 
     // assign values from knobs (or cv)
-    midi_out.setValue(tone, 14);
-    midi_out.setValue(lag, 15);
-    midi_out.setValue(mix, 16);
-    midi_out.setValue(rpm, 17);
-    midi_out.setValue(depth, 18);
-    midi_out.setValue(warp, 19);
+    midi_out.sendCachedCC(tone, 14);
+    midi_out.sendCachedCC(lag, 15);
+    midi_out.sendCachedCC(mix, 16);
+    midi_out.sendCachedCC(rpm, 17);
+    midi_out.sendCachedCC(depth, 18);
+    midi_out.sendCachedCC(warp, 19);
 
     // assign value for expression
     if (expr > 0)
-      midi_out.setValue(expr, 100);
+      midi_out.sendCachedCC(expr, 100);
 
     return;
   }

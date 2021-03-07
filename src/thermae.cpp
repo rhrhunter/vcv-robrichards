@@ -153,7 +153,7 @@ struct Thermae : RRModule {
     }
 
     // enable or bypass the pedal
-    midi_out.setValue(bypass, 102);
+    midi_out.sendCachedCC(bypass, 102);
 
     // 3way switch values (1,2,3)
     int l_toggle = (int) floor(params[L_TOGGLE_PARAM].getValue());
@@ -161,9 +161,9 @@ struct Thermae : RRModule {
     int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(l_toggle, 21);
-    midi_out.setValue(m_toggle, 22);
-    midi_out.setValue(r_toggle, 23);
+    midi_out.sendCachedCC(l_toggle, 21);
+    midi_out.sendCachedCC(m_toggle, 22);
+    midi_out.sendCachedCC(r_toggle, 23);
 
     // periodically reset the CC message cache for hold mode if it is
     // not turned on by the user. This is so that it doesn't get stuck turned on.
@@ -178,8 +178,8 @@ struct Thermae : RRModule {
     }
 
     // enable/disable hold mode and/or slowdown mode
-    midi_out.setValue(hold_mode, 24);
-    midi_out.setValue(slowdown_mode, 25);
+    midi_out.sendCachedCC(hold_mode, 24);
+    midi_out.sendCachedCC(slowdown_mode, 25);
 
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
@@ -226,16 +226,16 @@ struct Thermae : RRModule {
     }
 
     // assign values from knobs (or cv)
-    midi_out.setValue(mix, 14);
-    midi_out.setValue(lpf, 15);
-    midi_out.setValue(regen, 16);
-    midi_out.setValue(glide, 17);
-    midi_out.setValue(int1, 18);
-    midi_out.setValue(int2, 19);
+    midi_out.sendCachedCC(mix, 14);
+    midi_out.sendCachedCC(lpf, 15);
+    midi_out.sendCachedCC(regen, 16);
+    midi_out.sendCachedCC(glide, 17);
+    midi_out.sendCachedCC(int1, 18);
+    midi_out.sendCachedCC(int2, 19);
 
     // assign value for expression
     if (expr > 0)
-      midi_out.setValue(expr, 100);
+      midi_out.sendCachedCC(expr, 100);
 
     return;
   }

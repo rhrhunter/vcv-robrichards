@@ -121,12 +121,12 @@ struct Mood : RRModule {
     int loop_prog = (int) floor(params[LOOP_PROGRAM_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(blood_prog, 21);
-    midi_out.setValue(route_prog, 22);
+    midi_out.sendCachedCC(blood_prog, 21);
+    midi_out.sendCachedCC(route_prog, 22);
 
     // if the loop program is changed, the loop
     // section gets bypassed, so force a bypass
-    if (midi_out.setValue(loop_prog, 23)) {
+    if (midi_out.sendCachedCC(loop_prog, 23)) {
       enable_loop = 0;
       params[BYPASS_LOOP_PARAM].setValue(0.f);
     }
@@ -169,7 +169,7 @@ struct Mood : RRModule {
     }
 
     // bypass the blood and/or loop channels
-    midi_out.setValue(bypass, 103);
+    midi_out.sendCachedCC(bypass, 103);
 
     // if the loop is not on, flash the loop LED off-to-red
     // based on the sample rate of the clock knob.
@@ -217,16 +217,16 @@ struct Mood : RRModule {
     }
 
     // assign values from knobs (or cv)
-    midi_out.setValue(time, 14);
-    midi_out.setValue(mix, 15);
-    midi_out.setValue(length, 16);
-    midi_out.setValue(modify_blood, 17);
-    midi_out.setValue(clock, 18);
-    midi_out.setValue(modify_loop, 19);
+    midi_out.sendCachedCC(time, 14);
+    midi_out.sendCachedCC(mix, 15);
+    midi_out.sendCachedCC(length, 16);
+    midi_out.sendCachedCC(modify_blood, 17);
+    midi_out.sendCachedCC(clock, 18);
+    midi_out.sendCachedCC(modify_loop, 19);
 
     // assign value for expression
     if (expr > 0)
-      midi_out.setValue(expr, 100);
+      midi_out.sendCachedCC(expr, 100);
 
     return;
   }

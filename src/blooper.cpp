@@ -134,7 +134,7 @@ struct Blooper : RRModule {
     reset_one_shot(false);
 
     // send a record message
-    midi_out.setValue(1, 11);
+    midi_out.sendCachedCC(1, 11);
   }
 
   void play() {
@@ -142,7 +142,7 @@ struct Blooper : RRModule {
     reset_one_shot(false);
 
     // send a play message
-    midi_out.setValue(2, 11);
+    midi_out.sendCachedCC(2, 11);
   }
 
   void over_dub() {
@@ -150,7 +150,7 @@ struct Blooper : RRModule {
     reset_one_shot(false);
 
     // send an over dub message
-    midi_out.setValue(3, 11);
+    midi_out.sendCachedCC(3, 11);
   }
 
   void stop() {
@@ -158,7 +158,7 @@ struct Blooper : RRModule {
     reset_one_shot(false);
 
     // send a stop message
-    midi_out.setValue(4, 11);
+    midi_out.sendCachedCC(4, 11);
   }
 
   void erase() {
@@ -166,7 +166,7 @@ struct Blooper : RRModule {
     reset_one_shot(false);
 
     // send an erase message
-    midi_out.setValue(7, 11);
+    midi_out.sendCachedCC(7, 11);
 
     // collect a timestamp to know when the
     // erase grace period starts
@@ -175,7 +175,7 @@ struct Blooper : RRModule {
 
   void one_shot_record() {
     // enable one shot record
-    midi_out.setValue(1, 9);
+    midi_out.sendCachedCC(1, 9);
 
     // collect a timestamp to know when the one shot grace period starts
     gettimeofday(&one_shot_grace_period, NULL);
@@ -184,7 +184,7 @@ struct Blooper : RRModule {
   void reset_one_shot(bool reset_cache) {
     if (reset_cache)
       midi_out.resetCCCache(9);
-    midi_out.setValue(0, 9);
+    midi_out.sendCachedCC(0, 9);
   }
 
   float flash_led(float blink_rate) {
@@ -258,9 +258,9 @@ struct Blooper : RRModule {
     int r_toggle = (int) floor(params[R_TOGGLE_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(l_toggle, 21);
-    midi_out.setValue(m_toggle, 22);
-    midi_out.setValue(r_toggle, 23);
+    midi_out.sendCachedCC(l_toggle, 21);
+    midi_out.sendCachedCC(m_toggle, 22);
+    midi_out.sendCachedCC(r_toggle, 23);
 
     // read the mod a and mod b gate triggers
     bool moda_triggered = false;
@@ -287,7 +287,7 @@ struct Blooper : RRModule {
     if (moda_toggle) {
       // allow a 250ms grace period between button presses to prevent spam
       if (should_transition_to_state(0.25f, moda_toggle_grace_period)) {
-        midi_out.setValue(next_moda_toggle_value, 30);
+        midi_out.sendCachedCC(next_moda_toggle_value, 30);
         if (next_moda_toggle_value == 1)
           next_moda_toggle_value = 127;
         else
@@ -301,7 +301,7 @@ struct Blooper : RRModule {
     if (modb_toggle) {
       // allow a 250ms grace period between button presses to prevent spam
       if (should_transition_to_state(0.25f, modb_toggle_grace_period)) {
-        midi_out.setValue(next_modb_toggle_value, 31);
+        midi_out.sendCachedCC(next_modb_toggle_value, 31);
         if (next_modb_toggle_value == 1)
           next_modb_toggle_value = 127;
         else
@@ -654,28 +654,28 @@ struct Blooper : RRModule {
     }
 
     // assign values from knobs (or cv)
-    midi_out.setValue(volume, 14);
-    midi_out.setValue(layers, 15);
-    midi_out.setValue(repeats, 16);
-    midi_out.setValue(moda, 17);
-    midi_out.setValue(stability, 18);
-    midi_out.setValue(modb, 19);
+    midi_out.sendCachedCC(volume, 14);
+    midi_out.sendCachedCC(layers, 15);
+    midi_out.sendCachedCC(repeats, 16);
+    midi_out.sendCachedCC(moda, 17);
+    midi_out.sendCachedCC(stability, 18);
+    midi_out.sendCachedCC(modb, 19);
 
     // assign value for expression
     if (expr > 0)
-      midi_out.setValue(expr, 100);
+      midi_out.sendCachedCC(expr, 100);
 
     // assign value for ramping only if ramping is turned on
     int enable_ramp = (int) floor(params[TOGGLE_RAMP_PARAM].getValue());
     if (enable_ramp) {
       // turn on ramping
-      midi_out.setValue(1, 52);
+      midi_out.sendCachedCC(1, 52);
 
       // set the current ramp value
-      midi_out.setValue(ramp, 20);
+      midi_out.sendCachedCC(ramp, 20);
     } else {
       // turn off ramping
-      midi_out.setValue(0, 52);
+      midi_out.sendCachedCC(0, 52);
     }
 
     return;

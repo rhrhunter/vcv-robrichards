@@ -133,7 +133,7 @@ struct Darkworld : RRModule {
     }
 
     // bypass the dark and/or world channels
-    midi_out.setValue(bypass, 103);
+    midi_out.sendCachedCC(bypass, 103);
 
     // read the three-way switch values
     int dark_prog = (int) floor(params[DARK_PROGRAM_PARAM].getValue());
@@ -141,9 +141,9 @@ struct Darkworld : RRModule {
     int world_prog = (int) floor(params[WORLD_PROGRAM_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(dark_prog, 21);
-    midi_out.setValue(route_prog, 22);
-    midi_out.setValue(world_prog, 23);
+    midi_out.sendCachedCC(dark_prog, 21);
+    midi_out.sendCachedCC(route_prog, 22);
+    midi_out.sendCachedCC(world_prog, 23);
 
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
@@ -191,16 +191,16 @@ struct Darkworld : RRModule {
     }
 
     // assign values from knobs (or cv)
-    midi_out.setValue(decay, 14);
-    midi_out.setValue(mix, 15);
-    midi_out.setValue(dwell, 16);
-    midi_out.setValue(modify, 17);
-    midi_out.setValue(tone, 18);
-    midi_out.setValue(pre_delay, 19);
+    midi_out.sendCachedCC(decay, 14);
+    midi_out.sendCachedCC(mix, 15);
+    midi_out.sendCachedCC(dwell, 16);
+    midi_out.sendCachedCC(modify, 17);
+    midi_out.sendCachedCC(tone, 18);
+    midi_out.sendCachedCC(pre_delay, 19);
 
     // assign value for expression
     if (expr > 0)
-      midi_out.setValue(expr, 100);
+      midi_out.sendCachedCC(expr, 100);
 
     return;
   }

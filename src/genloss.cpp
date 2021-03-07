@@ -121,7 +121,7 @@ struct GenerationLoss : RRModule {
     }
 
     // bypass the aux function and/or pedal
-    midi_out.setValue(bypass, 103);
+    midi_out.sendCachedCC(bypass, 103);
 
     // read the three-way switch values
     int aux_func = (int) floor(params[AUX_FUNC_PARAM].getValue());
@@ -129,9 +129,9 @@ struct GenerationLoss : RRModule {
     int hiss_func = (int) floor(params[HISS_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(aux_func, 21);
-    midi_out.setValue(dry_func, 22);
-    midi_out.setValue(hiss_func, 23);
+    midi_out.sendCachedCC(aux_func, 21);
+    midi_out.sendCachedCC(dry_func, 22);
+    midi_out.sendCachedCC(hiss_func, 23);
 
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
@@ -178,16 +178,16 @@ struct GenerationLoss : RRModule {
     }
 
     // assign values from knobs (or cv)
-    midi_out.setValue(wow, 14);
-    midi_out.setValue(wet, 15);
-    midi_out.setValue(hp, 16);
-    midi_out.setValue(flutter, 17);
-    midi_out.setValue(gen, 18);
-    midi_out.setValue(lp, 19);
+    midi_out.sendCachedCC(wow, 14);
+    midi_out.sendCachedCC(wet, 15);
+    midi_out.sendCachedCC(hp, 16);
+    midi_out.sendCachedCC(flutter, 17);
+    midi_out.sendCachedCC(gen, 18);
+    midi_out.sendCachedCC(lp, 19);
 
     // assign value for expression
     if (expr > 0)
-      midi_out.setValue(expr, 100);
+      midi_out.sendCachedCC(expr, 100);
   }
 };
 

@@ -98,7 +98,7 @@ struct PreampMKII : RRModule {
     }
 
     // bypass (or enable) the pedal
-    midi_out.setValue(bypass, 102);
+    midi_out.sendCachedCC(bypass, 102);
 
     // read the three-way arcade buttons values
     int jump_arcade = (int) floor(params[JUMP_ARCADE_PARAM].getValue());
@@ -108,11 +108,11 @@ struct PreampMKII : RRModule {
     int fuzz_arcade = (int) floor(params[FUZZ_ARCADE_PARAM].getValue());
 
     // assign values from switches
-    midi_out.setValue(jump_arcade, 22);
-    midi_out.setValue(mids_arcade, 23);
-    midi_out.setValue(q_arcade, 24);
-    midi_out.setValue(diode_arcade, 25);
-    midi_out.setValue(fuzz_arcade, 26);
+    midi_out.sendCachedCC(jump_arcade, 22);
+    midi_out.sendCachedCC(mids_arcade, 23);
+    midi_out.sendCachedCC(q_arcade, 24);
+    midi_out.sendCachedCC(diode_arcade, 25);
+    midi_out.sendCachedCC(fuzz_arcade, 26);
 
     // check if the preset button was pressed
     // protect it from being spammed by limiting it
@@ -140,12 +140,12 @@ struct PreampMKII : RRModule {
     int gain = (int) std::round(params[GAIN_SLIDER_PARAM].getValue());
 
     // assign values from knobs (or cv)
-    midi_out.setValue(volume, 14);
-    midi_out.setValue(treble, 15);
-    midi_out.setValue(mids, 16);
-    midi_out.setValue(freq, 17);
-    midi_out.setValue(bass, 18);
-    midi_out.setValue(gain, 19);
+    midi_out.sendCachedCC(volume, 14);
+    midi_out.sendCachedCC(treble, 15);
+    midi_out.sendCachedCC(mids, 16);
+    midi_out.sendCachedCC(freq, 17);
+    midi_out.sendCachedCC(bass, 18);
+    midi_out.sendCachedCC(gain, 19);
 
     // read the expresion input if it is connected and clamp it between 0-127
     int expr = -1;
@@ -155,7 +155,7 @@ struct PreampMKII : RRModule {
 
       // assign value for expression
       if (expr > 0)
-        midi_out.setValue(expr, 100);
+        midi_out.sendCachedCC(expr, 100);
     }
 
     return;
