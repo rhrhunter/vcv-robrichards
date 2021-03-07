@@ -6,19 +6,19 @@
 #include "rr_midiwidget.hpp"
 #include <dsp/digital.hpp>
 
-struct PreampMKII : RRModule {
+struct Cxm1978 : RRModule {
   enum ParamIds {
-                 VOLUME_SLIDER_PARAM,
-                 TREBLE_SLIDER_PARAM,
-                 MIDS_SLIDER_PARAM,
-                 FREQ_SLIDER_PARAM,
                  BASS_SLIDER_PARAM,
-                 GAIN_SLIDER_PARAM,
+                 MIDS_SLIDER_PARAM,
+                 CROSS_SLIDER_PARAM,
+                 TREBLE_SLIDER_PARAM,
+                 MIX_SLIDER_PARAM,
+                 PREDLY_SLIDER_PARAM,
                  JUMP_ARCADE_PARAM,
-                 MIDS_ARCADE_PARAM,
-                 Q_ARCADE_PARAM,
-                 DIODE_ARCADE_PARAM,
-                 FUZZ_ARCADE_PARAM,
+                 TYPE_ARCADE_PARAM,
+                 DIFFUSION_ARCADE_PARAM,
+                 TANK_MOD_ARCADE_PARAM,
+                 CLOCK_ARCADE_PARAM,
                  CHANGE_PRESET_PARAM,
                  BYPASS_PARAM,
                  NUM_PARAMS
@@ -38,26 +38,26 @@ struct PreampMKII : RRModule {
   // grace period timevals
   struct timeval preset_change_grace_period;
 
-  PreampMKII() {
+  Cxm1978() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // main slider parameters
-    configParam(VOLUME_SLIDER_PARAM, 0.f, 127.f, 0.f, "Volume");
+    configParam(BASS_SLIDER_PARAM, 0.f, 127.f, 0.f, "Bass (Decay Time Below Crossover)");
+    configParam(MIDS_SLIDER_PARAM, 0.f, 127.f, 0.f, "Mids (Decay Time Above Crossover)");
+    configParam(CROSS_SLIDER_PARAM, 0.f, 127.f, 0.f, "Crossover Frequency (Bass<->Mid)");
     configParam(TREBLE_SLIDER_PARAM, 0.f, 127.f, 0.f, "Treble");
-    configParam(MIDS_SLIDER_PARAM, 0.f, 127.f, 0.f, "Mids");
-    configParam(FREQ_SLIDER_PARAM, 0.f, 127.f, 0.f, "Frequency");
-    configParam(BASS_SLIDER_PARAM, 0.f, 127.f, 0.f, "Bass");
-    configParam(GAIN_SLIDER_PARAM, 0.f, 127.f, 0.f, "Gain");
+    configParam(MIX_SLIDER_PARAM, 0.f, 127.f, 0.f, "Mix (Wey/Dry)");
+    configParam(PREDLY_SLIDER_PARAM, 0.f, 127.f, 0.f, "Pre-Delay");
 
     // arcade buttons
     // 1.0f is the black text
     // 2.0f is the blue text
     // 3.0f is the red text
     configParam(JUMP_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Preset Jump (Off, 1, 5)");
-    configParam(MIDS_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Mids Routine (Off, Pre, Post)");
-    configParam(Q_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Frequency Width 'Q' (Low, Mid, High)");
-    configParam(DIODE_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Diode Type (Off, Sil, Germ)");
-    configParam(FUZZ_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Fuzz Type (Off, Open, Gated)");
+    configParam(TYPE_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Reverb Type (Room, Plate, Hall)");
+    configParam(DIFFUSION_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Diffusion Level (Low, Medium, High)");
+    configParam(TANK_MOD_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Tank Modulation (Low, Medium, High)");
+    configParam(CLOCK_ARCADE_PARAM, 1.0f, 3.0f, 1.0f, "Pre-Delay Clock (Hifi, Standard, Lofi)");
 
     // bypass buttons
     configParam(CHANGE_PRESET_PARAM, 0.f, 1.f, 0.f, "Change Preset");
@@ -88,7 +88,7 @@ struct PreampMKII : RRModule {
 
     int bypass;
     if (enable_pedal) {
-      // LED (on) (red)
+      // LED (on) (green)
       lights[BYPASS_LIGHT].setBrightness(1.f);
       bypass = 127;
     } else {
@@ -102,17 +102,17 @@ struct PreampMKII : RRModule {
 
     // read the three-way arcade buttons values
     int jump_arcade = (int) floor(params[JUMP_ARCADE_PARAM].getValue());
-    int mids_arcade = (int) floor(params[MIDS_ARCADE_PARAM].getValue());
-    int q_arcade = (int) floor(params[Q_ARCADE_PARAM].getValue());
-    int diode_arcade = (int) floor(params[DIODE_ARCADE_PARAM].getValue());
-    int fuzz_arcade = (int) floor(params[FUZZ_ARCADE_PARAM].getValue());
+    int type_arcade = (int) floor(params[TYPE_ARCADE_PARAM].getValue());
+    int diffusion_arcade = (int) floor(params[DIFFUSION_ARCADE_PARAM].getValue());
+    int tank_mod_arcade = (int) floor(params[TANK_MOD_ARCADE_PARAM].getValue());
+    int clock_arcade = (int) floor(params[CLOCK_ARCADE_PARAM].getValue());
 
     // assign values from switches
     midi_out.sendCachedCC(jump_arcade, 22);
-    midi_out.sendCachedCC(mids_arcade, 23);
-    midi_out.sendCachedCC(q_arcade, 24);
-    midi_out.sendCachedCC(diode_arcade, 25);
-    midi_out.sendCachedCC(fuzz_arcade, 26);
+    midi_out.sendCachedCC(type_arcade, 23);
+    midi_out.sendCachedCC(diffusion_arcade, 24);
+    midi_out.sendCachedCC(tank_mod_arcade, 25);
+    midi_out.sendCachedCC(clock_arcade, 26);
 
     // check if the preset button was pressed
     // protect it from being spammed by limiting it
@@ -132,20 +132,20 @@ struct PreampMKII : RRModule {
       return;
 
     // slider values
-    int volume = (int) std::round(params[VOLUME_SLIDER_PARAM].getValue());
-    int treble = (int) std::round(params[TREBLE_SLIDER_PARAM].getValue());
-    int mids = (int) std::round(params[MIDS_SLIDER_PARAM].getValue());
-    int freq = (int) std::round(params[FREQ_SLIDER_PARAM].getValue());
     int bass = (int) std::round(params[BASS_SLIDER_PARAM].getValue());
-    int gain = (int) std::round(params[GAIN_SLIDER_PARAM].getValue());
+    int mids = (int) std::round(params[MIDS_SLIDER_PARAM].getValue());
+    int cross = (int) std::round(params[CROSS_SLIDER_PARAM].getValue());
+    int treble = (int) std::round(params[TREBLE_SLIDER_PARAM].getValue());
+    int mix = (int) std::round(params[MIX_SLIDER_PARAM].getValue());
+    int predly = (int) std::round(params[PREDLY_SLIDER_PARAM].getValue());
 
     // assign values from knobs (or cv)
-    midi_out.sendCachedCC(volume, 14);
-    midi_out.sendCachedCC(treble, 15);
-    midi_out.sendCachedCC(mids, 16);
-    midi_out.sendCachedCC(freq, 17);
-    midi_out.sendCachedCC(bass, 18);
-    midi_out.sendCachedCC(gain, 19);
+    midi_out.sendCachedCC(bass, 14);
+    midi_out.sendCachedCC(mids, 15);
+    midi_out.sendCachedCC(cross, 16);
+    midi_out.sendCachedCC(treble, 17);
+    midi_out.sendCachedCC(mix, 18);
+    midi_out.sendCachedCC(predly, 19);
 
     // read the expresion input if it is connected and clamp it between 0-127
     int expr = -1;
@@ -162,15 +162,11 @@ struct PreampMKII : RRModule {
   }
 };
 
-struct PreampMKIIWidget : ModuleWidget {
-  PreampMKIIWidget(PreampMKII* module) {
+struct Cxm1978Widget : ModuleWidget {
+  Cxm1978Widget(Cxm1978* module) {
     setModule(module);
 
-#ifdef USE_LOGOS
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_panel_logo.svg")));
-#else
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/preamp_mk2_panel.svg")));
-#endif
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/cxm1978.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, 1)));
@@ -179,29 +175,29 @@ struct PreampMKIIWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH + 10 , RACK_GRID_HEIGHT - RACK_GRID_WIDTH - 1)));
 
     // sliders
-    addParam(createParam<AutomatoneSlider>(mm2px(Vec(10, 11)), module, PreampMKII::VOLUME_SLIDER_PARAM));
-    addParam(createParam<AutomatoneSlider>(mm2px(Vec(25.5, 11)), module, PreampMKII::TREBLE_SLIDER_PARAM));
-    addParam(createParam<AutomatoneSlider>(mm2px(Vec(41, 11)), module, PreampMKII::MIDS_SLIDER_PARAM));
-    addParam(createParam<AutomatoneSlider>(mm2px(Vec(56.5, 11)), module, PreampMKII::FREQ_SLIDER_PARAM));
-    addParam(createParam<AutomatoneSlider>(mm2px(Vec(72, 11)), module, PreampMKII::BASS_SLIDER_PARAM));
-    addParam(createParam<AutomatoneSlider>(mm2px(Vec(87.5, 11)), module, PreampMKII::GAIN_SLIDER_PARAM));
+    addParam(createParam<AutomatoneSlider>(mm2px(Vec(10, 11)), module, Cxm1978::BASS_SLIDER_PARAM));
+    addParam(createParam<AutomatoneSlider>(mm2px(Vec(25.5, 11)), module, Cxm1978::MIDS_SLIDER_PARAM));
+    addParam(createParam<AutomatoneSlider>(mm2px(Vec(41, 11)), module, Cxm1978::CROSS_SLIDER_PARAM));
+    addParam(createParam<AutomatoneSlider>(mm2px(Vec(56.5, 11)), module, Cxm1978::TREBLE_SLIDER_PARAM));
+    addParam(createParam<AutomatoneSlider>(mm2px(Vec(72, 11)), module, Cxm1978::MIX_SLIDER_PARAM));
+    addParam(createParam<AutomatoneSlider>(mm2px(Vec(87.5, 11)), module, Cxm1978::PREDLY_SLIDER_PARAM));
 
     // arcade buttons in the middle
-    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(25.5, 88)), module, PreampMKII::JUMP_ARCADE_PARAM));
-    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(41.0, 88)), module, PreampMKII::MIDS_ARCADE_PARAM));
-    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(56.5, 88)), module, PreampMKII::Q_ARCADE_PARAM));
-    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(72.0, 88)), module, PreampMKII::DIODE_ARCADE_PARAM));
-    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(87.5, 88)), module, PreampMKII::FUZZ_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(25.5, 88)), module, Cxm1978::JUMP_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(41.0, 88)), module, Cxm1978::TYPE_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(56.5, 88)), module, Cxm1978::DIFFUSION_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(72.0, 88)), module, Cxm1978::TANK_MOD_ARCADE_PARAM));
+    addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(87.5, 88)), module, Cxm1978::CLOCK_ARCADE_PARAM));
 
     // preset change button
-    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(25, 113)), module, PreampMKII::CHANGE_PRESET_PARAM));
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(25, 113)), module, Cxm1978::CHANGE_PRESET_PARAM));
 
     // bypass pedal light and button
-    addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(75, 113)), module, PreampMKII::BYPASS_LIGHT));
-    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(87.5, 113)), module, PreampMKII::BYPASS_PARAM));
+    addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(75, 113)), module, Cxm1978::BYPASS_LIGHT));
+    addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(87.5, 113)), module, Cxm1978::BYPASS_PARAM));
 
     // expression port
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(13.6, 81.5)), module, PreampMKII::EXPR_INPUT));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(13.6, 81.5)), module, Cxm1978::EXPR_INPUT));
 
     // midi configuration displays
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(35, 99.5)));
@@ -211,4 +207,4 @@ struct PreampMKIIWidget : ModuleWidget {
   }
 };
 
-Model* modelPreampMKII = createModel<PreampMKII, PreampMKIIWidget>("preamp_mk2");
+Model* modelCxm1978 = createModel<Cxm1978, Cxm1978Widget>("cxm1978");

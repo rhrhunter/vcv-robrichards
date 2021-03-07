@@ -14,7 +14,7 @@ Current supported interfaces:
 * **Warped Vinyl**
 * **M O O D**
 * **Generation Loss**
-* **Blooper** *(Firmware (v2.1)*
+* **Blooper** *(Firmware (v3.0)*
 * **Preamp MKII**
 
 NOTE: In order to use these modules, you will need:

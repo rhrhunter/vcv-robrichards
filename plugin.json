@@ -54,6 +54,12 @@
       "name": "MIDI Controller: Chase Bliss Audio Preamp MKII AUTOMATONE",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'Preamp MKII'",
       "tags": ["midi"]
+    },
+    {
+      "slug": "cxm1978",
+      "name": "MIDI Controller: Chase Bliss Audio CXM 1978 AUTOMATONE",
+      "description": "VCV MIDI Controller for Chase Bliss Audio 'CXM 1978'",
+      "tags": ["midi"]
     }
   ]
 }
