@@ -27,6 +27,12 @@ struct Cxm1978 : RRModule {
                   PRESET_INPUT,
                   BYPASS_INPUT,
                   EXPR_INPUT,
+                  BASS_SLIDER_INPUT,
+                  MIDS_SLIDER_INPUT,
+                  CROSS_SLIDER_INPUT,
+                  TREBLE_SLIDER_INPUT,
+                  MIX_SLIDER_INPUT,
+                  PREDLY_SLIDER_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -139,7 +145,35 @@ struct Cxm1978 : RRModule {
     int mix = (int) std::round(params[MIX_SLIDER_PARAM].getValue());
     int predly = (int) std::round(params[PREDLY_SLIDER_PARAM].getValue());
 
-    // assign values from knobs (or cv)
+    // read cv voltages and override the values obtained from sliders positions
+    // clamp down the cv value to be between 0 and the value of the slider
+    if (inputs[BASS_SLIDER_INPUT].isConnected()) {
+      int bass_cv = convertCVtoCC(inputs[BASS_SLIDER_INPUT].getVoltage());
+      bass = clamp(bass_cv, 0, bass);
+      params[BASS_SLIDER_PARAM].setValue((float) bass);
+    }
+    if (inputs[MIDS_SLIDER_INPUT].isConnected()) {
+      int mids_cv = convertCVtoCC(inputs[MIDS_SLIDER_INPUT].getVoltage());
+      mids = clamp(mids_cv, 0, mids);
+    }
+    if (inputs[CROSS_SLIDER_INPUT].isConnected()) {
+      int cross_cv = convertCVtoCC(inputs[CROSS_SLIDER_INPUT].getVoltage());
+      cross = clamp(cross_cv, 0, cross);
+    }
+    if (inputs[TREBLE_SLIDER_INPUT].isConnected()) {
+      int treble_cv = convertCVtoCC(inputs[TREBLE_SLIDER_INPUT].getVoltage());
+      treble = clamp(treble_cv, 0, treble);
+    }
+    if (inputs[MIX_SLIDER_INPUT].isConnected()) {
+      int mix_cv = convertCVtoCC(inputs[MIX_SLIDER_INPUT].getVoltage());
+      mix = clamp(mix_cv, 0, mix);
+    }
+    if (inputs[PREDLY_SLIDER_INPUT].isConnected()) {
+      int predly_cv = convertCVtoCC(inputs[PREDLY_SLIDER_INPUT].getVoltage());
+      predly = clamp(predly_cv, 0, predly);
+    }
+
+    // Assign values from knobs (or cv)
     midi_out.sendCachedCC(bass, 14);
     midi_out.sendCachedCC(mids, 15);
     midi_out.sendCachedCC(cross, 16);
@@ -181,6 +215,14 @@ struct Cxm1978Widget : ModuleWidget {
     addParam(createParam<AutomatoneSlider>(mm2px(Vec(56.5, 11)), module, Cxm1978::TREBLE_SLIDER_PARAM));
     addParam(createParam<AutomatoneSlider>(mm2px(Vec(72, 11)), module, Cxm1978::MIX_SLIDER_PARAM));
     addParam(createParam<AutomatoneSlider>(mm2px(Vec(87.5, 11)), module, Cxm1978::PREDLY_SLIDER_PARAM));
+
+    // CV inputs
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(17.5, 65)), module, Cxm1978::BASS_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(33, 65)), module, Cxm1978::MIDS_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(48.5, 65)), module, Cxm1978::CROSS_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(64, 65)), module, Cxm1978::TREBLE_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(79.5, 65)), module, Cxm1978::MIX_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(95, 65)), module, Cxm1978::PREDLY_SLIDER_INPUT));
 
     // arcade buttons in the middle
     addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(25.5, 88)), module, Cxm1978::JUMP_ARCADE_PARAM));

@@ -27,6 +27,12 @@ struct PreampMKII : RRModule {
                   PRESET_INPUT,
                   BYPASS_INPUT,
                   EXPR_INPUT,
+                  VOLUME_SLIDER_INPUT,
+                  TREBLE_SLIDER_INPUT,
+                  MIDS_SLIDER_INPUT,
+                  FREQ_SLIDER_INPUT,
+                  BASS_SLIDER_INPUT,
+                  GAIN_SLIDER_INPUT,
                   NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -139,6 +145,33 @@ struct PreampMKII : RRModule {
     int bass = (int) std::round(params[BASS_SLIDER_PARAM].getValue());
     int gain = (int) std::round(params[GAIN_SLIDER_PARAM].getValue());
 
+    // read cv voltages and override the values obtained from sliders positions
+    // clamp down the cv value to be between 0 and the value of the slider
+    if (inputs[VOLUME_SLIDER_INPUT].isConnected()) {
+      int volume_cv = convertCVtoCC(inputs[VOLUME_SLIDER_INPUT].getVoltage());
+      volume = clamp(volume_cv, 0, volume);
+    }
+    if (inputs[TREBLE_SLIDER_INPUT].isConnected()) {
+      int treble_cv = convertCVtoCC(inputs[TREBLE_SLIDER_INPUT].getVoltage());
+      treble = clamp(treble_cv, 0, treble);
+    }
+    if (inputs[MIDS_SLIDER_INPUT].isConnected()) {
+      int mids_cv = convertCVtoCC(inputs[MIDS_SLIDER_INPUT].getVoltage());
+      mids = clamp(mids_cv, 0, mids);
+    }
+    if (inputs[FREQ_SLIDER_INPUT].isConnected()) {
+      int freq_cv = convertCVtoCC(inputs[FREQ_SLIDER_INPUT].getVoltage());
+      freq = clamp(freq_cv, 0, freq);
+    }
+    if (inputs[BASS_SLIDER_INPUT].isConnected()) {
+      int bass_cv = convertCVtoCC(inputs[BASS_SLIDER_INPUT].getVoltage());
+      bass = clamp(bass_cv, 0, bass);
+    }
+    if (inputs[GAIN_SLIDER_INPUT].isConnected()) {
+      int gain_cv = convertCVtoCC(inputs[GAIN_SLIDER_INPUT].getVoltage());
+      gain = clamp(gain_cv, 0, gain);
+    }
+
     // assign values from knobs (or cv)
     midi_out.sendCachedCC(volume, 14);
     midi_out.sendCachedCC(treble, 15);
@@ -185,6 +218,14 @@ struct PreampMKIIWidget : ModuleWidget {
     addParam(createParam<AutomatoneSlider>(mm2px(Vec(56.5, 11)), module, PreampMKII::FREQ_SLIDER_PARAM));
     addParam(createParam<AutomatoneSlider>(mm2px(Vec(72, 11)), module, PreampMKII::BASS_SLIDER_PARAM));
     addParam(createParam<AutomatoneSlider>(mm2px(Vec(87.5, 11)), module, PreampMKII::GAIN_SLIDER_PARAM));
+
+    // CV inputs
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(17.5, 65)), module, PreampMKII::VOLUME_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(33, 65)), module, PreampMKII::TREBLE_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(48.5, 65)), module, PreampMKII::MIDS_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(64, 65)), module, PreampMKII::FREQ_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(79.5, 65)), module, PreampMKII::BASS_SLIDER_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(95, 65)), module, PreampMKII::GAIN_SLIDER_INPUT));
 
     // arcade buttons in the middle
     addParam(createParamCentered<CBAArcadeButtonOffBlueRed>(mm2px(Vec(25.5, 88)), module, PreampMKII::JUMP_ARCADE_PARAM));

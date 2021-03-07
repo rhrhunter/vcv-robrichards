@@ -176,8 +176,11 @@ namespace rack {
     AutomatoneSlider() {
       Vec margin = Vec(1, 1);
       maxHandlePos = Vec(0.0, -13.0).plus(margin);
-      minHandlePos = Vec(0.0, 130.0).plus(margin);
-      setBackgroundSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/automatone_slider_background.svg")));
+      //minHandlePos = Vec(0.0, 130.0).plus(margin);
+      minHandlePos = Vec(0.0, 95.0).plus(margin);
+      //setBackgroundSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/automatone_slider_background.svg")));
+      setBackgroundSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/automatone_slider_background_short.svg")));
+
       setHandleSvg(APP->window->loadSvg(asset::plugin(pluginInstance, "res/automatone_slider_handle.svg")));
 
       background->box.pos = margin;
