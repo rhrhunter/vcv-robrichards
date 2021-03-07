@@ -75,7 +75,7 @@ Then launch Rack.
 
 ### Supported Voltage Range for CV Modulation of Knobs
 
-These plugins support a voltage range of 0-5V. When connecting an LFO to the CV ports, you will want to adjust the offset and scale of the LFO to fall into this range to avoid plateauing your wave forms (min or max).
+These plugins support a voltage range of 0-5V. When connecting an LFO to the CV ports, you will want to adjust the offset and scale of the LFO to fall into this range to avoid plateauing your wave forms (min or max). For example, if using the Bogaudio LFO this means setting the `offset` to 2.5V and the `scale` to 50%.
 
 ### Protection Mechanisms
 

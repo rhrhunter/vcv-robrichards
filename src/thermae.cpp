@@ -197,31 +197,31 @@ struct Thermae : RRModule {
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      int mix_cv = convertCVtoCC(inputs[MIX_INPUT].getVoltage());
       mix = clamp(mix_cv, 0, mix);
     }
     if (inputs[LPF_INPUT].isConnected()) {
-      int lpf_cv = (int) std::round(inputs[LPF_INPUT].getVoltage()*2) / 10.f * 127;
+      int lpf_cv = convertCVtoCC(inputs[LPF_INPUT].getVoltage());
       lpf = clamp(lpf_cv, 0, lpf);
     }
     if (inputs[REGEN_INPUT].isConnected()) {
-      int regen_cv = (int) std::round(inputs[REGEN_INPUT].getVoltage()*2) / 10.f * 127;
+      int regen_cv = convertCVtoCC(inputs[REGEN_INPUT].getVoltage());
       regen = clamp(regen_cv, 0, regen);
     }
     if (inputs[GLIDE_INPUT].isConnected()) {
-      int glide_cv = (int) std::round(inputs[GLIDE_INPUT].getVoltage()*2) / 10.f * 127;
+      int glide_cv = convertCVtoCC(inputs[GLIDE_INPUT].getVoltage());
       glide = clamp(glide_cv, 0, glide);
     }
     if (inputs[INT1_INPUT].isConnected()) {
-      int int1_cv = (int) std::round(inputs[INT1_INPUT].getVoltage()*2) / 10.f * 127;
+      int int1_cv = convertCVtoCC(inputs[INT1_INPUT].getVoltage());
       int1 = clamp(int1_cv, 0, int1);
     }
     if (inputs[INT2_INPUT].isConnected()) {
-      int int2_cv = (int) std::round(inputs[INT2_INPUT].getVoltage()*2) / 10.f * 127;
+      int int2_cv = convertCVtoCC(inputs[INT2_INPUT].getVoltage());
       int2 = clamp(int2_cv, 0, int2);
     }
     if (inputs[EXPR_INPUT].isConnected()) {
-      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      int expr_cv = convertCVtoCC(inputs[EXPR_INPUT].getVoltage());
       expr = clamp(expr_cv, 0, 127);
     }
 

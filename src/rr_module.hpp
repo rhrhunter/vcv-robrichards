@@ -176,6 +176,10 @@ struct RRModule : Module {
     return ret_brightness;
   }
 
+  int convertCVtoCC(float cv) {
+    return (int) std::round(cv*2 / 10.f * 127);
+  }
+
   bool should_transition_to_state(float time_until, struct timeval grace_period) {
     // get a new measurement
     struct timeval ctime;

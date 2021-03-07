@@ -621,35 +621,35 @@ struct Blooper : RRModule {
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[VOLUME_INPUT].isConnected()) {
-      int volume_cv = (int) std::round(inputs[VOLUME_INPUT].getVoltage()*2) / 10.f * 127;
+      int volume_cv = convertCVtoCC(inputs[VOLUME_INPUT].getVoltage());
       volume = clamp(volume_cv, 0, volume);
     }
     if (inputs[LAYERS_INPUT].isConnected()) {
-      int layers_cv = (int) std::round(inputs[LAYERS_INPUT].getVoltage()*2) / 10.f * 127;
+      int layers_cv = convertCVtoCC(inputs[LAYERS_INPUT].getVoltage());
       layers = clamp(layers_cv, 0, layers);
     }
     if (inputs[REPEATS_INPUT].isConnected()) {
-      int repeats_cv = (int) std::round(inputs[REPEATS_INPUT].getVoltage()*2) / 10.f * 127;
+      int repeats_cv = convertCVtoCC(inputs[REPEATS_INPUT].getVoltage());
       repeats = clamp(repeats_cv, 0, repeats);
     }
     if (inputs[MODA_INPUT].isConnected()) {
-      int moda_cv = (int) std::round(inputs[MODA_INPUT].getVoltage()*2) / 10.f * 127;
+      int moda_cv = convertCVtoCC(inputs[MODA_INPUT].getVoltage());
       moda = clamp(moda_cv, 0, moda);
     }
     if (inputs[STABILITY_INPUT].isConnected()) {
-      int stability_cv = (int) std::round(inputs[STABILITY_INPUT].getVoltage()*2) / 10.f * 127;
+      int stability_cv = convertCVtoCC(inputs[STABILITY_INPUT].getVoltage());
       stability = clamp(stability_cv, 0, stability);
     }
     if (inputs[MODB_INPUT].isConnected()) {
-      int modb_cv = (int) std::round(inputs[MODB_INPUT].getVoltage()*2) / 10.f * 127;
+      int modb_cv = convertCVtoCC(inputs[MODB_INPUT].getVoltage());
       modb = clamp(modb_cv, 0, modb);
     }
     if (inputs[RAMP_INPUT].isConnected()) {
-      int ramp_cv = (int) std::round(inputs[RAMP_INPUT].getVoltage()*2) / 10.f * 127;
+      int ramp_cv = convertCVtoCC(inputs[RAMP_INPUT].getVoltage());
       ramp = clamp(ramp_cv, 0, 127);
     }
     if (inputs[EXPR_INPUT].isConnected()) {
-      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      int expr_cv = convertCVtoCC(inputs[EXPR_INPUT].getVoltage());
       expr = clamp(expr_cv, 0, 127);
     }
 

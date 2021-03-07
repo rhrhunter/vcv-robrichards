@@ -135,7 +135,7 @@ struct Mood : RRModule {
     // at the correct rate.
     int clock = (int) std::round(params[CLOCK_PARAM].getValue());
     if (inputs[CLOCK_INPUT].isConnected()) {
-      int clock_cv = (int) std::round(inputs[CLOCK_INPUT].getVoltage()*2) / 10.f * 127;
+      int clock_cv = convertCVtoCC(inputs[CLOCK_INPUT].getVoltage());
       clock = clamp(clock_cv, 0, clock);
     }
 
@@ -192,27 +192,27 @@ struct Mood : RRModule {
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[TIME_INPUT].isConnected()) {
-      int time_cv = (int) std::round(inputs[TIME_INPUT].getVoltage()*2) / 10.f * 127;
+      int time_cv = convertCVtoCC(inputs[TIME_INPUT].getVoltage());
       time = clamp(time_cv, 0, time);
     }
     if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      int mix_cv = convertCVtoCC(inputs[MIX_INPUT].getVoltage());
       mix = clamp(mix_cv, 0, mix);
     }
     if (inputs[LENGTH_INPUT].isConnected()) {
-      int length_cv = (int) std::round(inputs[LENGTH_INPUT].getVoltage()*2) / 10.f * 127;
+      int length_cv = convertCVtoCC(inputs[LENGTH_INPUT].getVoltage());
       length = clamp(length_cv, 0, length);
     }
     if (inputs[MODIFY_BLOOD_INPUT].isConnected()) {
-      int modify_blood_cv = (int) std::round(inputs[MODIFY_BLOOD_INPUT].getVoltage()*2) / 10.f * 127;
+      int modify_blood_cv = convertCVtoCC(inputs[MODIFY_BLOOD_INPUT].getVoltage());
       modify_blood = clamp(modify_blood_cv, 0, modify_blood);
     }
     if (inputs[MODIFY_LOOP_INPUT].isConnected()) {
-      int modify_loop_cv = (int) std::round(inputs[MODIFY_LOOP_INPUT].getVoltage()*2) / 10.f * 127;
+      int modify_loop_cv = convertCVtoCC(inputs[MODIFY_LOOP_INPUT].getVoltage());
       modify_loop = clamp(modify_loop_cv, 0, modify_loop);
     }
     if (inputs[EXPR_INPUT].isConnected()) {
-      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      int expr_cv = convertCVtoCC(inputs[EXPR_INPUT].getVoltage());
       expr = clamp(expr_cv, 0, 127);
     }
 

@@ -46,11 +46,11 @@ struct GenerationLoss : RRModule {
 
     // main knob parameters
     configParam(WOW_PARAM, 0.f, 127.f, 0.f, "Wow");
-    configParam(WET_PARAM, 0.f, 127.f, 0.f, "Wet");
+    configParam(WET_PARAM, 0.f, 127.f, 63.f, "Wet");
     configParam(HP_PARAM, 0.f, 127.f, 0.f, "HP (High Pass)");
     configParam(FLUTTER_PARAM, 0.f, 127.f, 0.f, "Flutter");
-    configParam(GEN_PARAM, 0.f, 127.f, 0.f, "Gen (Generations)");
-    configParam(LP_PARAM, 0.f, 127.f, 0.f, "LP (Low Pass)");
+    configParam(GEN_PARAM, 0.f, 127.f, 127.f, "Gen (Generations)");
+    configParam(LP_PARAM, 0.f, 127.f, 127.f, "LP (Low Pass)");
 
     // three way switches
     // 1.0f is top position
@@ -149,31 +149,31 @@ struct GenerationLoss : RRModule {
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[WOW_INPUT].isConnected()) {
-      int wow_cv = (int) std::round(inputs[WOW_INPUT].getVoltage()*2) / 10.f * 127;
+      int wow_cv = convertCVtoCC(inputs[WOW_INPUT].getVoltage());
       wow = clamp(wow_cv, 0, wow);
     }
     if (inputs[WET_INPUT].isConnected()) {
-      int wet_cv = (int) std::round(inputs[WET_INPUT].getVoltage()*2) / 10.f * 127;
+      int wet_cv = convertCVtoCC(inputs[WET_INPUT].getVoltage());
       wet = clamp(wet_cv, 0, wet);
     }
     if (inputs[HP_INPUT].isConnected()) {
-      int hp_cv = (int) std::round(inputs[HP_INPUT].getVoltage()*2) / 10.f * 127;
+      int hp_cv = convertCVtoCC(inputs[HP_INPUT].getVoltage());
       hp = clamp(hp_cv, 0, hp);
     }
     if (inputs[GEN_INPUT].isConnected()) {
-      int gen_cv = (int) std::round(inputs[GEN_INPUT].getVoltage()*2) / 10.f * 127;
+      int gen_cv = convertCVtoCC(inputs[GEN_INPUT].getVoltage());
       gen = clamp(gen_cv, 0, gen);
     }
     if (inputs[FLUTTER_INPUT].isConnected()) {
-      int flutter_cv = (int) std::round(inputs[FLUTTER_INPUT].getVoltage()*2) / 10.f * 127;
+      int flutter_cv = convertCVtoCC(inputs[FLUTTER_INPUT].getVoltage());
       flutter = clamp(flutter_cv, 0, flutter);
     }
     if (inputs[LP_INPUT].isConnected()) {
-      int lp_cv = (int) std::round(inputs[LP_INPUT].getVoltage()*2) / 10.f * 127;
+      int lp_cv = convertCVtoCC(inputs[LP_INPUT].getVoltage());
       lp = clamp(lp_cv, 0, lp);
     }
     if (inputs[EXPR_INPUT].isConnected()) {
-      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      int expr_cv = convertCVtoCC(inputs[EXPR_INPUT].getVoltage());
       expr = clamp(expr_cv, 0, 127);
     }
 

@@ -51,7 +51,7 @@ struct Darkworld : RRModule {
     configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
     configParam(DWELL_PARAM, 0.f, 127.f, 0.f, "Dwell");
     configParam(MODIFY_PARAM, 0.f, 127.f, 0.f, "Modify");
-    configParam(TONE_PARAM, 0.f, 127.f, 0.f, "Tone");
+    configParam(TONE_PARAM, 0.f, 127.f, 63.f, "Tone");
     configParam(PRE_DELAY_PARAM, 0.f, 127.f, 0.f, "Pre-Delay");
 
     // three way switches
@@ -162,31 +162,31 @@ struct Darkworld : RRModule {
     // read cv voltages and override values of knobs,
     // clamp down the cv value to be between 0 and the value of the knob
     if (inputs[DECAY_INPUT].isConnected()) {
-      int decay_cv = (int) std::round(inputs[DECAY_INPUT].getVoltage()*2) / 10.f * 127;
+      int decay_cv = convertCVtoCC(inputs[DECAY_INPUT].getVoltage());
       decay = clamp(decay_cv, 0, decay);
     }
     if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      int mix_cv = convertCVtoCC(inputs[MIX_INPUT].getVoltage());
       mix = clamp(mix_cv, 0, mix);
     }
     if (inputs[DWELL_INPUT].isConnected()) {
-      int dwell_cv = (int) std::round(inputs[DWELL_INPUT].getVoltage()*2) / 10.f * 127;
+      int dwell_cv = convertCVtoCC(inputs[DWELL_INPUT].getVoltage());
       dwell = clamp(dwell_cv, 0, dwell);
     }
     if (inputs[TONE_INPUT].isConnected()) {
-      int tone_cv = (int) std::round(inputs[TONE_INPUT].getVoltage()*2) / 10.f * 127;
+      int tone_cv = convertCVtoCC(inputs[TONE_INPUT].getVoltage());
       tone = clamp(tone_cv, 0, tone);
     }
     if (inputs[MODIFY_INPUT].isConnected()) {
-      int modify_cv = (int) std::round(inputs[MODIFY_INPUT].getVoltage()*2) / 10.f * 127;
+      int modify_cv = convertCVtoCC(inputs[MODIFY_INPUT].getVoltage());
       modify = clamp(modify_cv, 0, modify);
     }
     if (inputs[PRE_DELAY_INPUT].isConnected()) {
-      int pre_delay_cv = (int) std::round(inputs[PRE_DELAY_INPUT].getVoltage()*2) / 10.f * 127;
+      int pre_delay_cv = convertCVtoCC(inputs[PRE_DELAY_INPUT].getVoltage());
       pre_delay = clamp(pre_delay_cv, 0, pre_delay);
     }
     if (inputs[EXPR_INPUT].isConnected()) {
-      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      int expr_cv = convertCVtoCC(inputs[EXPR_INPUT].getVoltage());
       expr = clamp(expr_cv, 0, 127);
     }
 

@@ -44,7 +44,7 @@ struct WarpedVinyl : RRModule {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // main knob parameters
-    configParam(TONE_PARAM, 0.f, 127.f, 0.f, "Tone");
+    configParam(TONE_PARAM, 0.f, 127.f, 63.f, "Tone");
     configParam(LAG_PARAM, 0.f, 127.f, 0.f, "Lag");
     configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
     configParam(RPM_PARAM, 0.f, 127.f, 0.f, "RPM");
@@ -139,31 +139,31 @@ struct WarpedVinyl : RRModule {
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
     if (inputs[TONE_INPUT].isConnected()) {
-      int tone_cv = (int) std::round(inputs[TONE_INPUT].getVoltage()*2) / 10.f * 127;
+      int tone_cv = convertCVtoCC(inputs[TONE_INPUT].getVoltage());
       tone = clamp(tone_cv, 0, tone);
     }
     if (inputs[LAG_INPUT].isConnected()) {
-      int lag_cv = (int) std::round(inputs[LAG_INPUT].getVoltage()*2) / 10.f * 127;
+      int lag_cv = convertCVtoCC(inputs[LAG_INPUT].getVoltage());
       lag = clamp(lag_cv, 0, lag);
     }
     if (inputs[MIX_INPUT].isConnected()) {
-      int mix_cv = (int) std::round(inputs[MIX_INPUT].getVoltage()*2) / 10.f * 127;
+      int mix_cv = convertCVtoCC(inputs[MIX_INPUT].getVoltage());
       mix = clamp(mix_cv, 0, mix);
     }
     if (inputs[RPM_INPUT].isConnected()) {
-      int rpm_cv = (int) std::round(inputs[RPM_INPUT].getVoltage()*2) / 10.f * 127;
+      int rpm_cv = convertCVtoCC(inputs[RPM_INPUT].getVoltage());
       rpm = clamp(rpm_cv, 0, rpm);
     }
     if (inputs[DEPTH_INPUT].isConnected()) {
-      int depth_cv = (int) std::round(inputs[DEPTH_INPUT].getVoltage()*2) / 10.f * 127;
+      int depth_cv = convertCVtoCC(inputs[DEPTH_INPUT].getVoltage());
       depth = clamp(depth_cv, 0, depth);
     }
     if (inputs[WARP_INPUT].isConnected()) {
-      int warp_cv = (int) std::round(inputs[WARP_INPUT].getVoltage()*2) / 10.f * 127;
+      int warp_cv = convertCVtoCC(inputs[WARP_INPUT].getVoltage());
       warp = clamp(warp_cv, 0, warp);
     }
     if (inputs[EXPR_INPUT].isConnected()) {
-      int expr_cv = (int) std::round(inputs[EXPR_INPUT].getVoltage()*2) / 10.f * 127;
+      int expr_cv = convertCVtoCC(inputs[EXPR_INPUT].getVoltage());
       expr = clamp(expr_cv, 0, 127);
     }
 
