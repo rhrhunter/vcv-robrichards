@@ -48,7 +48,7 @@ You will then need to download the most recent version of the [Rack SDK](https:/
 
 Finally, clone this git repo, change directories into it, and run the following to compile and install the plugin in your Rack installation.
 
-* On macOS: `RACK_SDK=~/Downloads/Rack-SDK make install`
+* On macOS: `RACK_DIR=~/Downloads/Rack-SDK make install`
 
 Then launch Rack.
 
