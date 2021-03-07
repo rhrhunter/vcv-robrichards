@@ -16,6 +16,7 @@ Current supported interfaces:
 * **Generation Loss**
 * **Blooper** *(Firmware (v3.0)*
 * **Preamp MKII**
+* **CXM 1978**
 
 NOTE: In order to use these modules, you will need:
 
@@ -68,8 +69,8 @@ Then launch Rack.
 * Loop Selection (Up/Down) (**Blooper**)
 * Ramping: Enable/Disable, CV, and knob control (**Blooper**)
 * One-Shot Record On/Off toggle (**Blooper**)
-* Actual control of motorized faders (**Preamp MKII**)
-* Preset cycling (**Preamp MK2**)
+* Remote control of motorized faders (**Preamp MKII** & **CXM 1978**)
+* Preset cycling (**Preamp MK2** & **CXM 1978**)
 
 ## Notes
 
@@ -83,7 +84,7 @@ As a precaution, the high and low gate triggers for pedal bypass are not impleme
 
 ### Known Issues (at least with my hardware)
 1. **M O O D** - I suspect it does not respond correctly to Midi Message **CC15=127** (Mix knob fully-CW). Instead of having a completely wet mix, it appears to be identical to sending **CC15=126**, where a small bit of the dry signal is still audible.
-2. **Preamp MKII** - The 'Jump' arcade button does not respond to **CC22=1** nor **CC22=2**. It only appears to respond to **CC22=3**, which instead of sending the state of the arcade button to "5 (Blue Light)", it actually toggles *between* the three options. This is contrary to the specification in the Midi Implementation Manual.
+2. **Preamp MKII** & **CXM 1978** - The 'Jump' arcade button does not respond to **CC22=1** nor **CC22=2**. It only appears to respond to **CC22=3**, which instead of sending the state of the arcade button to "5 (Blue Light)", it actually toggles *between* the three options. This is contrary to the specification in the Midi Implementation Manual.
 
 ### Caveats & Limitations
 
