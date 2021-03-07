@@ -58,7 +58,7 @@ struct Mood : RRModule {
     configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
     configParam(LENGTH_PARAM, 0.f, 127.f, 0.f, "Length");
     configParam(MODIFY_BLOOD_PARAM, 0.f, 127.f, 0.f, "Modify (Blood)");
-    configParam(CLOCK_PARAM, 0.f, 127.f, 63.f, "Clock");
+    configParam(CLOCK_PARAM, 0.f, 127.f, 64.f, "Clock");
     configParam(MODIFY_LOOP_PARAM, 0.f, 127.f, 0.f, "Modify (Loop)");
 
     // three way switches

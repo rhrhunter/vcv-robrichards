@@ -46,7 +46,7 @@ struct GenerationLoss : RRModule {
 
     // main knob parameters
     configParam(WOW_PARAM, 0.f, 127.f, 0.f, "Wow");
-    configParam(WET_PARAM, 0.f, 127.f, 63.f, "Wet");
+    configParam(WET_PARAM, 0.f, 127.f, 64.f, "Wet");
     configParam(HP_PARAM, 0.f, 127.f, 0.f, "HP (High Pass)");
     configParam(FLUTTER_PARAM, 0.f, 127.f, 0.f, "Flutter");
     configParam(GEN_PARAM, 0.f, 127.f, 127.f, "Gen (Generations)");

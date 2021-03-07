@@ -44,7 +44,7 @@ struct WarpedVinyl : RRModule {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // main knob parameters
-    configParam(TONE_PARAM, 0.f, 127.f, 63.f, "Tone");
+    configParam(TONE_PARAM, 0.f, 127.f, 64.f, "Tone");
     configParam(LAG_PARAM, 0.f, 127.f, 0.f, "Lag");
     configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
     configParam(RPM_PARAM, 0.f, 127.f, 0.f, "RPM");

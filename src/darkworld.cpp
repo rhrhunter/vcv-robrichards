@@ -51,7 +51,7 @@ struct Darkworld : RRModule {
     configParam(MIX_PARAM, 0.f, 127.f, 0.f, "Mix");
     configParam(DWELL_PARAM, 0.f, 127.f, 0.f, "Dwell");
     configParam(MODIFY_PARAM, 0.f, 127.f, 0.f, "Modify");
-    configParam(TONE_PARAM, 0.f, 127.f, 63.f, "Tone");
+    configParam(TONE_PARAM, 0.f, 127.f, 64.f, "Tone");
     configParam(PRE_DELAY_PARAM, 0.f, 127.f, 0.f, "Pre-Delay");
 
     // three way switches
