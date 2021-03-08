@@ -53,7 +53,7 @@ Finally, clone this git repo, change directories into it, and run the following 
 Then launch Rack.
 
 ## Features
-* Dynamic modulation of all knobs using CV inputs, via CV -> CC
+* Dynamic modulation of all knobs & faders using CV inputs [0-5V range] (All)
 * 3-way programmable switches (All)
 * Stomp switch controls (All)
 * Expression CV Input (All)
@@ -74,7 +74,7 @@ Then launch Rack.
 
 ## Notes
 
-### Supported Voltage Range for CV Modulation of Knobs
+### Supported Voltage Range for CV Modulation of Knobs & Faders
 
 These plugins support a voltage range of 0-5V. When connecting an LFO to the CV ports, you will want to adjust the offset and scale of the LFO to fall into this range to avoid plateauing your wave forms (min or max). For example, if using the Bogaudio LFO this means setting the `offset` to 2.5V and the `scale` to 50%.
 
@@ -91,5 +91,7 @@ As a precaution, the high and low gate triggers for pedal bypass are not impleme
 Chase Bliss Pedals do not respond well to the Running Status feature in the Midi protocol. To overcome this, every midi message that is sent to a CBA device is followed with dummy midi message to invalid the Running Status optimization feature. Although this means that double the amount of messages are being sent to the devices, it ensures that no messages are dropped by the devices.
 
 # Disclaimer/License
+
+The license for this software is GPL Version 3.
 
 The products and logos for *M O O D*, *Dark World*, *Thermae*, *Warped Vinyl Hifi*, *Generation Loss*, *Blooper*, and *Preamp MKII* are registered trademarks of *Chase Bliss Audio (www.chaseblissaudio.com)*. This software is free and distributed under the GNU GPLv3 license. It is not associated with the *Chase Bliss Audio* brand.
