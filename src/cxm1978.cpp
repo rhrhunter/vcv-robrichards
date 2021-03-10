@@ -150,7 +150,6 @@ struct Cxm1978 : RRModule {
     if (inputs[BASS_SLIDER_INPUT].isConnected()) {
       int bass_cv = convertCVtoCC(inputs[BASS_SLIDER_INPUT].getVoltage());
       bass = clamp(bass_cv, 0, bass);
-      params[BASS_SLIDER_PARAM].setValue((float) bass);
     }
     if (inputs[MIDS_SLIDER_INPUT].isConnected()) {
       int mids_cv = convertCVtoCC(inputs[MIDS_SLIDER_INPUT].getVoltage());
