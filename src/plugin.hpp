@@ -15,3 +15,4 @@ extern Model* modelThermae;
 extern Model* modelBlooper;
 extern Model* modelPreampMKII;
 extern Model* modelCxm1978;
+extern Model* modelP6MPE;

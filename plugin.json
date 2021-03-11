@@ -60,6 +60,12 @@
       "name": "MIDI Controller: Chase Bliss Audio CXM 1978 AUTOMATONE",
       "description": "VCV MIDI Controller for Chase Bliss Audio 'CXM 1978'",
       "tags": ["midi"]
+    },
+    {
+      "slug": "p6mpe",
+      "name": "Prophet 6 MPE",
+      "description": "VCV MIDI Controller Prophet 6 MPE",
+      "tags": ["midi"]
     }
   ]
 }
