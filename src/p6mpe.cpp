@@ -35,12 +35,12 @@ struct P6MPE : RRModule {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // hardcode the channels
-    midiout_mpe1.setChannel(2);
-    midiout_mpe2.setChannel(3);
-    midiout_mpe3.setChannel(4);
-    midiout_mpe4.setChannel(5);
-    midiout_mpe5.setChannel(6);
-    midiout_mpe6.setChannel(7);
+    midiout_mpe1.setChannel(1);
+    midiout_mpe2.setChannel(2);
+    midiout_mpe3.setChannel(3);
+    midiout_mpe4.setChannel(4);
+    midiout_mpe5.setChannel(5);
+    midiout_mpe6.setChannel(6);
 
     // hardcode the device IDs
     midiout_mpe1.setDeviceId(2);
@@ -65,7 +65,8 @@ struct P6MPE : RRModule {
     }
     int mpe1_pwheel = 0;
     if (inputs[MPE1_PWHEEL_INPUT].isConnected()) {
-      mpe1_pwheel = clamp(convertCVtoCC(inputs[MPE1_PWHEEL_INPUT].getVoltage()), 0, 127);
+      int pw = (int) std::round((inputs[MPE1_PWHEEL_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+      mpe1_pwheel = clamp(pw, 0, 0x3fff);
     }
     int mpe2_yaxis = 0;
     if (inputs[MPE2_YAXIS_INPUT].isConnected()) {
@@ -73,7 +74,8 @@ struct P6MPE : RRModule {
     }
     int mpe2_pwheel = 0;
     if (inputs[MPE2_PWHEEL_INPUT].isConnected()) {
-      mpe2_pwheel = clamp(convertCVtoCC(inputs[MPE2_PWHEEL_INPUT].getVoltage()), 0, 127);
+      int pw = (int) std::round((inputs[MPE2_PWHEEL_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+      mpe2_pwheel = clamp(pw, 0, 0x3fff);
     }
     int mpe3_yaxis = 0;
     if (inputs[MPE3_YAXIS_INPUT].isConnected()) {
@@ -81,7 +83,8 @@ struct P6MPE : RRModule {
     }
     int mpe3_pwheel = 0;
     if (inputs[MPE3_PWHEEL_INPUT].isConnected()) {
-      mpe3_pwheel = clamp(convertCVtoCC(inputs[MPE3_PWHEEL_INPUT].getVoltage()), 0, 127);
+      int pw = (int) std::round((inputs[MPE3_PWHEEL_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+      mpe3_pwheel = clamp(pw, 0, 0x3fff);
     }
     int mpe4_yaxis = 0;
     if (inputs[MPE4_YAXIS_INPUT].isConnected()) {
@@ -89,7 +92,8 @@ struct P6MPE : RRModule {
     }
     int mpe4_pwheel = 0;
     if (inputs[MPE4_PWHEEL_INPUT].isConnected()) {
-      mpe4_pwheel = clamp(convertCVtoCC(inputs[MPE4_PWHEEL_INPUT].getVoltage()), 0, 127);
+      int pw = (int) std::round((inputs[MPE4_PWHEEL_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+      mpe4_pwheel = clamp(pw, 0, 0x3fff);
     }
     int mpe5_yaxis = 0;
     if (inputs[MPE5_YAXIS_INPUT].isConnected()) {
@@ -97,24 +101,27 @@ struct P6MPE : RRModule {
     }
     int mpe5_pwheel = 0;
     if (inputs[MPE5_PWHEEL_INPUT].isConnected()) {
-      mpe5_pwheel = clamp(convertCVtoCC(inputs[MPE5_PWHEEL_INPUT].getVoltage()), 0, 127);
+      int pw = (int) std::round((inputs[MPE5_PWHEEL_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+      mpe5_pwheel = clamp(pw, 0, 0x3fff);
     }
     int mpe6_yaxis = 0;
     if (inputs[MPE6_YAXIS_INPUT].isConnected()) {
       mpe6_yaxis = clamp(convertCVtoCC(inputs[MPE6_YAXIS_INPUT].getVoltage()), 0, 127);
     }
     int mpe6_pwheel = 0;
+
     if (inputs[MPE6_PWHEEL_INPUT].isConnected()) {
-      mpe6_pwheel = clamp(convertCVtoCC(inputs[MPE6_PWHEEL_INPUT].getVoltage()), 0, 127);
+      int pw = (int) std::round((inputs[MPE6_PWHEEL_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+      mpe6_pwheel = clamp(pw, 0, 0x3fff);
     }
 
     // send CC values to each yaxis port
-    midiout_mpe1.sendCachedCC(mpe1_yaxis, 76);
-    midiout_mpe2.sendCachedCC(mpe2_yaxis, 76);
-    midiout_mpe3.sendCachedCC(mpe3_yaxis, 76);
-    midiout_mpe4.sendCachedCC(mpe4_yaxis, 76);
-    midiout_mpe5.sendCachedCC(mpe5_yaxis, 76);
-    midiout_mpe6.sendCachedCC(mpe6_yaxis, 76);
+    midiout_mpe1.sendCachedCC(mpe1_yaxis, 74);
+    midiout_mpe2.sendCachedCC(mpe2_yaxis, 74);
+    midiout_mpe3.sendCachedCC(mpe3_yaxis, 74);
+    midiout_mpe4.sendCachedCC(mpe4_yaxis, 74);
+    midiout_mpe5.sendCachedCC(mpe5_yaxis, 74);
+    midiout_mpe6.sendCachedCC(mpe6_yaxis, 74);
 
     // set pitch wheel values
     midiout_mpe1.setPitchWheel(mpe1_pwheel);
