@@ -133,7 +133,7 @@ struct P6MPEWidget : ModuleWidget {
   P6MPEWidget(P6MPE* module) {
     setModule(module);
 
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/core.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/p6mpe.svg")));
 
     // screws
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH-10, 1)));
@@ -142,23 +142,23 @@ struct P6MPEWidget : ModuleWidget {
     addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH + 10 , RACK_GRID_HEIGHT - RACK_GRID_WIDTH - 1)));
 
     // CV inputs
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 10)), module, P6MPE::MPE1_YAXIS_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(25, 10)), module, P6MPE::MPE1_PWHEEL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(23, 12)), module, P6MPE::MPE1_YAXIS_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(38, 12)), module, P6MPE::MPE1_PWHEEL_INPUT));
 
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 30)), module, P6MPE::MPE2_YAXIS_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(25, 30)), module, P6MPE::MPE2_PWHEEL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(23, 32)), module, P6MPE::MPE2_YAXIS_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(38, 32)), module, P6MPE::MPE2_PWHEEL_INPUT));
 
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 50)), module, P6MPE::MPE3_YAXIS_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(25, 50)), module, P6MPE::MPE3_PWHEEL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(23, 52)), module, P6MPE::MPE3_YAXIS_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(38, 52)), module, P6MPE::MPE3_PWHEEL_INPUT));
 
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 70)), module, P6MPE::MPE4_YAXIS_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(25, 70)), module, P6MPE::MPE4_PWHEEL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(23, 72)), module, P6MPE::MPE4_YAXIS_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(38, 72)), module, P6MPE::MPE4_PWHEEL_INPUT));
 
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 90)), module, P6MPE::MPE5_YAXIS_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(25, 90)), module, P6MPE::MPE5_PWHEEL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(23, 92)), module, P6MPE::MPE5_YAXIS_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(38, 92)), module, P6MPE::MPE5_PWHEEL_INPUT));
 
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(10, 110)), module, P6MPE::MPE6_YAXIS_INPUT));
-    addInput(createInputCentered<CL1362Port>(mm2px(Vec(25, 110)), module, P6MPE::MPE6_PWHEEL_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(23, 112)), module, P6MPE::MPE6_YAXIS_INPUT));
+    addInput(createInputCentered<CL1362Port>(mm2px(Vec(38, 112)), module, P6MPE::MPE6_PWHEEL_INPUT));
 
   }
 };
