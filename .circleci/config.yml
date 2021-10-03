@@ -1,30 +1,12 @@
 version: 2
 jobs:
-  vcvplugin_docker_build_ubuntu1804_rack116:
+  vcvplugin_docker_build_ubuntu1804_rack2:
     machine: true
     steps:
       - checkout
-      - run: ./test/build-ubuntu1804-rack116.sh
-  vcvplugin_docker_build_ubuntu1810_rack116:
-    machine: true
-    steps:
-      - checkout
-      - run: ./test/build-ubuntu1810-rack116.sh
-  vcvplugin_docker_build_ubuntu1904_rack116:
-    machine: true
-    steps:
-      - checkout
-      - run: ./test/build-ubuntu1904-rack116.sh
-  vcvplugin_docker_build_ubuntu1910_rack116:
-    machine: true
-    steps:
-      - checkout
-      - run: ./test/build-ubuntu1910-rack116.sh        
+      - run: ./test/build-ubuntu1804-rack2.sh
 workflows:
   version: 2
   vcvplugin_build:
     jobs:
-      - vcvplugin_docker_build_ubuntu1804_rack116
-      - vcvplugin_docker_build_ubuntu1810_rack116
-      - vcvplugin_docker_build_ubuntu1904_rack116
-      - vcvplugin_docker_build_ubuntu1910_rack116      
+      - vcvplugin_docker_build_ubuntu1804_rack2
