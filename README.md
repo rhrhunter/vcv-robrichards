@@ -1,5 +1,5 @@
 # vcv-robrichards
-[![CircleCI](https://circleci.com/gh/rhrhunter/vcv-robrichards/tree/master.svg?style=svg)](https://circleci.com/gh/rhrhunter/vcv-robrichards/tree/master)
+[![Rack V2](https://circleci.com/gh/rhrhunter/vcv-robrichards/tree/v2.svg?style=svg)](https://circleci.com/gh/rhrhunter/vcv-robrichards/tree/v2)
 
 VCV Plugins by RobRichards
 
