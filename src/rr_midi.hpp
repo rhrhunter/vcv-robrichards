@@ -23,7 +23,7 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     MidiGenerator::reset();
   }
 
-  void onMessage(midi::Message message) override {
+  void onMessage(const midi::Message& message) override {
     midi::Output::sendMessage(message);
   }
 

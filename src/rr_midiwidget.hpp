@@ -21,34 +21,34 @@ namespace rack {
     int chosenDriverId = -1;
     void onAction(const event::Action& e) override {
       if (!port) {
-        return;
+	return;
       }
 
       ui::Menu* menu = createMenu();
       menu->addChild(createMenuLabel("MIDI driver"));
-      for (int driverId : port->getDriverIds()) {
-        RRMidiDriverItem* item = new RRMidiDriverItem;
-        item->port = port;
-        item->driverId = driverId;
-        item->text = port->getDriverName(driverId);
-        item->rightText = CHECKMARK(item->driverId == port->driverId);
-        menu->addChild(item);
-      }
+      midi::Driver* driver = port->getDriver();
+
+      RRMidiDriverItem* item = new RRMidiDriverItem;
+      item->port = port;
+      item->driverId = port->getDriverId();
+      item->text = driver->getName();
+      item->rightText = CHECKMARK(item->driverId == port->driverId);
+      menu->addChild(item);
     }
     void step() override {
       if (!text.empty() && port && chosenDriverId == port->driverId) {
-        return;
+	return;
       }
 
-      text = port ? port->getDriverName(port->driverId) : "";
+      text = port ? ((midi::Driver*) port->getDriver())->getName() : "";
       if (text.empty()) {
-        text = "(No driver)";
-        chosenDriverId = -1;
-        color.a = 0.5f;
+	text = "(No driver)";
+	chosenDriverId = -1;
+	color.a = 0.5f;
       }
       else {
-        chosenDriverId = port->driverId;
-        color.a = 1.f;
+	chosenDriverId = port->driverId;
+	color.a = 1.f;
       }
     }
   };
@@ -74,26 +74,26 @@ namespace rack {
     int chosenChannel = -1;
     void onAction(const event::Action& e) override {
       if (!port) {
-        return;
+	return;
       }
 
       ui::Menu* menu = createMenu();
       menu->addChild(createMenuLabel("MIDI channel"));
       for (int channel : port->getChannels()) {
-        RRMidiChannelItem* item = new RRMidiChannelItem;
-        item->port = port;
-        item->channel = channel;
-        item->text = port->getChannelName(channel);
-        item->rightText = CHECKMARK(item->channel == port->channel);
-        menu->addChild(item);
+	RRMidiChannelItem* item = new RRMidiChannelItem;
+	item->port = port;
+	item->channel = channel;
+	item->text = port->getChannelName(channel);
+	item->rightText = CHECKMARK(item->channel == port->channel);
+	menu->addChild(item);
       }
     }
     void step() override {
       if (!text.empty() && port && chosenChannel == port->channel)
-        return;
+	return;
       text = port ? port->getChannelName(port->channel) : "Channel 1";
       if (port)
-        chosenChannel = port->channel;
+	chosenChannel = port->channel;
     }
   };
 
@@ -102,41 +102,41 @@ namespace rack {
     midi::Port* port;
     void onAction(const event::Action& e) override {
       if (!port)
-        return;
+	return;
 
       ui::Menu* menu = createMenu();
       menu->addChild(createMenuLabel("MIDI Device"));
       {
-        RRMidiDeviceItem* item = new RRMidiDeviceItem;
-        item->port = port;
-        item->deviceId = -1;
-        item->text = "(No Device)";
-        item->rightText = CHECKMARK(item->deviceId == port->deviceId);
-        menu->addChild(item);
+	RRMidiDeviceItem* item = new RRMidiDeviceItem;
+	item->port = port;
+	item->deviceId = -1;
+	item->text = "(No Device)";
+	item->rightText = CHECKMARK(item->deviceId == port->deviceId);
+	menu->addChild(item);
       }
       for (int deviceId : port->getDeviceIds()) {
-        RRMidiDeviceItem* item = new RRMidiDeviceItem;
-        item->port = port;
-        item->deviceId = deviceId;
-        item->text = port->getDeviceName(deviceId);
-        item->rightText = CHECKMARK(item->deviceId == port->deviceId);
-        menu->addChild(item);
+	RRMidiDeviceItem* item = new RRMidiDeviceItem;
+	item->port = port;
+	item->deviceId = deviceId;
+	item->text = port->getDeviceName(deviceId);
+	item->rightText = CHECKMARK(item->deviceId == port->deviceId);
+	menu->addChild(item);
       }
     }
 
     void step() override {
       // cache the device name until the deviceId changes.
       if (!text.empty() && port && chosenDeviceId == port->deviceId)
-        return;
+	return;
 
       text = port ? port->getDeviceName(port->deviceId) : "";
       if (text.empty()) {
-        text = "(No Device)";
-        chosenDeviceId = -1;
-        color.a = 0.5f;
+	text = "(No Device)";
+	chosenDeviceId = -1;
+	color.a = 0.5f;
       } else {
-        chosenDeviceId = port->deviceId;
-        color.a = 1.f;
+	chosenDeviceId = port->deviceId;
+	color.a = 1.f;
       }
     }
 
