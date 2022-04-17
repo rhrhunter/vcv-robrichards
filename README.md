@@ -5,7 +5,7 @@ VCV Plugins by RobRichards
 
 ![RobRichards Plugins](plugins.png)
 
-Here you'll find unofficial MIDI controller plugins for various Chase Bliss Audio Pedals.
+Here you'll find unofficial VCV Rack V2 MIDI controller plugins for various Chase Bliss Audio effects pedals.
 
 Current supported interfaces:
 
@@ -14,7 +14,7 @@ Current supported interfaces:
 * **Warped Vinyl**
 * **M O O D**
 * **Generation Loss**
-* **Blooper** *(Firmware (v3.0)*
+* **Blooper** *(Firmware v3.2)*
 * **Preamp MKII**
 * **CXM 1978**
 
@@ -31,7 +31,7 @@ Enjoy.
 
 I've verified that these modules work properly with:
 
-* macOS Mojave with VCVRack 1.1.6 using a Disaster Area Designs Midibox and a MOTU Express XT MIDI Interface
+* macOS Mojave with VCVRack 2.0.6 using a Disaster Area Designs Midibox and a MOTU Express XT MIDI Interface
 
 Y.M.M.V. with Windows and Linux, but I'm fairly certain they should work as well.
 
@@ -44,11 +44,11 @@ To do this, first set up your development environment for your platform using th
 
 **Note: you do not need to compile Rack.**
 
-You will then need to download the most recent version of the [Rack SDK](https://vcvrack.com/downloads/Rack-SDK-1.1.6.zip) and unzip it to some directory (e.g. ~/Downloads/Rack-SDK).
+You will then need to download the most recent version of the Rack SDK 2.0.6 ([mac](https://vcvrack.com/downloads/Rack-SDK-2.0.6-mac.zip)/[windows](https://vcvrack.com/downloads/Rack-SDK-2.0.6-windows.zip)/[linux](https://vcvrack.com/downloads/Rack-SDK-2.0.6-lin.zip)) and unzip it to some directory (e.g. ~/Downloads/Rack-SDK).
 
 Finally, clone this git repo, change directories into it, and run the following to compile and install the plugin in your Rack installation.
 
-* On macOS: `RACK_DIR=~/Downloads/Rack-SDK make install`
+* For example, on macOS: `RACK_DIR=~/Downloads/Rack-SDK make install`
 
 Then launch Rack.
 
