@@ -44,7 +44,7 @@ To do this, first set up your development environment for your platform using th
 
 **Note: you do not need to compile Rack.**
 
-You will then need to download the most recent version of the Rack SDK 2.0.6 ([mac](https://vcvrack.com/downloads/Rack-SDK-2.0.6-mac.zip)/[windows](https://vcvrack.com/downloads/Rack-SDK-2.0.6-windows.zip)/[linux](https://vcvrack.com/downloads/Rack-SDK-2.0.6-lin.zip)) and unzip it to some directory (e.g. ~/Downloads/Rack-SDK).
+You will then need to download the most recent version of the Rack SDK 2.0.6 ([mac](https://vcvrack.com/downloads/Rack-SDK-2.0.6-mac.zip)/[windows](https://vcvrack.com/downloads/Rack-SDK-2.0.6-win.zip)/[linux](https://vcvrack.com/downloads/Rack-SDK-2.0.6-lin.zip)) and unzip it to some directory (e.g. ~/Downloads/Rack-SDK).
 
 Finally, clone this git repo, change directories into it, and run the following to compile and install the plugin in your Rack installation.
 
