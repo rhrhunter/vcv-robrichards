@@ -234,10 +234,10 @@ struct Habit : RRModule {
     // knob values
     int level = (int) std::round(params[LEVEL_PARAM].getValue());
     int repeats = (int) std::round(params[REPEATS_PARAM].getValue());
-    int regen = (int) std::round(params[SIZE_PARAM].getValue());
-    int glide = (int) std::round(params[MODIFY_PARAM].getValue());
-    int int1 = (int) std::round(params[SPREAD_PARAM].getValue());
-    int int2 = (int) std::round(params[SCAN_PARAM].getValue());
+    int size = (int) std::round(params[SIZE_PARAM].getValue());
+    int modify = (int) std::round(params[MODIFY_PARAM].getValue());
+    int spread = (int) std::round(params[SPREAD_PARAM].getValue());
+    int scan = (int) std::round(params[SCAN_PARAM].getValue());
     int expr = -1;
 
     // read cv voltages and override values of knobs, use the knob value as a ceiling
@@ -329,8 +329,8 @@ struct HabitWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(27, 66)), module, Habit::M_TOGGLE_PARAM));
     addParam(createParamCentered<CBASwitch>(mm2px(Vec(47, 66)), module, Habit::R_TOGGLE_PARAM));
 
-    // scan and loop mode toggles
-    addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Habit::SCAN_MODE_PARAM));
+    // scan mode and loop hold momentary toggles
+    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(43.5, 82)), module, Habit::SCAN_MODE_PARAM));
     addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(55, 82)), module, Habit::LOOP_HOLD_PARAM));
 
     // bypass and tap tempo LEDs
@@ -342,8 +342,8 @@ struct HabitWidget : ModuleWidget {
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Habit::BYPASS_PARAM));
 
     // bypass high and low gates
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 109)), module, Mood::BYPASS_LOOP_INPUT_HIGH));
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 118)), module, Mood::BYPASS_LOOP_INPUT_LOW));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 109)), module, Habit::BYPASS_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 118)), module, Habit::BYPASS_INPUT_LOW));
 
     // tap tempo high gate
     addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Habit::TAP_TEMPO_INPUT_HIGH));   
