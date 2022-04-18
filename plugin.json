@@ -1,65 +1,71 @@
 {
-  "slug": "RobRichards",
-  "name": "RobRichards",
-  "version": "2.0.0",
-  "license": "GPLv3",
-  "brand": "RobRichards",
-  "author": "RobRichards",
-  "authorEmail": "robrichards@hunter-rivera.com",
-  "authorUrl": "https://robrich.bandcamp.com/",
-  "pluginUrl": "https://github.com/rhrhunter/vcv-robrichards",
-  "manualUrl": "https://github.com/rhrhunter/vcv-robrichards",
-  "sourceUrl": "https://github.com/rhrhunter/vcv-robrichards",
-  "donateUrl": "",
-  "changelogUrl": "",
-  "modules": [
-    {
-      "slug": "darkworld",
-      "name": "MIDI Controller: Chase Bliss Audio Darkworld",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'Darkworld'",
-      "tags": ["midi", "darkworld", "reverb"]
-    },
-    {
-      "slug": "warpedvinyl",
-      "name": "MIDI Controller: Chase Bliss Audio Warped Vinyl Hifi",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'Warped Vinyl Hifi'",
-      "tags": ["midi", "warpedvinyl", "chorus", "vibrato"]
-    },
-    {
-      "slug": "mood",
-      "name": "MIDI Controller: Chase Bliss Audio M O O D",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'M O O D'",
-      "tags": ["midi", "mood", "looper"]
-    },
-    {
-      "slug": "genloss",
-      "name": "MIDI Controller: Chase Bliss Audio Generation Loss",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'Generation Loss'",
-      "tags": ["midi", "genloss", "lofi"]
-    },
-    {
-      "slug": "thermae",
-      "name": "MIDI Controller: Chase Bliss Audio Thermae",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'Thermae'",
-      "tags": ["midi", "thermae", "delay", "pitch shifter"]
-    },
-    {
-      "slug": "blooper",
-      "name": "MIDI Controller: Chase Bliss Audio Blooper",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'Blooper'",
-      "tags": ["midi", "blooper", "looper", "sampler"]
-    },
-    {
-      "slug": "preamp_mk2",
-      "name": "MIDI Controller: Chase Bliss Audio Preamp MKII AUTOMATONE",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'Preamp MKII'",
-      "tags": ["midi"]
-    },
-    {
-      "slug": "cxm1978",
-      "name": "MIDI Controller: Chase Bliss Audio CXM 1978 AUTOMATONE",
-      "description": "VCV MIDI Controller for Chase Bliss Audio 'CXM 1978'",
-      "tags": ["midi"]
-    }
-  ]
+    "slug": "RobRichards",
+    "name": "RobRichards",
+    "version": "2.0.0",
+    "license": "GPLv3",
+    "brand": "RobRichards",
+    "author": "RobRichards",
+    "authorEmail": "robrichards@hunter-rivera.com",
+    "authorUrl": "https://robrich.bandcamp.com/",
+    "pluginUrl": "https://github.com/rhrhunter/vcv-robrichards",
+    "manualUrl": "https://github.com/rhrhunter/vcv-robrichards",
+    "sourceUrl": "https://github.com/rhrhunter/vcv-robrichards",
+    "donateUrl": "",
+    "changelogUrl": "",
+    "modules": [
+	{
+	    "slug": "darkworld",
+	    "name": "MIDI Controller: Chase Bliss Audio Darkworld",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Darkworld'",
+	    "tags": ["midi", "darkworld", "reverb"]
+	},
+	{
+	    "slug": "warpedvinyl",
+	    "name": "MIDI Controller: Chase Bliss Audio Warped Vinyl Hifi",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Warped Vinyl Hifi'",
+	    "tags": ["midi", "warpedvinyl", "chorus", "vibrato"]
+	},
+	{
+	    "slug": "mood",
+	    "name": "MIDI Controller: Chase Bliss Audio M O O D",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'M O O D'",
+	    "tags": ["midi", "mood", "looper"]
+	},
+	{
+	    "slug": "genloss",
+	    "name": "MIDI Controller: Chase Bliss Audio Generation Loss",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Generation Loss'",
+	    "tags": ["midi", "genloss", "lofi"]
+	},
+	{
+	    "slug": "thermae",
+	    "name": "MIDI Controller: Chase Bliss Audio Thermae",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Thermae'",
+	    "tags": ["midi", "thermae", "delay", "pitch shifter"]
+	},
+	{
+	    "slug": "blooper",
+	    "name": "MIDI Controller: Chase Bliss Audio Blooper",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Blooper'",
+	    "tags": ["midi", "blooper", "looper", "sampler"]
+	},
+	{
+	    "slug": "habit",
+	    "name": "MIDI Controller: Chase Bliss Audio Habit",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Habit'",
+	    "tags": ["midi", "habit", "delay", "echo", "looper"]
+	},
+	{
+	    "slug": "preamp_mk2",
+	    "name": "MIDI Controller: Chase Bliss Audio Preamp MKII AUTOMATONE",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'Preamp MKII'",
+	    "tags": ["midi"]
+	},
+	{
+	    "slug": "cxm1978",
+	    "name": "MIDI Controller: Chase Bliss Audio CXM 1978 AUTOMATONE",
+	    "description": "VCV MIDI Controller for Chase Bliss Audio 'CXM 1978'",
+	    "tags": ["midi"]
+	}
+    ]
 }

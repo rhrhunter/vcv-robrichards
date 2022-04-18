@@ -13,5 +13,6 @@ extern Model* modelMood;
 extern Model* modelGenerationLoss;
 extern Model* modelThermae;
 extern Model* modelBlooper;
+extern Model* modelHabit;
 extern Model* modelPreampMKII;
 extern Model* modelCxm1978;
