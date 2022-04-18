@@ -33,6 +33,8 @@ struct Habit : RRModule {
 		  CLOCK_INPUT,
 		  EXPR_INPUT,
 		  TAP_TEMPO_INPUT_HIGH,
+		  BYPASS_INPUT_LOW,
+		  BYPASS_INPUT_HIGH,
 		  NUM_INPUTS
   };
   enum OutputIds { NUM_OUTPUTS };
@@ -54,7 +56,7 @@ struct Habit : RRModule {
   // bypass LED colors
   int curr_bypass_light_color = 1; // 1=red, 0=green
 
-  dsp::SchmittTrigger tap_tempo_trigger_high;
+  dsp::SchmittTrigger tap_tempo_trigger_high, bypass_trigger_low, bypass_trigger_high;
 
   Habit() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -145,6 +147,16 @@ struct Habit : RRModule {
 	// if the trigger goes high, trigger a tap tempo
 	tap_gate = 1;
       }
+    }
+    if (inputs[BYPASS_INPUT_HIGH].isConnected()) {
+      if (bypass_trigger_high.process(rescale(inputs[BYPASS_INPUT_HIGH].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+	// if the trigger goes high, enable the pedal
+	params[BYPASS_PARAM].setValue(1.f);
+    }
+    if (inputs[BYPASS_INPUT_LOW].isConnected()) {
+      if (bypass_trigger_low.process(rescale(inputs[BYPASS_INPUT_LOW].getVoltage(), 0.1f, 2.f, 0.f, 1.f)))
+	// if the trigger goes low, bypass the pedal
+	params[BYPASS_PARAM].setValue(0.f);
     }
 
     // process any tap tempo requests
@@ -321,14 +333,20 @@ struct HabitWidget : ModuleWidget {
     addParam(createParamCentered<CBASwitchTwoWay>(mm2px(Vec(43.5, 82)), module, Habit::SCAN_MODE_PARAM));
     addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(55, 82)), module, Habit::LOOP_HOLD_PARAM));
 
-    // bypass switches & tap tempo
+    // bypass and tap tempo LEDs
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Habit::TAP_TEMPO_LIGHT));
-    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(15, 118)), module, Habit::TAP_TEMPO_PARAM));
     addChild(createLightCentered<LargeLight<RedLight>>(mm2px(Vec(46, 109)), module, Habit::BYPASS_LIGHT));
+
+    // bypass and tap tempo switches
+    addParam(createParamCentered<CBAButtonGrayMomentary>(mm2px(Vec(15, 118)), module, Habit::TAP_TEMPO_PARAM));
     addParam(createParamCentered<CBAButtonGray>(mm2px(Vec(46, 118)), module, Habit::BYPASS_PARAM));
 
+    // bypass high and low gates
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 109)), module, Mood::BYPASS_LOOP_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(36, 118)), module, Mood::BYPASS_LOOP_INPUT_LOW));
+
     // tap tempo high gate
-    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Habit::TAP_TEMPO_INPUT_HIGH));
+    addInput(createInputCentered<PJ301MPort>(mm2px(Vec(25, 109)), module, Habit::TAP_TEMPO_INPUT_HIGH));   
 
     // midi configuration display
     RRMidiWidget* midiWidget = createWidget<RRMidiWidget>(mm2px(Vec(3, 75)));
