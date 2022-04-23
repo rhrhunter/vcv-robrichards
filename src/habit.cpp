@@ -19,6 +19,7 @@ struct Habit : RRModule {
 		 R_TOGGLE_PARAM,
 		 LOOP_HOLD_PARAM,
 		 SCAN_MODE_PARAM,
+		 RESET_TOGGLE_PARAM,
 		 BYPASS_PARAM,
 		 TAP_TEMPO_PARAM,
 		 NUM_PARAMS
@@ -78,6 +79,7 @@ struct Habit : RRModule {
     // 2 way switches
     configParam(LOOP_HOLD_PARAM, 0.f, 1.f, 0.f, "Loop Hold");
     configParam(SCAN_MODE_PARAM, 0.f, 1.f, 0.f, "Scan Mode");
+    configParam(RESET_TOGGLE_PARAM, 0.f, 1.f, 0.f, "Reset Toggle");    
 
     // bypass button
     configParam(BYPASS_PARAM, 0.f, 1.f, 0.f, "Pedal Bypass");
@@ -140,6 +142,13 @@ struct Habit : RRModule {
       curr_bypass_light_color = 1;
     }
 
+    int reset_toggle = (int) floor(params[RESET_TOGGLE_PARAM].getValue());
+    if (reset_toggle > 0) {
+      reset_toggle = 127;
+    } else {
+      reset_toggle = 0;
+    }
+    
     // read the gate triggers
     int tap_gate = 0;
     if (inputs[TAP_TEMPO_INPUT_HIGH].isConnected()) {
@@ -225,6 +234,9 @@ struct Habit : RRModule {
     // enable/disable hold mode and/or slowdown mode
     midi_out.sendCachedCC(loop_hold, 24);
     midi_out.sendCachedCC(scan_mode, 25);
+
+    // reset the memory if toggled
+    midi_out.sendCachedCC(reset_toggle, 26);    
 
     // apply rate limiting here so that we do not flood the
     // system with midi messages caused by the CV inputs.
@@ -332,6 +344,7 @@ struct HabitWidget : ModuleWidget {
     // scan mode and loop hold momentary toggles
     addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(43.5, 82)), module, Habit::SCAN_MODE_PARAM));
     addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(55, 82)), module, Habit::LOOP_HOLD_PARAM));
+    addParam(createParamCentered<CBASwitchTwoWayMomentary>(mm2px(Vec(6, 113)), module, Habit::RESET_TOGGLE_PARAM));    
 
     // bypass and tap tempo LEDs
     addChild(createLightCentered<LargeLight<GreenRedLight>>(mm2px(Vec(15, 109)), module, Habit::TAP_TEMPO_LIGHT));
