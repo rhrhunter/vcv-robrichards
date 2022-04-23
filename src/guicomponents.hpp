@@ -19,6 +19,12 @@ namespace rack {
     }
   };
 
+  struct CBAKnobHabit : RoundKnob {
+    CBAKnobHabit() {
+      setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_habit.svg")));
+    }
+  };
+  
   struct CBAKnobThermae : RoundKnob {
     CBAKnobThermae() {
       setSvg(APP->window->loadSvg(asset::plugin(pluginInstance,"res/cba_knob_thermae.svg")));

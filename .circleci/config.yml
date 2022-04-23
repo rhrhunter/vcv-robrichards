@@ -1,7 +1,8 @@
-version: 2
+version: 2.1
 jobs:
   vcvplugin_docker_build_ubuntu1804_rack2:
-    machine: true
+    machine:
+      image: ubuntu-2004:202201-02
     steps:
       - checkout
       - run: ./test/build-ubuntu1804-rack2.sh

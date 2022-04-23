@@ -17,6 +17,7 @@ Current supported interfaces:
 * **Blooper** *(Firmware v3.2)*
 * **Preamp MKII**
 * **CXM 1978**
+* **Habit**
 
 NOTE: In order to use these modules, you will need:
 
@@ -57,10 +58,10 @@ Then launch Rack.
 * 3-way programmable switches (All)
 * Stomp switch controls (All)
 * Expression CV Input (All)
-* Bypass high and low gate triggers (All Channels -> **Dark World** & **M O O D**) (AUX -> **Generation Loss**)
-* Clock SYNC inputs (**Thermae**, **Warped Vinyl**, & **Blooper**)
-* Tap Tempo switch (**Thermae** & **Warped Vinyl**)
-* Tap Tempo high gate trigger (**Thermae** & **Warped Vinyl**)
+* Bypass high and low gate triggers (All Channels -> **Dark World**, **M O O D**, **HABIT**) (AUX -> **Generation Loss**)
+* Clock SYNC inputs (**Thermae**, **Warped Vinyl**, **Blooper**, & **HABIT**)
+* Tap Tempo switch (**Thermae**, **Warped Vinyl**, & **HABIT**)
+* Tap Tempo high gate trigger (**Thermae**, **Warped Vinyl**, & **HABIT**)
 * "Slow-down" mode toggle (**Thermae**)
 * "Self-oscillation/Hold" mode via momentary toggle (**Thermae**)
 * Midi Note tempo divisions (**Warped Vinyl**)
@@ -71,6 +72,7 @@ Then launch Rack.
 * One-Shot Record On/Off toggle (**Blooper**)
 * Remote control of motorized faders (**Preamp MKII** & **CXM 1978**)
 * Preset cycling (**Preamp MK2** & **CXM 1978**)
+* Scan Hold, Loop Hold, Memory Reset (**HABIT**)
 
 ## Notes
 
