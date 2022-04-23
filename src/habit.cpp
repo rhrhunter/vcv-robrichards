@@ -40,8 +40,8 @@ struct Habit : RRModule {
   };
   enum OutputIds { NUM_OUTPUTS };
   enum LightIds  {
-		  ENUMS(TAP_TEMPO_LIGHT, 2),
-		  BYPASS_LIGHT,
+                  ENUMS(TAP_TEMPO_LIGHT, 2),
+		  ENUMS(BYPASS_LIGHT, 2),
 		  NUM_LIGHTS
   };
 
