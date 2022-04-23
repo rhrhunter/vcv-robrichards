@@ -207,7 +207,7 @@ struct Habit : RRModule {
     midi_out.sendCachedCC(m_toggle, 22);
     midi_out.sendCachedCC(r_toggle, 23);
 
-    // periodically reset the CC message cache for hold mode if it is
+    // periodically reset the CC message cache for loop hold if it is
     // not turned on by the user. This is so that it doesn't get stuck turned on.
     if (!loop_hold) {
       if (disable_loop_hold_attempts > 0 && disable_loop_hold_clk.process()) {
@@ -216,10 +216,10 @@ struct Habit : RRModule {
       }
     } else {
       // hold mode is being requested, reset the hold mode attempts
-      disable_loop_hold_attempts = 5;
+      disable_loop_hold_attempts = 2;
     }
 
-    // periodically reset the CC message cache for hold mode if it is
+    // periodically reset the CC message cache for scan mode if it is
     // not turned on by the user. This is so that it doesn't get stuck turned on.
     if (!scan_mode) {
       if (disable_scan_mode_attempts > 0 && disable_scan_mode_clk.process()) {
@@ -228,10 +228,10 @@ struct Habit : RRModule {
       }
     } else {
       // hold mode is being requested, reset the hold mode attempts
-      disable_scan_mode_attempts = 5;
+      disable_scan_mode_attempts = 2;
     }
 
-    // enable/disable hold mode and/or slowdown mode
+    // enable/disable loop and scan mode
     midi_out.sendCachedCC(loop_hold, 24);
     midi_out.sendCachedCC(scan_mode, 25);
 
