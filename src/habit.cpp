@@ -65,7 +65,7 @@ struct Habit : RRModule {
     // main knob parameters
     configParam(LEVEL_PARAM, 0.f, 127.f, 64.f, "Volume Level (Wet/Dry)");
     configParam(REPEATS_PARAM, 0.f, 127.f, 0.f, "Repeats (0 -> Infinite)");
-    configParam(SIZE_PARAM, 0.f, 127.f, 32.f, "Size of each repeat (50ms -> 60s)");
+    configParam(SIZE_PARAM, 0.f, 127.f, 25.f, "Size of each repeat (50ms -> 60s)");
     configParam(MODIFY_PARAM, 0.f, 127.f, 64.f, "Modify");
     configParam(SPREAD_PARAM, 0.f, 127.f, 0.f, "Spread");
     configParam(SCAN_PARAM, 0.f, 127.f, 0.f, "Scan");
