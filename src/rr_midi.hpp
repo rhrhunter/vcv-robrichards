@@ -91,8 +91,8 @@ struct RRMidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
     // MIDI's Running Status feature that causes CBA
     // pedals to drop consecutive messages.
     midi::Message m2;
-    m2.setStatus(0xa);
-    m2.setNote(60);
+    m2.setStatus(0x8);
+    m2.setNote(64);
     m2.setValue(1);
     sendMessage(m2);
   }
