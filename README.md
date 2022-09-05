@@ -32,7 +32,7 @@ Enjoy.
 
 I've verified that these modules work properly with:
 
-* macOS Mojave with VCVRack 2.0.6 using a Disaster Area Designs Midibox and a MOTU Express XT MIDI Interface
+* macOS Monterey 12.5.1 with VCVRack 2.1.2 using a Disaster Area Designs Midibox and a MOTU Express XT MIDI Interface
 
 Y.M.M.V. with Windows and Linux, but I'm fairly certain they should work as well.
 
